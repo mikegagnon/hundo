@@ -18,6 +18,12 @@ board = {
             row: 2,
             col: 2
         }
+    ],
+    balls: [
+        {
+            row: 2,
+            col: 3,
+        }
     ]
 }
 
@@ -41,3 +47,17 @@ viz.selectAll(".block")
       var y = block.row * vizConfig.cellSize;
       return "translate(" + x + ", " + y + ") "
     })
+
+viz.selectAll(".ball")
+    .data(board.balls)
+    .enter()
+    .append("svg:use")
+    .attr("class", "ball")
+    .attr("xlink:href", "#ballTemplate")
+    .attr("transform", function(block) {
+      var x = block.col * vizConfig.cellSize;
+      var y = block.row * vizConfig.cellSize;
+      return "translate(" + x + ", " + y + ") "
+    })
+
+
