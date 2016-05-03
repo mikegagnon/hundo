@@ -10,9 +10,14 @@ var state = {
     waiting: true,
 }
 
-board = {
-    num_rows: 5,
-    num_cols: 10,
+var PieceTypeEnum = {
+    BALL: 2,
+    BLOCK: 1
+}
+
+var boardConfig = board = {
+    numRows: 5,
+    numCols: 10,
     blocks : [
         {
             row: 2,
@@ -31,15 +36,50 @@ board = {
     ]
 }
 
+// TODO: Assume boardConfig is untrusted
+function Board (boardConfig) {
+    this.numRows = boardConfig.numRows;
+    this.numCols = boardConfig.numCols;
+    this.ball = boardConfig.balls[0];
+    
+    this.matrix = new Array(this.numRows);
+    for (var i = 0; i < this.numRows; i++) {
+      this.matrix[i] = new Array(this.numCols);
+      for (var j = 0; j < this.numCols; j++) {
+        this.matrix[i][j] = new Array();
+      }
+    }
+
+    for (var block in boardConfig.blocks) {
+        this.matrix[block.row][block.col].append({"type": PieceTypeEnum.BLOCK})
+    }
+    
+    for (var ball in boardConfig.balls) {
+        this.matrix[ball.row][ball.col].append({"type": PieceTypeEnum.BALL})
+    }
+
+}
+ 
+Board.prototype.getBlocks = function() {
+    return null;
+};
+
+Board.prototype.getBalls = function() {
+    return null;
+};
+
+
+
+
 
 
 viz = d3.select("#boardSvg")
-    .attr("width", board.num_cols * vizConfig.cellSize)
-    .attr("height", board.num_rows * vizConfig.cellSize);
+    .attr("width", board.numCols * vizConfig.cellSize)
+    .attr("height", board.numRows * vizConfig.cellSize);
 
 viz.select("#background")
-    .attr("width", board.num_cols * vizConfig.cellSize)
-    .attr("height", board.num_rows * vizConfig.cellSize)
+    .attr("width", board.numCols * vizConfig.cellSize)
+    .attr("height", board.numRows * vizConfig.cellSize)
     .attr("style", "fill:black");
 
 viz.selectAll(".block")
@@ -88,6 +128,23 @@ function checkKey(e) {
     }
     else if (e.keyCode == '39') {
         console.log("right")
+        
     }
 
 }
+
+function Apple (type) {
+    this.type = type;
+    this.color = "red";
+}
+ 
+Apple.prototype.getInfo = function() {
+    return this.color + ' ' + this.type + ' apple';
+};
+
+var x = new Apple("gala");
+
+var y = new Apple("fuji");
+
+console.log(x.getInfo())
+console.log(y.getInfo())
