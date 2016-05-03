@@ -6,6 +6,10 @@ var vizConfig = {
     cellSize : 32
 }
 
+var state = {
+    waiting: true,
+}
+
 board = {
     num_rows: 5,
     num_cols: 10,
@@ -26,6 +30,8 @@ board = {
         }
     ]
 }
+
+
 
 viz = d3.select("#boardSvg")
     .attr("width", board.num_cols * vizConfig.cellSize)
@@ -61,3 +67,27 @@ viz.selectAll(".ball")
     })
 
 
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+
+    if (!state.waiting) {
+        return;
+    }
+
+    var e = e || window.event;
+
+    if (e.keyCode == '38') {
+        console.log("up")
+    }
+    else if (e.keyCode == '40') {
+        console.log("down")
+    }
+    else if (e.keyCode == '37') {
+        console.log("left")
+    }
+    else if (e.keyCode == '39') {
+        console.log("right")
+    }
+
+}
