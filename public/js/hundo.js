@@ -1,36 +1,38 @@
 
-var PieceTypeEnum = {
+var hundo = {}
+
+hundo.PieceTypeEnum = {
     BALL: "BALL",
     BLOCK: "BLOCK"
 }
 
-var DirectionEnum = {
+hundo.DirectionEnum = {
     UP: 0,
     DOWN: 1,
     LEFT: 2,
     RIGHT: 3
 }
 
-var MoveEnum = {
+hundo.MoveEnum = {
     // out of bounds
     OOB: 0,
     NO_MOVE: 1
 }
 
-function Block(row, col) {
-    this.type = PieceTypeEnum.BLOCK;
+hundo.Block = function(row, col) {
+    this.type = hundo.PieceTypeEnum.BLOCK;
     this.row = row;
     this.col = col;
 }
 
-function Ball(row, col) {
-    this.type = PieceTypeEnum.BALL;
+hundo.Ball = function(row, col) {
+    this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
 }
 
 // TODO: Assume boardConfig is untrusted
-function Board (boardConfig) {
+hundo.Board = function(boardConfig) {
 
     // waiting for input. The ball cannot move when waiting == false
     // this.waiting = true,
@@ -53,18 +55,18 @@ function Board (boardConfig) {
     $.each(boardConfig.blocks, function(index, block) { 
         var row = block.row;
         var col = block.col;
-        THIS.matrix[row][col].push(new Block(row, col));
+        THIS.matrix[row][col].push(new hundo.Block(row, col));
     })
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
-    this.matrix[row][col].push(new Ball(row, col));
+    this.matrix[row][col].push(new hundo.Ball(row, col));
 
 }
 
 // func(piece) should return true if the piece is of the type being gotten
-Board.prototype.getPieces = function(func) {
+hundo.Board.prototype.getPieces = function(func) {
 
     var pieces = [];
 
@@ -81,20 +83,20 @@ Board.prototype.getPieces = function(func) {
     return pieces;
 }
  
-Board.prototype.getBlocks = function() {
+hundo.Board.prototype.getBlocks = function() {
     return this.getPieces(function(piece){
-        return piece.type == PieceTypeEnum.BLOCK;
+        return piece.type == hundo.PieceTypeEnum.BLOCK;
     });
 };
 
-Board.prototype.getBalls = function() {
+hundo.Board.prototype.getBalls = function() {
     return this.getPieces(function(piece){
-        return piece.type == PieceTypeEnum.BALL;
+        return piece.type == hundo.PieceTypeEnum.BALL;
     });
 };
 
 
-/*Board.prototype.move = function(direction) {
+hundo.Board.prototype.move = function(direction) {
     if (this.ball.row < 0 || this.ball.row > this.numRows ||
         this.ball.col < 0 || this.ball.col > this.numCols) {
         return MoveEnum.OOB;
@@ -121,9 +123,9 @@ Board.prototype.getBalls = function() {
     } else {
         
     }
-}*/
+}
 
-var boardConfig = board = {
+boardConfig = board = {
     numRows: 5,
     numCols: 10,
     blocks : [
@@ -142,23 +144,23 @@ var boardConfig = board = {
     }
 }
 
-board = new Board(boardConfig);
+var board = new hundo.Board(boardConfig);
 
 var vizConfig = {
     cellSize : 32
 }
 
-viz = d3.select("#boardSvg")
+hundo.viz = d3.select("#boardSvg")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize);
 
-viz.select("#background")
+hundo.viz.select("#background")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize)
     .attr("style", "fill:black");
 
 
-viz.selectAll(".block")
+hundo.viz.selectAll(".block")
     .data(board.getBlocks())
     .enter()
     .append("svg:use")
@@ -170,7 +172,7 @@ viz.selectAll(".block")
       return "translate(" + x + ", " + y + ") "
     })
 
-viz.selectAll(".ball")
+hundo.viz.selectAll(".ball")
     .data(board.getBalls())
     .enter()
     .append("svg:use")
