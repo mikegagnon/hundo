@@ -1,12 +1,4 @@
 
-
-var viz;
-var board;
-
-var vizConfig = {
-    cellSize : 32
-}
-
 var PieceTypeEnum = {
     BALL: "BALL",
     BLOCK: "BLOCK"
@@ -151,6 +143,10 @@ var boardConfig = board = {
 }
 
 board = new Board(boardConfig);
+
+var vizConfig = {
+    cellSize : 32
+}
 
 viz = d3.select("#boardSvg")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
