@@ -67,7 +67,7 @@ hundo.Board = function(boardConfig) {
 
 }
 
-// func(piece) should return true if the piece is of the type being gotten
+// func(piece) should return true iff the piece is of the type being gotten
 hundo.Board.prototype.getPieces = function(func) {
 
     var pieces = [];
