@@ -10,7 +10,8 @@ hundo.DirectionEnum = {
     UP: 0,
     DOWN: 1,
     LEFT: 2,
-    RIGHT: 3
+    RIGHT: 3,
+    NODIR: 4
 }
 
 hundo.MoveEnum = {
@@ -29,6 +30,7 @@ hundo.Ball = function(row, col) {
     this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
+    this.dir = hundo.PieceTypeEnum.NODIR;
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -95,8 +97,13 @@ hundo.Board.prototype.getBalls = function() {
     });
 };
 
+hundo.Board.prototype.step = function() {
 
-hundo.Board.prototype.move = function(direction) {
+    if (this.ball.dir == DirectionEnum.NODIR) {
+        alert("Cannot step when ball has no momentum");
+        return;
+    }
+
     if (this.ball.row < 0 || this.ball.row > this.numRows ||
         this.ball.col < 0 || this.ball.col > this.numCols) {
         return MoveEnum.OOB;
@@ -125,7 +132,7 @@ hundo.Board.prototype.move = function(direction) {
     }
 }
 
-boardConfig = board = {
+boardConfig = {
     numRows: 5,
     numCols: 10,
     blocks : [
