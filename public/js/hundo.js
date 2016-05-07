@@ -14,12 +14,6 @@ hundo.DirectionEnum = {
     NODIR: 4
 }
 
-hundo.MoveEnum = {
-    // out of bounds
-    OOB: 0,
-    NO_MOVE: 1
-}
-
 hundo.Block = function(row, col) {
     this.type = hundo.PieceTypeEnum.BLOCK;
     this.row = row;
@@ -97,16 +91,21 @@ hundo.Board.prototype.getBalls = function() {
     });
 };
 
+// returns null on fatal error
+// else, returns an animation object
 hundo.Board.prototype.step = function() {
 
-    if (this.ball.dir == DirectionEnum.NODIR) {
-        alert("Cannot step when ball has no momentum");
-        return;
+    var direction = ball.dir;
+
+    if (direction == DirectionEnum.NODIR) {
+        return null;
     }
 
     if (this.ball.row < 0 || this.ball.row > this.numRows ||
         this.ball.col < 0 || this.ball.col > this.numCols) {
-        return MoveEnum.OOB;
+        return {
+            "oob": true
+        };
     }
     
     var dr = 0, dc = 0;
@@ -116,17 +115,22 @@ hundo.Board.prototype.step = function() {
         dr = 1;
     } else if (direction == DirectionEnum.LEFT) {
         dc = -1;
-    } else if (direction == DirectionEnum.UP) {
+    } else if (direction == DirectionEnum.RIGHT) {
         dc = 1;
     } else {
-        alert("error");
+        return null;
     }
 
     var newRow = this.ball.row + dr;
     var newCol = this.ball.col + dc;
 
     if (this.matrix[newRow][newCol].length > 0) {
-        return MoveEnum.NO_MOVE;
+        return {
+            "collide": {
+                "dir": direction,
+                "recipients": this.matrix[newRow][newCol]
+            }
+        };
     } else {
         
     }
