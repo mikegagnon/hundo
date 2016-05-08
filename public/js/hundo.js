@@ -130,7 +130,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
         return;
     }
 
-    // add the piece to it's new location
+    // add the piece to its new location
     this.matrix[row][col].push(piece);
 
     piece.row = row;
