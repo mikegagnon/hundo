@@ -1,17 +1,14 @@
 
 
-/**
- * Side effects
- **************************************************/
 
-var TEST_CASE;
 
 /**
  * Equals methods for piece objects
  **************************************************/
 
 function equalsTypeRowCol(a, b) {
-    return a.type == b.type &&
+    return a.id == b.id &&
+        a.type == b.type &&
         a.row == b.row &&
         a.col == b.col;
 }
@@ -57,9 +54,9 @@ var board = new hundo.Board(config1);
 
 assertEquals(1, board.numRows, 5);
 assertEquals(2, board.numCols, 10);
-assert(3, board.matrix[2][1][0].equals(new hundo.Block(2,1)));
-assert(4, board.matrix[2][2][0].equals(new hundo.Block(2,2)));
-assert(5, board.matrix[2][3][0].equals(new hundo.Ball(2,3)));
+assert(3, board.matrix[2][1][0].equals(new hundo.Block(0, 2,1)));
+assert(4, board.matrix[2][2][0].equals(new hundo.Block(1, 2,2)));
+assert(5, board.matrix[2][3][0].equals(new hundo.Ball(2, 2,3)));
 
 /**
  * Test Board.getBlocks
@@ -70,7 +67,7 @@ var board = new hundo.Board(config1);
 
 var blocks = board.getBlocks();
 assertEquals(1, blocks.length, 2);
-assert(2, blocks[0].equals(new hundo.Block(2,1)));
+assert(2, blocks[0].equals(new hundo.Block(0, 2,1)));
 
 /**
  * Test Board.getBalls
@@ -81,3 +78,31 @@ var board = new hundo.Board(config1);
 
 var blocks = board.getBalls();
 assertEquals(1, blocks.length, 1);
+
+/**
+ * 
+ **************************************************/
+
+/**
+ * Board.movePiece
+ **************************************************/
+
+TEST_CASE = "Board.movePiece"
+
+var board = new hundo.Board(config1);
+
+var ball = new hundo.Ball(2, 2, 3);
+
+board.movePiece(ball, 2, 4);
+
+assert(1, ball.equals(new hundo.Ball(2, 2, 4)));
+assertEquals(2, board.matrix[2][3].length, 0);
+assert(3, board.matrix[2][4].length, 1);
+assert(4, board.matrix[2][4][0].equals(new hundo.Ball(2, 2, 4)));
+
+
+
+
+
+
+

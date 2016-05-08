@@ -14,13 +14,16 @@ hundo.DirectionEnum = {
     NODIR: 4
 }
 
-hundo.Block = function(row, col) {
+// every piece has unique id
+hundo.Block = function(id, row, col) {
+    this.id = id;
     this.type = hundo.PieceTypeEnum.BLOCK;
     this.row = row;
     this.col = col;
 }
 
-hundo.Ball = function(row, col) {
+hundo.Ball = function(id, row, col) {
+    this.id = id;
     this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
@@ -45,19 +48,21 @@ hundo.Board = function(boardConfig) {
       }
     }
 
+    var nextId = 0;
+
     var THIS = this;
 
     // Add blocks to the matrix
     $.each(boardConfig.blocks, function(index, block) { 
         var row = block.row;
         var col = block.col;
-        THIS.matrix[row][col].push(new hundo.Block(row, col));
+        THIS.matrix[row][col].push(new hundo.Block(nextId++, row, col));
     })
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
-    this.matrix[row][col].push(new hundo.Ball(row, col));
+    this.matrix[row][col].push(new hundo.Ball(nextId++, row, col));
 
 }
 
@@ -91,21 +96,58 @@ hundo.Board.prototype.getBalls = function() {
     });
 };
 
+// removes the first element in array for which func(element) is true
+// if an element is removed, returns the index of the element removed
+// otherwise, returns -1
+hundo.arrayRemove = function(array, func) {
+
+    var i;
+    for (i = 0; i < array.length; i++) {
+        if (func(array[i])) {
+            break;
+        }
+    }
+
+    if (i == array.length) {
+        return -1;
+    }
+
+    array.splice(i, 1);
+
+    return i;
+}
+
+hundo.Board.prototype.movePiece = function(piece, row, col) {
+
+    var pieces = this.matrix[piece.row][piece.col];
+
+    var i = hundo.arrayRemove(pieces, function(p) {
+        return p.id == piece.id;
+    })
+
+    if (i == -1) {
+        console.error("Could not remove piece");
+        return;
+    }
+
+    // add the piece to it's new location
+    this.matrix[row][col].push(piece);
+
+    piece.row = row;
+    piece.col = col;
+
+}
+
 // returns null on fatal error
-// else, returns an animation object
+// else, returns an animation object, which describes how the
+// the step should be animated
 hundo.Board.prototype.step = function() {
 
     var direction = ball.dir;
 
     if (direction == DirectionEnum.NODIR) {
-        return null;
-    }
-
-    if (this.ball.row < 0 || this.ball.row > this.numRows ||
-        this.ball.col < 0 || this.ball.col > this.numCols) {
-        return {
-            "oob": true
-        };
+        console.error("Ball must have a direction to step");
+        return;
     }
     
     var dr = 0, dc = 0;
@@ -118,21 +160,41 @@ hundo.Board.prototype.step = function() {
     } else if (direction == DirectionEnum.RIGHT) {
         dc = 1;
     } else {
-        return null;
+        console.error("Ball must have a direction to step");
+        return;
     }
 
     var newRow = this.ball.row + dr;
     var newCol = this.ball.col + dc;
 
+    // Check for out of bounds
+    if (newRow < 0 || newRow > this.numRows ||
+        newCol < 0 || newColcol > this.numCols) {
+
+        // TODO: update matrix state
+
+        return {
+            "move": {
+                "dir": "direction"
+            },
+            "oob": true
+        };
+    }
+
     if (this.matrix[newRow][newCol].length > 0) {
         return {
             "collide": {
                 "dir": direction,
-                "recipients": this.matrix[newRow][newCol]
+                "recipients": [this.matrix[newRow][newCol]]
             }
         };
     } else {
-        
+        this.movePiece(this.ball, newRow, newCol);
+        return {
+            "move": {
+                "dir": direction
+            }
+        }
     }
 }
 
