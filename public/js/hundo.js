@@ -168,7 +168,7 @@ hundo.Board.prototype.step = function() {
 
     // Check for out of bounds
     if (newRow < 0 || newRow > this.numRows ||
-        newCol < 0 || newColcol > this.numCols) {
+        newCol < 0 || newCol > this.numCols) {
 
         this.done = true;
 
