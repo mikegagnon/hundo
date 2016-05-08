@@ -33,6 +33,8 @@ hundo.Ball = function(id, row, col) {
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
+    this.done = false;
+
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
     
@@ -168,7 +170,7 @@ hundo.Board.prototype.step = function() {
     if (newRow < 0 || newRow > this.numRows ||
         newCol < 0 || newColcol > this.numCols) {
 
-        // TODO: update matrix state
+        this.done = true;
 
         return {
             "move": {
