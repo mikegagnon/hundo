@@ -33,9 +33,6 @@ hundo.Ball = function(id, row, col) {
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
-    // waiting for input. The ball cannot move when waiting == false
-    // this.waiting = true,
-
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
     
