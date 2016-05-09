@@ -1,7 +1,7 @@
 /**
  * hundo.arrayRemove
  **************************************************/
-TEST_CASE = "hundo.arrayRemove"
+TEST = "hundo.arrayRemove"
 
 var array = []
 assertEquals(1, -1, hundo.arrayRemove(array, function(x){return true;}));

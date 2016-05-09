@@ -22,12 +22,12 @@ hundo.Block = function(id, row, col) {
     this.col = col;
 }
 
-hundo.Ball = function(id, row, col) {
+hundo.Ball = function(id, row, col, dir) {
     this.id = id;
     this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
-    this.dir = hundo.PieceTypeEnum.NODIR;
+    this.dir = dir;
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -61,7 +61,8 @@ hundo.Board = function(boardConfig) {
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
-    this.matrix[row][col].push(new hundo.Ball(nextId++, row, col));
+    this.ball = new hundo.Ball(nextId++, row, col, hundo.DirectionEnum.NODIR);
+    this.matrix[row][col].push(this.ball);
 
 }
 
@@ -142,25 +143,25 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 // the step should be animated
 hundo.Board.prototype.step = function() {
 
-    var direction = ball.dir;
+    var direction = this.ball.dir;
 
-    if (direction == DirectionEnum.NODIR) {
+    if (direction == hundo.DirectionEnum.NODIR) {
         console.error("Ball must have a direction to step");
-        return;
+        return null;
     }
     
     var dr = 0, dc = 0;
-    if (direction == DirectionEnum.UP) {
+    if (direction == hundo.DirectionEnum.UP) {
         dr = -1;
-    } else if (direction == DirectionEnum.DOWN) {
+    } else if (direction == hundo.DirectionEnum.DOWN) {
         dr = 1;
-    } else if (direction == DirectionEnum.LEFT) {
+    } else if (direction == hundo.DirectionEnum.LEFT) {
         dc = -1;
-    } else if (direction == DirectionEnum.RIGHT) {
+    } else if (direction == hundo.DirectionEnum.RIGHT) {
         dc = 1;
     } else {
         console.error("Ball must have a direction to step");
-        return;
+        return null;
     }
 
     var newRow = this.ball.row + dr;
@@ -181,10 +182,11 @@ hundo.Board.prototype.step = function() {
     }
 
     if (this.matrix[newRow][newCol].length > 0) {
+        this.ball.dir = hundo.DirectionEnum.NODIR;
         return {
             "collide": {
                 "dir": direction,
-                "recipients": [this.matrix[newRow][newCol]]
+                "recipients": this.matrix[newRow][newCol]
             }
         };
     } else {
