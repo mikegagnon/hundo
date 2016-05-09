@@ -14,6 +14,9 @@ hundo.DirectionEnum = {
     NODIR: 4
 }
 
+// waiting for input
+hundo.waiting = false;
+
 // every piece has unique id
 hundo.Block = function(id, row, col) {
     this.id = id;
@@ -64,6 +67,10 @@ hundo.Board = function(boardConfig) {
     this.ball = new hundo.Ball(nextId++, row, col, hundo.DirectionEnum.NODIR);
     this.matrix[row][col].push(this.ball);
 
+}
+
+hundo.Board.prototype.setDir = function(direction) {
+    this.ball.dir = direction;
 }
 
 // func(piece) should return true iff the piece is of the type being gotten
@@ -172,10 +179,11 @@ hundo.Board.prototype.step = function() {
         newCol < 0 || newCol > this.numCols) {
 
         this.done = true;
+        this.ball.dir = hundo.DirectionEnum.NODIR;
 
         return {
             "move": {
-                "dir": "direction"
+                "dir": direction
             },
             "oob": true
         };
@@ -218,11 +226,11 @@ boardConfig = {
     }
 }
 
-var board = new hundo.Board(boardConfig);
-
 var vizConfig = {
     cellSize : 32
 }
+
+hundo.board = new hundo.Board(boardConfig);
 
 hundo.viz = d3.select("#boardSvg")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
@@ -235,7 +243,7 @@ hundo.viz.select("#background")
 
 
 hundo.viz.selectAll(".block")
-    .data(board.getBlocks())
+    .data(hundo.board.getBlocks())
     .enter()
     .append("svg:use")
     .attr("class", "block")
@@ -247,7 +255,7 @@ hundo.viz.selectAll(".block")
     })
 
 hundo.viz.selectAll(".ball")
-    .data(board.getBalls())
+    .data(hundo.board.getBalls())
     .enter()
     .append("svg:use")
     .attr("class", "ball")
@@ -258,26 +266,38 @@ hundo.viz.selectAll(".ball")
       return "translate(" + x + ", " + y + ") "
     })
 
+hundo.waiting = true;
 
-document.onkeydown = checkKey;
+hundo.checkKey = function(e) {
 
-function checkKey(e) {
-
-    if (!boardConfig.waiting) {
+    if (!hundo.waiting) {
         return;
     }
 
     var e = e || window.event;
 
-    if (e.keyCode == '38') {
-        console.log("up")
-    } else if (e.keyCode == '40') {
-        console.log("down")
-    } else if (e.keyCode == '37') {
-        console.log("left")
-    } else if (e.keyCode == '39') {
-        console.log("right")
+    var direction;
 
+    if (e.keyCode == '38') {
+        console.log("up");
+        direction = hundo.DirectionEnum.UP;
+    } else if (e.keyCode == '40') {
+        console.log("down");
+        direction = hundo.DirectionEnum.DOWN;
+    } else if (e.keyCode == '37') {
+        console.log("left");
+        direction = hundo.DirectionEnum.LEFT;
+    } else if (e.keyCode == '39') {
+        console.log("right");
+        direction = hundo.DirectionEnum.RIGHT;
+    } else {
+        return;
     }
 
+    hundo.board.setDir(direction);
+    var animate = hundo.board.step();
+
+
 }
+
+document.onkeydown = hundo.checkKey;

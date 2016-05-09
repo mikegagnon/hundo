@@ -97,10 +97,10 @@ assert(3, board.matrix[2][4].length, 1);
 assert(4, board.matrix[2][4][0].equals(new hundo.Ball(2, 2, 4, NODIR)));
 
 /**
- * Board.step
+ * Board.step once
  **************************************************/
 
-TEST = "Board.step"
+TEST = "Board.step once"
 
 
 // UP
@@ -125,7 +125,7 @@ assert(4, board.matrix[3][3][0].equals(expectedBall));
 assert(5, board.ball.equals(expectedBall));
 assertEquals(6, result.move.dir, hundo.DirectionEnum.DOWN);
 
-// LEFT
+// LEFT collide
 var board = new hundo.Board(config1);
 
 board.ball.dir = hundo.DirectionEnum.LEFT;
@@ -149,6 +149,18 @@ assert(11, board.matrix[2][4][0].equals(expectedBall));
 assert(12, board.ball.equals(expectedBall));
 assertEquals(13, result.move.dir, hundo.DirectionEnum.RIGHT);
 
+/**
+ * Board.step once
+ **************************************************/
 
+TEST = "Board.step once"
+
+var board = new hundo.Board(config1);
+
+board.ball.dir = hundo.DirectionEnum.UP;
+
+board.step();
+board.step();
+var result = board.step();
 
 
