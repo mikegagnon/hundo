@@ -201,6 +201,7 @@ hundo.Board.prototype.step = function() {
         this.movePiece(this.ball, newRow, newCol);
         return {
             "move": {
+                "ball": this.ball,
                 "dir": direction
             }
         }
@@ -241,16 +242,24 @@ hundo.viz.select("#background")
     .attr("height", boardConfig.numRows * vizConfig.cellSize)
     .attr("style", "fill:black");
 
+hundo.viz.blockId = function(block) {
+    return "block" + block.id;
+}
+
+hundo.viz.ballId = function(ball) {
+    return "ball" + ball.id;
+}
 
 hundo.viz.selectAll(".block")
     .data(hundo.board.getBlocks())
     .enter()
     .append("svg:use")
     .attr("class", "block")
+    .attr("id", hundo.viz.blockId)
     .attr("xlink:href", "#blockTemplate")
-    .attr("transform", function(ball) {
-      var x = ball.col * vizConfig.cellSize;
-      var y = ball.row * vizConfig.cellSize;
+    .attr("transform", function(block) {
+      var x = block.col * vizConfig.cellSize;
+      var y = block.row * vizConfig.cellSize;
       return "translate(" + x + ", " + y + ") "
     })
 
@@ -259,10 +268,11 @@ hundo.viz.selectAll(".ball")
     .enter()
     .append("svg:use")
     .attr("class", "ball")
+    .attr("id", hundo.viz.ballId)
     .attr("xlink:href", "#ballTemplate")
-    .attr("transform", function(block) {
-      var x = block.col * vizConfig.cellSize;
-      var y = block.row * vizConfig.cellSize;
+    .attr("transform", function(ball) {
+      var x = ball.col * vizConfig.cellSize;
+      var y = ball.row * vizConfig.cellSize;
       return "translate(" + x + ", " + y + ") "
     })
 
@@ -296,6 +306,22 @@ hundo.checkKey = function(e) {
 
     hundo.board.setDir(direction);
     var animate = hundo.board.step();
+
+    if ("move" in animate) {
+        console.log("move");
+        ball = animate.move.ball;
+        ballId = "#" + hundo.viz.ballId(ball);
+        hundo.viz.select(ballId)
+            .transition()
+            .attr("transform", function(ball) {
+                var x = ball.col * vizConfig.cellSize;
+                var y = ball.row * vizConfig.cellSize;
+                return "translate(" + x + ", " + y + ") "
+            })
+
+    } else if ("collide" in animate) {
+        console.log("collide");
+    }
 
 
 }
