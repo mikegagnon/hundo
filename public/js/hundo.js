@@ -90,6 +90,8 @@ hundo.Board.prototype.reset = function() {
         this.movePiece(piece, piece.origRow, piece.origCol);
     }
 
+    this.done = false;
+
     return moved;
 }
 
@@ -301,12 +303,8 @@ hundo.boardSvg.select("#background")
 
 hundo.viz = {}
 
-hundo.viz.blockId = function(block) {
-    return "block" + block.id;
-}
-
-hundo.viz.ballId = function(ball) {
-    return "ball" + ball.id;
+hundo.viz.pieceId = function(piece) {
+    return "piece" + piece.id;
 }
 
 hundo.boardSvg.selectAll(".block")
@@ -314,7 +312,7 @@ hundo.boardSvg.selectAll(".block")
     .enter()
     .append("svg:use")
     .attr("class", "block")
-    .attr("id", hundo.viz.blockId)
+    .attr("id", hundo.viz.pieceId)
     .attr("xlink:href", "#blockTemplate")
     .attr("transform", function(block) {
       var x = block.col * vizConfig.cellSize;
@@ -327,7 +325,7 @@ hundo.boardSvg.selectAll(".ball")
     .enter()
     .append("svg:use")
     .attr("class", "ball")
-    .attr("id", hundo.viz.ballId)
+    .attr("id", hundo.viz.pieceId)
     .attr("xlink:href", "#ballTemplate")
     .attr("transform", function(ball) {
       var x = ball.col * vizConfig.cellSize;
@@ -336,7 +334,25 @@ hundo.boardSvg.selectAll(".ball")
     })
 
 hundo.viz.reset = function() {
-    console.log("reset");
+
+    var pieces = hundo.board.getPieces(function(piece) {
+        return (piece.row != piece.origRow) || (piece.col != piece.origCol);
+    })
+
+    hundo.board.reset();
+
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        hundo.boardSvg.select("#" + hundo.viz.pieceId(piece))
+            .transition()
+            .ease("linear")
+            .attr("transform", function(ball) {
+                var x = piece.col * vizConfig.cellSize;
+                var y = piece.row * vizConfig.cellSize;
+                return "translate(" + x + ", " + y + ") "
+            })
+            .duration(vizConfig.stepDuration);
+    }
 
 }
 
@@ -356,7 +372,7 @@ hundo.viz.stepAnimate = function() {
 
         }
         ball = animate.move.ball;
-        ballId = "#" + hundo.viz.ballId(ball);
+        ballId = "#" + hundo.viz.pieceId(ball);
         hundo.boardSvg.select(ballId)
             .transition()
             .ease("linear")
@@ -401,6 +417,10 @@ hundo.viz.checkKey = function(e) {
     if (!hundo.board.atRest) {
         hundo.viz.animateInterval =
             setInterval(hundo.viz.stepAnimate, vizConfig.stepDuration);
+    }
+
+    if (hundo.board.done) {
+        hundo.viz.reset();
     }
 
 
