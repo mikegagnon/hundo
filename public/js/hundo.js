@@ -239,14 +239,16 @@ var vizConfig = {
 
 hundo.board = new hundo.Board(boardConfig);
 
-hundo.viz = d3.select("#boardSvg")
+hundo.boardSvg = d3.select("#boardSvg")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize);
 
-hundo.viz.select("#background")
+hundo.boardSvg.select("#background")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize)
     .attr("style", "fill:black");
+
+hundo.viz = {}
 
 hundo.viz.blockId = function(block) {
     return "block" + block.id;
@@ -256,7 +258,7 @@ hundo.viz.ballId = function(ball) {
     return "ball" + ball.id;
 }
 
-hundo.viz.selectAll(".block")
+hundo.boardSvg.selectAll(".block")
     .data(hundo.board.getBlocks())
     .enter()
     .append("svg:use")
@@ -269,7 +271,7 @@ hundo.viz.selectAll(".block")
       return "translate(" + x + ", " + y + ") "
     })
 
-hundo.viz.selectAll(".ball")
+hundo.boardSvg.selectAll(".ball")
     .data(hundo.board.getBalls())
     .enter()
     .append("svg:use")
@@ -293,7 +295,7 @@ hundo.stepAnimate = function() {
         console.log("move");
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.ballId(ball);
-        hundo.viz.select(ballId)
+        hundo.boardSvg.select(ballId)
             .transition()
             .ease("linear")
             .attr("transform", function(ball) {
