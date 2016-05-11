@@ -33,7 +33,12 @@ hundo.Ball = function(id, row, col, dir) {
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
+    // is the ball at rest?
     this.atRest = true;
+
+    // is the board finished? namely, the ball has gone out
+    // of bounds or reached a goal
+    this.done = false;
 
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
@@ -177,7 +182,13 @@ hundo.Board.prototype.step = function() {
         newCol < 0 || newCol >= this.numCols) {
 
         this.atRest = true;
+        this.done = true;
         this.ball.dir = hundo.DirectionEnum.NODIR;
+
+        console.log("done");
+
+        this.ball.row = newRow;
+        this.ball.col = newCol;
 
         return {
             "move": {
@@ -235,7 +246,7 @@ var boardConfig = {
 
 var vizConfig = {
     cellSize: 32,
-    stepDuration: 1000
+    stepDuration: 50
 }
 
 hundo.board = new hundo.Board(boardConfig);
@@ -289,11 +300,15 @@ hundo.stepAnimate = function() {
     var animate = hundo.board.step();
 
     if (hundo.board.atRest) {
+        console.log("clear");
         clearInterval(hundo.viz.animateInterval);
     }
 
     if ("move" in animate) {
         console.log("move");
+        if ("oob" in animate) {
+            console.log("oob")
+        }
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.ballId(ball);
         hundo.boardSvg.select(ballId)
@@ -341,9 +356,10 @@ hundo.checkKey = function(e) {
 
     hundo.stepAnimate();
 
-    hundo.viz.animateInterval =
-        setInterval(hundo.stepAnimate, vizConfig.stepDuration);
-
+    if (!hundo.board.atRest) {
+        hundo.viz.animateInterval =
+            setInterval(hundo.stepAnimate, vizConfig.stepDuration);
+    }
 
 
 }
