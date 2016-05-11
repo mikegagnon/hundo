@@ -33,7 +33,7 @@ hundo.Ball = function(id, row, col, dir) {
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
-    this.done = true;
+    this.atRest = true;
 
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
@@ -68,7 +68,7 @@ hundo.Board = function(boardConfig) {
 
 hundo.Board.prototype.setDir = function(direction) {
     this.ball.dir = direction;
-    this.done = false;
+    this.atRest = false;
 }
 
 // func(piece) should return true iff the piece is of the type being gotten
@@ -176,7 +176,7 @@ hundo.Board.prototype.step = function() {
     if (newRow < 0 || newRow >= this.numRows ||
         newCol < 0 || newCol >= this.numCols) {
 
-        this.done = true;
+        this.atRest = true;
         this.ball.dir = hundo.DirectionEnum.NODIR;
 
         return {
@@ -190,7 +190,7 @@ hundo.Board.prototype.step = function() {
 
     if (this.matrix[newRow][newCol].length > 0) {
         this.ball.dir = hundo.DirectionEnum.NODIR;
-        this.done = true;
+        this.atRest = true;
         return {
             "collide": {
                 "dir": direction,
@@ -288,7 +288,7 @@ hundo.boardSvg.selectAll(".ball")
 hundo.stepAnimate = function() {
     var animate = hundo.board.step();
 
-    if (hundo.board.done) {
+    if (hundo.board.atRest) {
         clearInterval(hundo.viz.animateInterval);
     }
 
@@ -313,7 +313,7 @@ hundo.stepAnimate = function() {
 
 hundo.checkKey = function(e) {
 
-    if (!hundo.board.done) {
+    if (!hundo.board.atRest) {
         return;
     }
 
