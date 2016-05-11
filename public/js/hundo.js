@@ -87,7 +87,7 @@ hundo.Board = function(boardConfig) {
     this.matrix[row][col].push(this.ball);
 
     // Add goals to the matrix
-    $.each(boardConfig.goals, function(index, goal) { 
+    $.each(boardConfig.goals, function(index, goal) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
