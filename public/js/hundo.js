@@ -80,8 +80,6 @@ hundo.Board = function(boardConfig) {
 
 hundo.Board.prototype.reset = function() {
 
-    var THIS = this;
-
     // moved is the set of all pieces that have moved
     var moved = this.getPieces(function(piece) {
         return (piece.row != piece.origRow) || (piece.col != piece.origCol);
@@ -89,15 +87,8 @@ hundo.Board.prototype.reset = function() {
 
     for (var i = 0; i < moved.length; i++) {
         var piece = moved[i];
-        THIS.movePiece(piece, piece.origRow, piece.origCol);
+        this.movePiece(piece, piece.origRow, piece.origCol);
     }
-
-    /*
-    $.each(moved, function(piece){
-        console.log("moving back")
-        console.log(piece)
-        THIS.movePiece(piece, piece.origRow, piece.origCol);
-    })*/
 
     return moved;
 }
