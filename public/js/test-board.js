@@ -157,14 +157,29 @@ assert(2, board.oob[1].equals(
     new hundo.Block(1, -1, -1)));
 board.reset();
 
-/*
+
 assertEquals(3, board.oob.length, 0);
 assert(4, board.matrix[2][3][0],
     new hundo.Ball(3, 2, 3, hundo.DirectionEnum.NODIR));
 assert(5, board.matrix[2][2][0],
     new hundo.Block(2, 2, 2));
-*/
 
+TEST = "Board.reset in bounds and out of bounds"
+var board = new hundo.Board(config1);
+
+board.movePiece(board.matrix[2][2][0], -1, -1);
+assert(1, board.oob[0].equals(
+    new hundo.Block(1, -1, -1)));
+
+board.movePiece(board.ball, 0, 0);
+assert(2, board.matrix[0][0][0].equals(
+    new hundo.Ball(2, 0, 0, hundo.DirectionEnum.NODIR)));
+
+board.reset();
+assert(3, board.matrix[2][2][0].equals(
+    new hundo.Block(1, 2, 2)));
+assert(4, board.matrix[2][3][0].equals(
+    new hundo.Ball(2, 2, 3, hundo.DirectionEnum.NODIR)));
 
 
 /**
