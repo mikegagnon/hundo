@@ -14,9 +14,6 @@ hundo.DirectionEnum = {
     NODIR: 4
 }
 
-// waiting for input
-hundo.waiting = false;
-
 // every piece has unique id
 hundo.Block = function(id, row, col) {
     this.id = id;
@@ -36,7 +33,7 @@ hundo.Ball = function(id, row, col, dir) {
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
-    this.done = false;
+    this.done = true;
 
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
@@ -71,6 +68,7 @@ hundo.Board = function(boardConfig) {
 
 hundo.Board.prototype.setDir = function(direction) {
     this.ball.dir = direction;
+    this.done = false;
 }
 
 // func(piece) should return true iff the piece is of the type being gotten
@@ -191,6 +189,7 @@ hundo.Board.prototype.step = function() {
 
     if (this.matrix[newRow][newCol].length > 0) {
         this.ball.dir = hundo.DirectionEnum.NODIR;
+        this.done = true;
         return {
             "collide": {
                 "dir": direction,
@@ -208,7 +207,9 @@ hundo.Board.prototype.step = function() {
     }
 }
 
-boardConfig = {
+
+
+var boardConfig = {
     numRows: 5,
     numCols: 10,
     blocks : [
@@ -219,6 +220,10 @@ boardConfig = {
         {
             row: 2,
             col: 2
+        },
+        {
+            row: 2,
+            col: 8
         }
     ],
     ball: {
@@ -228,7 +233,8 @@ boardConfig = {
 }
 
 var vizConfig = {
-    cellSize : 32
+    cellSize: 32,
+    stepDuration: 1000
 }
 
 hundo.board = new hundo.Board(boardConfig);
@@ -276,11 +282,35 @@ hundo.viz.selectAll(".ball")
       return "translate(" + x + ", " + y + ") "
     })
 
-hundo.waiting = true;
+hundo.stepAnimate = function() {
+    var animate = hundo.board.step();
+
+    if (hundo.board.done) {
+        clearInterval(hundo.viz.animateInterval);
+    }
+
+    if ("move" in animate) {
+        console.log("move");
+        ball = animate.move.ball;
+        ballId = "#" + hundo.viz.ballId(ball);
+        hundo.viz.select(ballId)
+            .transition()
+            .ease("linear")
+            .attr("transform", function(ball) {
+                var x = ball.col * vizConfig.cellSize;
+                var y = ball.row * vizConfig.cellSize;
+                return "translate(" + x + ", " + y + ") "
+            })
+            .duration(vizConfig.stepDuration);
+
+    } else if ("collide" in animate) {
+        console.log("collide");
+    }
+}
 
 hundo.checkKey = function(e) {
 
-    if (!hundo.waiting) {
+    if (!hundo.board.done) {
         return;
     }
 
@@ -305,23 +335,12 @@ hundo.checkKey = function(e) {
     }
 
     hundo.board.setDir(direction);
-    var animate = hundo.board.step();
 
-    if ("move" in animate) {
-        console.log("move");
-        ball = animate.move.ball;
-        ballId = "#" + hundo.viz.ballId(ball);
-        hundo.viz.select(ballId)
-            .transition()
-            .attr("transform", function(ball) {
-                var x = ball.col * vizConfig.cellSize;
-                var y = ball.row * vizConfig.cellSize;
-                return "translate(" + x + ", " + y + ") "
-            })
+    hundo.stepAnimate();
 
-    } else if ("collide" in animate) {
-        console.log("collide");
-    }
+    hundo.viz.animateInterval =
+        setInterval(hundo.stepAnimate, vizConfig.stepDuration);
+
 
 
 }
