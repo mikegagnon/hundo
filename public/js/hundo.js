@@ -173,14 +173,15 @@ hundo.Board.prototype.step = function() {
     var newCol = this.ball.col + dc;
 
     // Check for out of bounds
-    if (newRow < 0 || newRow > this.numRows ||
-        newCol < 0 || newCol > this.numCols) {
+    if (newRow < 0 || newRow >= this.numRows ||
+        newCol < 0 || newCol >= this.numCols) {
 
         this.done = true;
         this.ball.dir = hundo.DirectionEnum.NODIR;
 
         return {
             "move": {
+                "ball": this.ball,
                 "dir": direction
             },
             "oob": true
