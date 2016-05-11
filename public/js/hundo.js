@@ -279,6 +279,12 @@ var boardConfig = {
             col: 8
         }
     ],
+    goals: [
+        {
+            row: 1,
+            col: 7
+        }
+    ],
     ball: {
         row: 2,
         col: 3,
@@ -346,12 +352,12 @@ hundo.viz.reset = function() {
         hundo.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
-            .attr("transform", function(ball) {
+            .attr("transform", function(piece) {
                 var x = piece.col * vizConfig.cellSize;
                 var y = piece.row * vizConfig.cellSize;
                 return "translate(" + x + ", " + y + ") "
             })
-            .duration(vizConfig.stepDuration);
+            .duration(0);
     }
 
 }
