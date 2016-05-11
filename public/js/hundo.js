@@ -296,7 +296,7 @@ hundo.boardSvg.selectAll(".ball")
       return "translate(" + x + ", " + y + ") "
     })
 
-hundo.stepAnimate = function() {
+hundo.viz.stepAnimate = function() {
     var animate = hundo.board.step();
 
     if (hundo.board.atRest) {
@@ -326,7 +326,7 @@ hundo.stepAnimate = function() {
     }
 }
 
-hundo.checkKey = function(e) {
+hundo.viz.checkKey = function(e) {
 
     if (!hundo.board.atRest) {
         return;
@@ -354,14 +354,14 @@ hundo.checkKey = function(e) {
 
     hundo.board.setDir(direction);
 
-    hundo.stepAnimate();
+    hundo.viz.stepAnimate();
 
     if (!hundo.board.atRest) {
         hundo.viz.animateInterval =
-            setInterval(hundo.stepAnimate, vizConfig.stepDuration);
+            setInterval(hundo.viz.stepAnimate, vizConfig.stepDuration);
     }
 
 
 }
 
-document.onkeydown = hundo.checkKey;
+document.onkeydown = hundo.viz.checkKey;
