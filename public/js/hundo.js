@@ -20,6 +20,8 @@ hundo.Block = function(id, row, col) {
     this.type = hundo.PieceTypeEnum.BLOCK;
     this.row = row;
     this.col = col;
+    this.origRow = row;
+    this.origCol = col;
 }
 
 hundo.Ball = function(id, row, col, dir) {
@@ -27,7 +29,10 @@ hundo.Ball = function(id, row, col, dir) {
     this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
+    this.origRow = row;
+    this.origCol = col;
     this.dir = dir;
+
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -43,6 +48,9 @@ hundo.Board = function(boardConfig) {
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
     
+    // The set of pieces that have moved out of bounds
+    this.oob = [];
+
     // this.matrix[row][call] == array of piece objects
     this.matrix = new Array(this.numRows);
     for (var i = 0; i < this.numRows; i++) {
@@ -68,7 +76,30 @@ hundo.Board = function(boardConfig) {
     var col = boardConfig.ball.col;
     this.ball = new hundo.Ball(nextId++, row, col, hundo.DirectionEnum.NODIR);
     this.matrix[row][col].push(this.ball);
+}
 
+hundo.Board.prototype.reset = function() {
+
+    var THIS = this;
+
+    // moved is the set of all pieces that have moved
+    var moved = this.getPieces(function(piece) {
+        return (piece.row != piece.origRow) || (piece.col != piece.origCol);
+    })
+
+    for (var i = 0; i < moved.length; i++) {
+        var piece = moved[i];
+        THIS.movePiece(piece, piece.origRow, piece.origCol);
+    }
+
+    /*
+    $.each(moved, function(piece){
+        console.log("moving back")
+        console.log(piece)
+        THIS.movePiece(piece, piece.origRow, piece.origCol);
+    })*/
+
+    return moved;
 }
 
 hundo.Board.prototype.setDir = function(direction) {
@@ -90,6 +121,12 @@ hundo.Board.prototype.getPieces = function(func) {
             })
         })
     });
+
+    $.each(this.oob, function(i, piece){
+        if (func(piece)) {
+            pieces.push(piece);
+        }
+    })
 
     return pieces;
 }
@@ -129,20 +166,34 @@ hundo.arrayRemove = function(array, func) {
 
 hundo.Board.prototype.movePiece = function(piece, row, col) {
 
-    var pieces = this.matrix[piece.row][piece.col];
+    var i;
 
-    var i = hundo.arrayRemove(pieces, function(p) {
-        return p.id == piece.id;
-    })
+    if (piece.row < 0 || piece.row >= this.numRows ||
+        piece.col < 0 || piece.col >= this.numCols) {
+
+        i = hundo.arrayRemove(this.oob, function(p) {
+            return p.id = piece.id;
+        })
+    } else {
+        var pieces = this.matrix[piece.row][piece.col];
+
+        i = hundo.arrayRemove(pieces, function(p) {
+            return p.id == piece.id;
+        })
+    }
 
     if (i == -1) {
         console.error("Could not remove piece");
         return;
     }
 
-    // add the piece to its new location
-    this.matrix[row][col].push(piece);
-
+    if (row < 0 || row >= this.numRows ||
+        col < 0 || col >= this.numCols) {
+        this.oob.push(piece);
+    } else {
+        // add the piece to its new location
+        this.matrix[row][col].push(piece);
+    }
     piece.row = row;
     piece.col = col;
 
@@ -185,10 +236,7 @@ hundo.Board.prototype.step = function() {
         this.done = true;
         this.ball.dir = hundo.DirectionEnum.NODIR;
 
-        console.log("done");
-
-        this.ball.row = newRow;
-        this.ball.col = newCol;
+        this.movePiece(this.ball, newRow, newCol);
 
         return {
             "move": {
@@ -296,18 +344,25 @@ hundo.boardSvg.selectAll(".ball")
       return "translate(" + x + ", " + y + ") "
     })
 
+hundo.viz.reset = function() {
+    console.log("reset");
+
+}
+
 hundo.viz.stepAnimate = function() {
     var animate = hundo.board.step();
 
     if (hundo.board.atRest) {
-        console.log("clear");
         clearInterval(hundo.viz.animateInterval);
     }
 
+    if (hundo.board.done) {
+        setTimeout(hundo.viz.reset, hundo.viz.animateInterval);
+    }
+
     if ("move" in animate) {
-        console.log("move");
         if ("oob" in animate) {
-            console.log("oob")
+
         }
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.ballId(ball);
@@ -322,7 +377,7 @@ hundo.viz.stepAnimate = function() {
             .duration(vizConfig.stepDuration);
 
     } else if ("collide" in animate) {
-        console.log("collide");
+
     }
 }
 
@@ -337,16 +392,12 @@ hundo.viz.checkKey = function(e) {
     var direction;
 
     if (e.keyCode == '38') {
-        console.log("up");
         direction = hundo.DirectionEnum.UP;
     } else if (e.keyCode == '40') {
-        console.log("down");
         direction = hundo.DirectionEnum.DOWN;
     } else if (e.keyCode == '37') {
-        console.log("left");
         direction = hundo.DirectionEnum.LEFT;
     } else if (e.keyCode == '39') {
-        console.log("right");
         direction = hundo.DirectionEnum.RIGHT;
     } else {
         return;
