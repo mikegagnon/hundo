@@ -42,6 +42,7 @@ hundo.Goal = function(id, row, col, dir) {
     this.col = col;
     this.origRow = row;
     this.origCol = col;
+    this.dir = dir;
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -150,6 +151,12 @@ hundo.Board.prototype.getBlocks = function() {
 hundo.Board.prototype.getBalls = function() {
     return this.getPieces(function(piece){
         return piece.type == hundo.PieceTypeEnum.BALL;
+    });
+};
+
+hundo.Board.prototype.getGoals = function() {
+    return this.getPieces(function(piece){
+        return piece.type == hundo.PieceTypeEnum.GOAL;
     });
 };
 
@@ -299,7 +306,8 @@ var boardConfig = {
     goals: [
         {
             row: 1,
-            col: 7
+            col: 7,
+            dir: hundo.DirectionEnum.DOWN
         }
     ],
     ball: {
@@ -341,7 +349,7 @@ hundo.boardSvg.selectAll(".block")
       var x = block.col * vizConfig.cellSize;
       var y = block.row * vizConfig.cellSize;
       return "translate(" + x + ", " + y + ") "
-    })
+    });
 
 hundo.boardSvg.selectAll(".ball")
     .data(hundo.board.getBalls())
@@ -354,7 +362,39 @@ hundo.boardSvg.selectAll(".ball")
       var x = ball.col * vizConfig.cellSize;
       var y = ball.row * vizConfig.cellSize;
       return "translate(" + x + ", " + y + ") "
-    })
+    });
+
+hundo.viz.dirToDegrees = function(dir) {
+    if (dir == hundo.DirectionEnum.UP) {
+        return 0;
+    } else if (dir == hundo.DirectionEnum.DOWN) {
+        return 180;
+    } else if (dir == hundo.DirectionEnum.LEFT) {
+        return 270;
+    } else if (dir == hundo.DirectionEnum.RIGHT) {
+        return 90;
+    } else {
+        console.error("Invalid direction:" + dir);
+    }
+}
+
+hundo.boardSvg.selectAll(".goal")
+    .data(hundo.board.getGoals())
+    .enter()
+    .append("svg:use")
+    .attr("class", "goal")
+    .attr("id", hundo.viz.pieceId)
+    .attr("xlink:href", "#goalTemplate")
+    .attr("transform", function(goal) {
+      var x = goal.col * vizConfig.cellSize;
+      var y = goal.row * vizConfig.cellSize;
+      var z = vizConfig.cellSize / 2;
+      var degrees = hundo.viz.dirToDegrees(goal.dir);
+      return "translate(" + x + ", " + y + ") " +
+        "rotate(" + degrees + ", " + z + ", " + z + ")"
+    });
+
+
 
 hundo.viz.reset = function() {
 
