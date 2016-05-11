@@ -13,13 +13,18 @@ function equalsTypeRowCol(a, b) {
         a.col == b.col;
 }
 
-hundo.Block.prototype.equals = function(block) {
-    return equalsTypeRowCol(this, block);
+hundo.Block.prototype.equals = function(piece) {
+    return equalsTypeRowCol(this, piece);
 }
 
-hundo.Ball.prototype.equals = function(ball) {
-    return equalsTypeRowCol(this, ball) &&
-        this.dir == ball.dir;
+hundo.Ball.prototype.equals = function(piece) {
+    return equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
+}
+
+hundo.Goal.prototype.equals = function(piece) {
+    return equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
 }
 
 /**
@@ -42,7 +47,14 @@ var config1 = {
     ball: {
         row: 2,
         col: 3,
-    }
+    },
+    goals: [
+        {
+            row: 1,
+            col: 7,
+            dir: hundo.DirectionEnum.UP
+        }
+    ]
 }
 
 /**
@@ -57,6 +69,8 @@ assertEquals(2, board.numCols, 10);
 assert(3, board.matrix[2][1][0].equals(new hundo.Block(0, 2, 1, NODIR)));
 assert(4, board.matrix[2][2][0].equals(new hundo.Block(1, 2, 2, NODIR)));
 assert(5, board.matrix[2][3][0].equals(new hundo.Ball(2, 2, 3, NODIR)));
+assert(6, board.matrix[1][7][0].equals(
+    new hundo.Goal(3, 1, 7, hundo.DirectionEnum.UP)));
 
 /**
  * Test Board.getBlocks

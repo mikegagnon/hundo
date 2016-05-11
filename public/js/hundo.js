@@ -3,7 +3,8 @@ var hundo = {}
 
 hundo.PieceTypeEnum = {
     BALL: "BALL",
-    BLOCK: "BLOCK"
+    BLOCK: "BLOCK",
+    GOAL: "GOAL"
 }
 
 hundo.DirectionEnum = {
@@ -32,7 +33,15 @@ hundo.Ball = function(id, row, col, dir) {
     this.origRow = row;
     this.origCol = col;
     this.dir = dir;
+}
 
+hundo.Goal = function(id, row, col, dir) {
+    this.id = id;
+    this.type = hundo.PieceTypeEnum.GOAL;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -76,6 +85,14 @@ hundo.Board = function(boardConfig) {
     var col = boardConfig.ball.col;
     this.ball = new hundo.Ball(nextId++, row, col, hundo.DirectionEnum.NODIR);
     this.matrix[row][col].push(this.ball);
+
+    // Add goals to the matrix
+    $.each(boardConfig.goals, function(index, goal) { 
+        var row = goal.row;
+        var col = goal.col;
+        var dir = goal.dir;
+        THIS.matrix[row][col].push(new hundo.Goal(nextId++, row, col, dir));
+    })
 }
 
 hundo.Board.prototype.reset = function() {
