@@ -739,8 +739,8 @@ var boardConfig = {
         },
         {
             row: 10,
-            col: 3,
-            dir: hundo.DirectionEnum.RIGHT
+            col: 5,
+            dir: hundo.DirectionEnum.UP
         }
 
     ],
