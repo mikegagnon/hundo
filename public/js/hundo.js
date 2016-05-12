@@ -381,9 +381,17 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.viz.transform = function(piece, dir) {
+hundo.viz.transform = function(piece, dir, dx, dy) {
     var x = piece.col * vizConfig.cellSize;
     var y = piece.row * vizConfig.cellSize;
+
+    if (typeof dx != "undefined") {
+        x += dx;
+    }
+
+    if (typeof dy != "undefined") {
+        y += dy;
+    }
 
     if (typeof dir == "undefined") {
         return "translate(" + x + ", " + y + ") ";
@@ -453,6 +461,20 @@ hundo.viz.reset = function(board) {
 
 }
 
+hundo.viz.dxdy = function(dir) {
+    if (dir == hundo.DirectionEnum.UP) {
+        return [0, -1];
+    } else if (dir == hundo.DirectionEnum.DOWN) {
+        return [0, 1];
+    } else if (dir == hundo.DirectionEnum.LEFT) {
+        return [-1, 0];
+    } else if (dir == hundo.DirectionEnum.RIGHT) {
+        return [1, 0];
+    } else {
+        console.error("Bad direction: " + dir);
+    }
+}
+
 hundo.viz.stepAnimate = function(board) {
     var animate = board.step();
 
@@ -478,7 +500,46 @@ hundo.viz.stepAnimate = function(board) {
             .duration(vizConfig.stepDuration);
 
     } else if ("collide" in animate) {
+        var recipients = animate.collide.recipients;
+        var dir = animate.collide.dir;
+        for (var i = 0; i < recipients.length; i++) {
+            var piece = recipients[i];
+            var id = "#" + hundo.viz.pieceId(piece);
+            hundo.viz.boardSvg.select(id)
+                .transition()
+                .ease("linear")
+                .attr("transform", function() {
 
+                    var [dx, dy] = hundo.viz.dxdy(dir);
+
+                    dx *= vizConfig.cellSize / 3;
+                    dy *= vizConfig.cellSize / 3;
+
+                    if (piece.type == hundo.PieceTypeEnum.BALL ||
+                        piece.type == hundo.PieceTypeEnum.BLOCK) {
+                        return hundo.viz.transform(piece, undefined, dx, dy);
+                    } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
+                        return hundo.viz.transform(piece, piece.dir, dx, dy);
+                    }
+                })
+                .duration(vizConfig.stepDuration / 2);
+
+            setTimeout(function(){
+                hundo.viz.boardSvg.select(id)
+                    .transition()
+                    .ease("linear")
+                    .attr("transform", function() {
+
+                        if (piece.type == hundo.PieceTypeEnum.BALL ||
+                            piece.type == hundo.PieceTypeEnum.BLOCK) {
+                            return hundo.viz.transform(piece);
+                        } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
+                            return hundo.viz.transform(piece, piece.dir);
+                        }
+                    })
+                    .duration(vizConfig.stepDuration / 2);
+            }, vizConfig.stepDuration / 2);
+        }
     }
 }
 
