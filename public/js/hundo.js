@@ -527,7 +527,6 @@ hundo.viz.stepAnimate = function(board) {
                 .duration(vizConfig.stepDuration / 2);
         }
 
-
         setTimeout(function(){
             for (var i = 0; i < recipients.length; i++) {
                 var piece = recipients[i];
@@ -607,12 +606,20 @@ var boardConfig = {
         },
         {
             row: 2,
+            col: 3
+        },
+        {
+            row: 2,
             col: 8
         },
         {
             row: 2,
             col: 4
-        }
+        },
+        {
+            row: 2,
+            col: 9
+        },
     ],
     goals: [
         {
