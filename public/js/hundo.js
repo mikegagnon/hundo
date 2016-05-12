@@ -383,16 +383,21 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.viz.transform = function(piece, dx, dy) {
+hundo.viz.transform = function(piece, transformation) {
+
+    if (typeof transformation == "undefined") {
+        transformation = {};
+    }
+
     var x = piece.col * vizConfig.cellSize;
     var y = piece.row * vizConfig.cellSize;
 
-    if (typeof dx != "undefined") {
-        x += dx;
+    if ("dx" in transformation) {
+        x += transformation.dx;
     }
 
-    if (typeof dy != "undefined") {
-        y += dy;
+    if ("dy" in transformation) {
+        y += transformation.dy;
     }
 
     if (piece.type == hundo.PieceTypeEnum.BALL ||
@@ -518,7 +523,7 @@ hundo.viz.stepAnimate = function(board) {
                     dx *= vizConfig.cellSize / 3;
                     dy *= vizConfig.cellSize / 3;
 
-                    return hundo.viz.transform(piece, dx, dy);
+                    return hundo.viz.transform(piece, {dx: dx, dy: dy});
                 })
                 .duration(vizConfig.stepDuration / 2);
         }
