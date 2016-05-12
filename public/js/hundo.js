@@ -320,9 +320,9 @@ hundo.Board.prototype.step = function() {
         return {
             "move": {
                 "ball": this.ball,
-                "dir": direction
+                "dir": direction,
+                "solved": false
             },
-            "oob": true
         };
     }
 
@@ -333,10 +333,12 @@ hundo.Board.prototype.step = function() {
             this.atRest = true;
             this.ball.dir = hundo.DirectionEnum.NODIR;
         }
+
         return {
             "move": {
                 "ball": this.ball,
-                "dir": direction
+                "dir": direction,
+                "solved": this.solved
             }
         }
     } else {
@@ -560,6 +562,36 @@ hundo.viz.dxdy = function(dir) {
     }
 }
 
+hundo.viz.animateSolved = function() {
+
+    var pieces = hundo.board.getPieces(function(){ return true; });
+
+    var dxdy = vizConfig.cellSize / 2;
+    var delays = []
+    for (var i = 0; i < pieces.length; i++) {
+        delays.push(hundo.getRandom(0, vizConfig.flyInDuration / 2));
+    }
+
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        var id = "#" + hundo.viz.pieceId(piece);
+        var delay = delays[i];
+
+        hundo.viz.boardSvg.select(id)
+            .transition()
+            .ease("linear")
+            .delay(delay)
+            .attr("transform", function() {
+                return hundo.viz.transform(piece, {
+                    dx: dxdy,
+                    dy: dxdy,
+                    scale: 0
+                });
+            })
+            .duration(vizConfig.flyInDuration);
+    }
+}
+
 hundo.viz.stepAnimate = function(board) {
     var animate = board.step();
 
@@ -608,6 +640,9 @@ hundo.viz.stepAnimate = function(board) {
             })
             .duration(vizConfig.stepDuration);
 
+        if (animate.move.solved) {
+            hundo.viz.animateSolved();
+        }
 
     } else if ("collide" in animate) {
         var recipients = animate.collide.recipients;
