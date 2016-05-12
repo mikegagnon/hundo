@@ -381,10 +381,18 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.viz.transform = function(piece) {
+hundo.viz.transform = function(piece, dir) {
     var x = piece.col * vizConfig.cellSize;
     var y = piece.row * vizConfig.cellSize;
-    return "translate(" + x + ", " + y + ") ";
+
+    if (typeof dir == "undefined") {
+        return "translate(" + x + ", " + y + ") ";
+    } else {
+        var z = vizConfig.cellSize / 2;
+        var degrees = hundo.viz.dirToDegrees(dir);
+        return "translate(" + x + ", " + y + ") " +
+            "rotate(" + degrees + ", " + z + ", " + z + ")"
+    }
 }
 
 hundo.viz.drawBoard = function(board) {
@@ -396,7 +404,9 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "block")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
-        .attr("transform", hundo.viz.transform);
+        .attr("transform", function(piece) {
+            return hundo.viz.transform(piece);
+        });
 
     hundo.viz.boardSvg.selectAll(".ball")
         .data(board.getBalls())
@@ -405,7 +415,9 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "ball")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#ballTemplate")
-        .attr("transform", hundo.viz.transform);
+        .attr("transform", function(piece) {
+            return hundo.viz.transform(piece);
+        });
 
     hundo.viz.boardSvg.selectAll(".goal")
         .data(board.getGoals())
@@ -415,12 +427,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(goal) {
-          var x = goal.col * vizConfig.cellSize;
-          var y = goal.row * vizConfig.cellSize;
-          var z = vizConfig.cellSize / 2;
-          var degrees = hundo.viz.dirToDegrees(goal.dir);
-          return "translate(" + x + ", " + y + ") " +
-            "rotate(" + degrees + ", " + z + ", " + z + ")"
+            return hundo.viz.transform(goal, goal.dir);
         });
 }
 
@@ -438,7 +445,9 @@ hundo.viz.reset = function(board) {
         hundo.viz.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
-            .attr("transform", hundo.viz.transform)
+            .attr("transform", function() {
+                return hundo.viz.transform(piece);
+            })
             .duration(0);
     }
 
@@ -463,7 +472,9 @@ hundo.viz.stepAnimate = function(board) {
         hundo.viz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
-            .attr("transform", hundo.viz.transform)
+            .attr("transform", function() {
+                return hundo.viz.transform(ball);
+            })
             .duration(vizConfig.stepDuration);
 
     } else if ("collide" in animate) {
@@ -539,6 +550,11 @@ var boardConfig = {
     goals: [
         {
             row: 1,
+            col: 7,
+            dir: hundo.DirectionEnum.DOWN
+        },
+        {
+            row: 3,
             col: 7,
             dir: hundo.DirectionEnum.DOWN
         }
