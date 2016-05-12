@@ -383,7 +383,7 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.viz.transform = function(piece, dir, dx, dy) {
+hundo.viz.transform = function(piece, dx, dy) {
     var x = piece.col * vizConfig.cellSize;
     var y = piece.row * vizConfig.cellSize;
 
@@ -395,11 +395,12 @@ hundo.viz.transform = function(piece, dir, dx, dy) {
         y += dy;
     }
 
-    if (typeof dir == "undefined") {
+    if (piece.type == hundo.PieceTypeEnum.BALL ||
+        piece.type == hundo.PieceTypeEnum.BLOCK) {
         return "translate(" + x + ", " + y + ") ";
-    } else {
+    } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = vizConfig.cellSize / 2;
-        var degrees = hundo.viz.dirToDegrees(dir);
+        var degrees = hundo.viz.dirToDegrees(piece.dir);
         return "translate(" + x + ", " + y + ") " +
             "rotate(" + degrees + ", " + z + ", " + z + ")"
     }
@@ -437,7 +438,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(goal) {
-            return hundo.viz.transform(goal, goal.dir);
+            return hundo.viz.transform(goal);
         });
 }
 
@@ -517,12 +518,7 @@ hundo.viz.stepAnimate = function(board) {
                     dx *= vizConfig.cellSize / 3;
                     dy *= vizConfig.cellSize / 3;
 
-                    if (piece.type == hundo.PieceTypeEnum.BALL ||
-                        piece.type == hundo.PieceTypeEnum.BLOCK) {
-                        return hundo.viz.transform(piece, undefined, dx, dy);
-                    } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
-                        return hundo.viz.transform(piece, piece.dir, dx, dy);
-                    }
+                    return hundo.viz.transform(piece, dx, dy);
                 })
                 .duration(vizConfig.stepDuration / 2);
         }
@@ -535,12 +531,7 @@ hundo.viz.stepAnimate = function(board) {
                     .transition()
                     .ease("linear")
                     .attr("transform", function() {
-                        if (piece.type == hundo.PieceTypeEnum.BALL ||
-                            piece.type == hundo.PieceTypeEnum.BLOCK) {
-                            return hundo.viz.transform(piece);
-                        } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
-                            return hundo.viz.transform(piece, piece.dir);
-                        }
+                        return hundo.viz.transform(piece);
                     })
                     .duration(vizConfig.stepDuration / 2);
                 }
