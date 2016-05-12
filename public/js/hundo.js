@@ -464,9 +464,6 @@ hundo.viz.stepAnimate = function(board) {
     }
 
     if ("move" in animate) {
-        if ("oob" in animate) {
-
-        }
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.pieceId(ball);
         hundo.viz.boardSvg.select(ballId)
