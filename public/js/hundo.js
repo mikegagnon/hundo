@@ -499,6 +499,7 @@ hundo.viz.stepAnimate = function(board) {
     if ("move" in animate) {
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.pieceId(ball);
+
         hundo.viz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
@@ -506,6 +507,7 @@ hundo.viz.stepAnimate = function(board) {
                 return hundo.viz.transform(ball);
             })
             .duration(vizConfig.stepDuration);
+
 
     } else if ("collide" in animate) {
         var recipients = animate.collide.recipients;
