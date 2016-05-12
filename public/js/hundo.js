@@ -441,10 +441,16 @@ hundo.viz.drawBoard = function(board) {
             });
         });
 
+    // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
     hundo.viz.boardSvg.selectAll(".ball")
         .data(board.getBalls())
         .enter()
-        .append("svg:use")
+        .append("ellipse")
+        .attr("cx", vizConfig.cellSize / 2)
+        .attr("cy", vizConfig.cellSize / 2)
+        .attr("rx", vizConfig.cellSize / 2)
+        .attr("ry", vizConfig.cellSize / 2)
+        .attr("style", "fill:#eee")
         .attr("class", "ball")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#ballTemplate")
@@ -530,6 +536,8 @@ hundo.viz.reset = function(board) {
         hundo.viz.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
+            .attr("rx", vizConfig.cellSize / 2)
+            .attr("ry", vizConfig.cellSize / 2)
             .attr("transform", function() {
                 return hundo.viz.transform(piece);
             })
@@ -569,9 +577,32 @@ hundo.viz.stepAnimate = function(board) {
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.pieceId(ball);
 
+        var dx;
+        var dy;
+        if (ball.dir != hundo.DirectionEnum.NODIR) {
+            [dx, dy] = hundo.viz.dxdy(ball.dir);
+        } else {
+            dx = 0;
+            dy = 0;
+        }
+
         hundo.viz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
+            .attr("rx", function() {
+                if (dy != 0) {
+                    return vizConfig.cellSize / 4;
+                } else {
+                    return vizConfig.cellSize / 2;
+                }
+            })
+            .attr("ry", function() {
+                if (dx != 0) {
+                    return vizConfig.cellSize / 4;
+                } else {
+                    return vizConfig.cellSize / 2;
+                }
+            })
             .attr("transform", function() {
                 return hundo.viz.transform(ball);
             })
@@ -587,6 +618,8 @@ hundo.viz.stepAnimate = function(board) {
             hundo.viz.boardSvg.select(id)
                 .transition()
                 .ease("linear")
+                .attr("rx", vizConfig.cellSize / 2)
+                .attr("ry", vizConfig.cellSize / 2)
                 .attr("transform", function() {
 
                     var [dx, dy] = hundo.viz.dxdy(dir);
