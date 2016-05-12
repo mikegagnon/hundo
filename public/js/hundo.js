@@ -84,6 +84,8 @@ hundo.Board = function(boardConfig) {
     // of bounds or reached a goal
     this.done = false;
 
+    this.solved = false;
+
     this.numRows = boardConfig.numRows;
     this.numCols = boardConfig.numCols;
     
@@ -261,6 +263,20 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
 
 }
 
+hundo.Board.prototype.checkSolved = function() {
+
+    var pieces = this.matrix[this.ball.row][this.ball.col]
+
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        if (piece.type == hundo.PieceTypeEnum.GOAL) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // returns null on fatal error
 // else, returns an animation object, which describes how the
 // the step should be animated
@@ -311,6 +327,11 @@ hundo.Board.prototype.step = function() {
 
     if (this.nudge(newRow, newCol, this.ball.dir)) {
         this.movePiece(this.ball, newRow, newCol);
+        if (this.checkSolved()) {
+            this.solved = true;
+            this.atRest = true;
+            this.ball.dir = hundo.DirectionEnum.NODIR;
+        }
         return {
             "move": {
                 "ball": this.ball,
@@ -503,6 +524,10 @@ hundo.viz.stepAnimate = function() {
 hundo.viz.checkKey = function(e) {
 
     if (!hundo.board.atRest) {
+        return;
+    }
+
+    if (hundo.board.solved) {
         return;
     }
 

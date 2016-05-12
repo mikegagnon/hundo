@@ -322,3 +322,16 @@ assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN));
 assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT));
 assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT));
 
+/**
+ * Board.checkSolved
+ **************************************************/
+TEST = "Board.checkSolved"
+
+var board = new hundo.Board(config1);
+
+assert(1, !board.checkSolved());
+
+board.movePiece(board.ball, 1, 7);
+
+assert(2, board.checkSolved());
+
