@@ -381,6 +381,12 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
+hundo.viz.transform = function(piece) {
+    var x = piece.col * vizConfig.cellSize;
+    var y = piece.row * vizConfig.cellSize;
+    return "translate(" + x + ", " + y + ") ";
+}
+
 hundo.viz.drawBoard = function(board) {
 
     hundo.viz.boardSvg.selectAll(".block")
@@ -390,11 +396,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "block")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
-        .attr("transform", function(block) {
-          var x = block.col * vizConfig.cellSize;
-          var y = block.row * vizConfig.cellSize;
-          return "translate(" + x + ", " + y + ") "
-        });
+        .attr("transform", hundo.viz.transform);
 
     hundo.viz.boardSvg.selectAll(".ball")
         .data(board.getBalls())
@@ -403,11 +405,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "ball")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#ballTemplate")
-        .attr("transform", function(ball) {
-          var x = ball.col * vizConfig.cellSize;
-          var y = ball.row * vizConfig.cellSize;
-          return "translate(" + x + ", " + y + ") "
-        });
+        .attr("transform", hundo.viz.transform);
 
     hundo.viz.boardSvg.selectAll(".goal")
         .data(board.getGoals())
@@ -440,11 +438,7 @@ hundo.viz.reset = function(board) {
         hundo.viz.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
-            .attr("transform", function(piece) {
-                var x = piece.col * vizConfig.cellSize;
-                var y = piece.row * vizConfig.cellSize;
-                return "translate(" + x + ", " + y + ") "
-            })
+            .attr("transform", hundo.viz.transform)
             .duration(0);
     }
 
@@ -469,11 +463,7 @@ hundo.viz.stepAnimate = function(board) {
         hundo.viz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
-            .attr("transform", function(ball) {
-                var x = ball.col * vizConfig.cellSize;
-                var y = ball.row * vizConfig.cellSize;
-                return "translate(" + x + ", " + y + ") "
-            })
+            .attr("transform", hundo.viz.transform)
             .duration(vizConfig.stepDuration);
 
     } else if ("collide" in animate) {
