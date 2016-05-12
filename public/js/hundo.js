@@ -400,18 +400,31 @@ hundo.viz.transform = function(piece, transformation) {
         y += transformation.dy;
     }
 
+    var t = "translate(" + x + ", " + y + ") ";
+
+    if ("scale" in transformation) {
+        t += "scale(" + transformation.scale + ") ";
+    }
+
     if (piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.BLOCK) {
-        return "translate(" + x + ", " + y + ") ";
+        return t;
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = vizConfig.cellSize / 2;
         var degrees = hundo.viz.dirToDegrees(piece.dir);
-        return "translate(" + x + ", " + y + ") " +
-            "rotate(" + degrees + ", " + z + ", " + z + ")"
+        return t + "rotate(" + degrees + ", " + z + ", " + z + ") " ;
+    } else {
+        console.error("Bad piece type: " + piece.type);
     }
 }
 
+hundo.getRandom = function (min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 hundo.viz.drawBoard = function(board) {
+
+    var dxdy = vizConfig.cellSize / 2;
 
     hundo.viz.boardSvg.selectAll(".block")
         .data(board.getBlocks())
@@ -421,7 +434,11 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
         .attr("transform", function(piece) {
-            return hundo.viz.transform(piece);
+            return hundo.viz.transform(piece, {
+                dx: dxdy,
+                dy: dxdy,
+                scale: 0
+            });
         });
 
     hundo.viz.boardSvg.selectAll(".ball")
@@ -432,7 +449,11 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#ballTemplate")
         .attr("transform", function(piece) {
-            return hundo.viz.transform(piece);
+            return hundo.viz.transform(piece, {
+                dx: dxdy,
+                dy: dxdy,
+                scale: 0
+            });
         });
 
     hundo.viz.boardSvg.selectAll(".goal")
@@ -442,9 +463,57 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "goal")
         .attr("id", hundo.viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
-        .attr("transform", function(goal) {
-            return hundo.viz.transform(goal);
+        .attr("transform", function(piece) {
+            return hundo.viz.transform(piece, {
+                dx: dxdy,
+                dy: dxdy,
+                scale: 0
+            });
         });
+
+    var dxdy = -(vizConfig.cellSize / 2) * vizConfig.blowupScale;
+
+    var pieces = hundo.board.getPieces(function(){ return true; });
+    var delays = []
+    for (var i = 0; i < pieces.length; i++) {
+        delays.push(hundo.getRandom(0, vizConfig.flyInDuration / 2));
+    }
+
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        var id = "#" + hundo.viz.pieceId(piece);
+        var delay = delays[i];
+
+        hundo.viz.boardSvg.select(id)
+            .transition()
+            .ease("linear")
+            .delay(delay)
+            .attr("transform", function() {
+                return hundo.viz.transform(piece, {
+                    dx: dxdy,
+                    dy: dxdy,
+                    scale: vizConfig.blowupScale
+                });
+            })
+            .duration(vizConfig.flyInDuration / 2);
+    }
+
+    setTimeout(function(){
+        for (var i = 0; i < pieces.length; i++) {
+            var piece = pieces[i];
+            var id = "#" + hundo.viz.pieceId(piece);
+            var delay = delays[i];
+            hundo.viz.boardSvg.select(id)
+                .transition()
+                .ease("linear")
+                .delay(delay)
+                .attr("transform", function() {
+                    return hundo.viz.transform(piece);
+                })
+                .duration(vizConfig.flyInDuration / 2);
+            }
+    }, vizConfig.flyInDuration / 2);
+
 }
 
 
@@ -628,8 +697,19 @@ var boardConfig = {
         {
             row: 3,
             col: 7,
-            dir: hundo.DirectionEnum.DOWN
+            dir: hundo.DirectionEnum.UP
+        },
+        {
+            row: 5,
+            col: 8,
+            dir: hundo.DirectionEnum.LEFT
+        },
+        {
+            row: 10,
+            col: 3,
+            dir: hundo.DirectionEnum.RIGHT
         }
+
     ],
     ball: {
         row: 2,
@@ -639,7 +719,9 @@ var boardConfig = {
 
 var vizConfig = {
     cellSize: 20,
-    stepDuration: 50
+    stepDuration: 50,
+    flyInDuration: 250,
+    blowupScale: 3
 }
 
 document.onkeydown = hundo.viz.checkKey;
