@@ -393,22 +393,23 @@ var vizConfig = {
 
 hundo.board = new hundo.Board(boardConfig);
 
-hundo.boardSvg = d3.select("#boardSvg")
+hundo.viz = {}
+
+hundo.viz.boardSvg = d3.select("#boardSvg")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize);
 
-hundo.boardSvg.select("#background")
+hundo.viz.boardSvg.select("#background")
     .attr("width", boardConfig.numCols * vizConfig.cellSize)
     .attr("height", boardConfig.numRows * vizConfig.cellSize)
     .attr("style", "fill:black");
 
-hundo.viz = {}
 
 hundo.viz.pieceId = function(piece) {
     return "piece" + piece.id;
 }
 
-hundo.boardSvg.selectAll(".block")
+hundo.viz.boardSvg.selectAll(".block")
     .data(hundo.board.getBlocks())
     .enter()
     .append("svg:use")
@@ -421,7 +422,7 @@ hundo.boardSvg.selectAll(".block")
       return "translate(" + x + ", " + y + ") "
     });
 
-hundo.boardSvg.selectAll(".ball")
+hundo.viz.boardSvg.selectAll(".ball")
     .data(hundo.board.getBalls())
     .enter()
     .append("svg:use")
@@ -448,7 +449,7 @@ hundo.viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.boardSvg.selectAll(".goal")
+hundo.viz.boardSvg.selectAll(".goal")
     .data(hundo.board.getGoals())
     .enter()
     .append("svg:use")
@@ -476,7 +477,7 @@ hundo.viz.reset = function() {
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
-        hundo.boardSvg.select("#" + hundo.viz.pieceId(piece))
+        hundo.viz.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
             .attr("transform", function(piece) {
@@ -506,7 +507,7 @@ hundo.viz.stepAnimate = function() {
         }
         ball = animate.move.ball;
         ballId = "#" + hundo.viz.pieceId(ball);
-        hundo.boardSvg.select(ballId)
+        hundo.viz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
             .attr("transform", function(ball) {
