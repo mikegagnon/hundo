@@ -8,11 +8,11 @@ hundo.PieceTypeEnum = {
 }
 
 hundo.DirectionEnum = {
-    UP: 0,
-    DOWN: 1,
-    LEFT: 2,
-    RIGHT: 3,
-    NODIR: 4
+    UP: "UP",
+    DOWN: "DOWN",
+    LEFT: "LEFT",
+    RIGHT: "RIGHT",
+    NODIR: "NODIR"
 }
 
 // every piece has unique id
@@ -25,6 +25,10 @@ hundo.Block = function(id, row, col) {
     this.origCol = col;
 }
 
+hundo.Block.prototype.nudge = function(dir) {
+    return false;
+}
+
 hundo.Ball = function(id, row, col, dir) {
     this.id = id;
     this.type = hundo.PieceTypeEnum.BALL;
@@ -35,6 +39,10 @@ hundo.Ball = function(id, row, col, dir) {
     this.dir = dir;
 }
 
+hundo.Ball.prototype.nudge = function(dir) {
+    return false;
+}
+
 hundo.Goal = function(id, row, col, dir) {
     this.id = id;
     this.type = hundo.PieceTypeEnum.GOAL;
@@ -43,6 +51,27 @@ hundo.Goal = function(id, row, col, dir) {
     this.origRow = row;
     this.origCol = col;
     this.dir = dir;
+}
+
+hundo.oppositeDir = function(dir) {
+
+    if (dir == hundo.DirectionEnum.UP) {
+        return hundo.DirectionEnum.DOWN;
+    } else if (dir == hundo.DirectionEnum.DOWN) {
+        return hundo.DirectionEnum.UP;
+    } else if (dir == hundo.DirectionEnum.LEFT) {
+        return hundo.DirectionEnum.RIGHT;
+    } else if (dir == hundo.DirectionEnum.RIGHT) {
+        return hundo.DirectionEnum.LEFT;
+    } else {
+        console.error("Bad direction: " + dir)
+    }
+}
+
+// dir is the direction of the momentum of piece doing the nudging
+// returns true if this piece can accept the nudging piece
+hundo.Goal.prototype.nudge = function(dir) {
+    return this.dir == hundo.oppositeDir(dir);
 }
 
 // TODO: Assume boardConfig is untrusted
@@ -216,6 +245,22 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 
 }
 
+// see hundo.nudge
+hundo.Board.prototype.nudge = function(row, col, dir) {
+
+    var pieces = this.matrix[row][col];
+
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        if (!piece.nudge(dir)) {
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 // returns null on fatal error
 // else, returns an animation object, which describes how the
 // the step should be animated
@@ -264,7 +309,15 @@ hundo.Board.prototype.step = function() {
         };
     }
 
-    if (this.matrix[newRow][newCol].length > 0) {
+    if (this.nudge(newRow, newCol, this.ball.dir)) {
+        this.movePiece(this.ball, newRow, newCol);
+        return {
+            "move": {
+                "ball": this.ball,
+                "dir": direction
+            }
+        }
+    } else {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
         return {
@@ -273,15 +326,7 @@ hundo.Board.prototype.step = function() {
                 "recipients": this.matrix[newRow][newCol]
             }
         };
-    } else {
-        this.movePiece(this.ball, newRow, newCol);
-        return {
-            "move": {
-                "ball": this.ball,
-                "dir": direction
-            }
-        }
-    }
+    } 
 }
 
 
@@ -301,6 +346,10 @@ var boardConfig = {
         {
             row: 2,
             col: 8
+        },
+        {
+            row: 2,
+            col: 4
         }
     ],
     goals: [
@@ -312,7 +361,7 @@ var boardConfig = {
     ],
     ball: {
         row: 2,
-        col: 3,
+        col: 7,
     }
 }
 

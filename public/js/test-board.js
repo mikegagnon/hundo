@@ -57,6 +57,36 @@ var config1 = {
     ]
 }
 
+var config2 = {
+    numRows: 5,
+    numCols: 10,
+    blocks : [
+        {
+            row: 2,
+            col: 1
+        },
+        {
+            row: 2,
+            col: 2
+        },
+        {
+            row: 2,
+            col: 4
+        }
+    ],
+    ball: {
+        row: 2,
+        col: 3,
+    },
+    goals: [
+        {
+            row: 1,
+            col: 7,
+            dir: hundo.DirectionEnum.UP
+        }
+    ]
+}
+
 /**
  * Test Board constructor
  **************************************************/
@@ -250,17 +280,45 @@ assert(12, board.ball.equals(expectedBall));
 assertEquals(13, result.move.dir, hundo.DirectionEnum.RIGHT);
 
 /**
- * Board.step once
+ * Board.step 
  **************************************************/
 
 TEST = "Board.step three times"
 
+var board = new hundo.Board(config2);
+
+board.ball.dir = hundo.DirectionEnum.RIGHT;
+
+assertEquals(1, board.ball.col, 3);
+
+board.step();
+
+assertEquals(1, board.ball.col, 3);
+
+// TODO: assert
+
+/**
+ * Board.nudge
+ **************************************************/
+TEST = "Board.nudge"
+
 var board = new hundo.Board(config1);
 
-board.ball.dir = hundo.DirectionEnum.UP;
+// nudging empty space
+assertEquals(1, true, board.nudge(0,0, hundo.DirectionEnum.UP));
+assertEquals(2, true, board.nudge(0,0, hundo.DirectionEnum.DOWN));
+assertEquals(3, true, board.nudge(0,0, hundo.DirectionEnum.LEFT));
+assertEquals(4, true, board.nudge(0,0, hundo.DirectionEnum.RIGHT));
 
-board.step();
-board.step();
-var result = board.step();
+// nudging a block
+assertEquals(5, false, board.nudge(2,1, hundo.DirectionEnum.UP));
+assertEquals(6, false, board.nudge(2,1, hundo.DirectionEnum.DOWN));
+assertEquals(7, false, board.nudge(2,1, hundo.DirectionEnum.LEFT));
+assertEquals(8, false, board.nudge(2,1, hundo.DirectionEnum.RIGHT));
 
+// nudging a goal
+assertEquals(9, false, board.nudge(1,7, hundo.DirectionEnum.UP));
+assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN));
+assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT));
+assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT));
 
