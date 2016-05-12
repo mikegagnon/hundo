@@ -342,10 +342,12 @@ hundo.Board.prototype.step = function() {
     } else {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
+        var recipients = this.matrix[newRow][newCol].slice(0);
+        recipients.push(this.ball);
         return {
             "collide": {
                 "dir": direction,
-                "recipients": this.matrix[newRow][newCol]
+                "recipients": recipients
             }
         };
     } 
@@ -523,13 +525,17 @@ hundo.viz.stepAnimate = function(board) {
                     }
                 })
                 .duration(vizConfig.stepDuration / 2);
+        }
 
-            setTimeout(function(){
+
+        setTimeout(function(){
+            for (var i = 0; i < recipients.length; i++) {
+                var piece = recipients[i];
+                var id = "#" + hundo.viz.pieceId(piece);
                 hundo.viz.boardSvg.select(id)
                     .transition()
                     .ease("linear")
                     .attr("transform", function() {
-
                         if (piece.type == hundo.PieceTypeEnum.BALL ||
                             piece.type == hundo.PieceTypeEnum.BLOCK) {
                             return hundo.viz.transform(piece);
@@ -538,8 +544,8 @@ hundo.viz.stepAnimate = function(board) {
                         }
                     })
                     .duration(vizConfig.stepDuration / 2);
-            }, vizConfig.stepDuration / 2);
-        }
+                }
+        }, vizConfig.stepDuration / 2);
     }
 }
 
