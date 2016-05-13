@@ -859,8 +859,8 @@ var boardConfig1 = {
 }
 
 var boardConfig2 = {
-    numRows: 20,
-    numCols: 30,
+    numRows: 15,
+    numCols: 20,
     blocks : [
         {
             row: 2,
