@@ -588,7 +588,8 @@ hundo.viz.animateSolved = function() {
                     scale: 0
                 });
             })
-            .duration(vizConfig.flyInDuration);
+            .duration(vizConfig.flyInDuration)
+            .remove();
     }
 }
 
@@ -727,7 +728,7 @@ hundo.viz.checkKey = function(e) {
 
 }
 
-var boardConfig = {
+var boardConfig1 = {
     numRows: 20,
     numCols: 30,
     blocks : [
@@ -793,6 +794,6 @@ var vizConfig = {
 }
 
 document.onkeydown = hundo.viz.checkKey;
-hundo.board = new hundo.Board(boardConfig);
-hundo.viz.init(boardConfig, vizConfig);
+hundo.board = new hundo.Board(boardConfig1);
+hundo.viz.init(boardConfig1, vizConfig);
 hundo.viz.drawBoard(hundo.board);
