@@ -726,6 +726,7 @@ hundo.viz.stepAnimate = function(board) {
             .attr("r", vizConfig.cellSize / 2 - vizConfig.cellSize / 8)
             .attr("style", "fill:#bbb")
             .transition()
+            .duration(vizConfig.stepDuration * 4)
             .attr("r", "0")
             .remove();
 
