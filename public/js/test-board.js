@@ -7,8 +7,7 @@
  **************************************************/
 
 function equalsTypeRowCol(a, b) {
-    return a.id == b.id &&
-        a.type == b.type &&
+    return a.type == b.type &&
         a.row == b.row &&
         a.col == b.col;
 }
@@ -131,7 +130,7 @@ TEST = "Board.movePiece in bound to inbound"
 
 var board = new hundo.Board(config1);
 
-var ball = new hundo.Ball(2, 2, 3, NODIR);
+var ball = board.ball;
 
 board.movePiece(ball, 2, 4);
 
@@ -144,7 +143,7 @@ TEST = "Board.movePiece out of bounds"
 
 var board = new hundo.Board(config1);
 
-var ball = new hundo.Ball(2, 2, 3, NODIR);
+var ball = board.ball;
 
 board.movePiece(ball, -1, 4);
 
@@ -161,6 +160,7 @@ assert(1, ball.equals(new hundo.Ball(2, 4, 4, NODIR)));
 assertEquals(2, board.oob.length, 0);
 assert(3, board.matrix[4][4].length, 1);
 assert(4, board.matrix[4][4][0].equals(new hundo.Ball(2, 4, 4, NODIR)));
+
 
 /**
  * Board.reset
