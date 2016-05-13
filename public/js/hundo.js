@@ -363,6 +363,7 @@ hundo.viz.init = function(boardConfig, vizConfig) {
         .attr("height", boardConfig.numRows * vizConfig.cellSize);
 
     hundo.viz.boardSvg.select("#background")
+        .attr("id", "background")
         .attr("width", boardConfig.numCols * vizConfig.cellSize)
         .attr("height", boardConfig.numRows * vizConfig.cellSize)
         .attr("style", "fill:black");
@@ -565,8 +566,10 @@ hundo.viz.dxdy = function(dir) {
 
 hundo.viz.animateVictory = function() {
 
-
-
+    hundo.viz.boardSvg.select("#background")
+        .transition()
+        .style("fill", "#FFBF00")
+        .duration(vizConfig.flyInDuration * 10);
 }
 
 hundo.viz.animateSolved = function() {
