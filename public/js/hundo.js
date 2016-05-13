@@ -367,6 +367,9 @@ hundo.viz.init = function(boardConfig, vizConfig) {
         .attr("width", boardConfig.numCols * vizConfig.cellSize)
         .attr("height", boardConfig.numRows * vizConfig.cellSize)
         .attr("style", "fill:black");
+
+    hundo.viz.drawGrid(boardConfig);
+
 }
 
 hundo.viz.pieceId = function(piece) {
@@ -424,6 +427,47 @@ hundo.viz.transform = function(piece, transformation) {
 
 hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
+}
+
+hundo.viz.drawGrid = function(boardConfig) {
+
+    var rows = []
+
+    for (var row = 1; row < boardConfig.numRows; row++) {
+        rows.push(row)
+    }
+
+    hundo.viz.boardSvg.selectAll()
+        .data(rows)
+        .enter()
+        .append("line")
+        .attr("class", "grid")
+        .attr("x1", 0)
+        .attr("y1", function(row) { return row * vizConfig.cellSize })
+        .attr("x2", boardConfig.numCols * vizConfig.cellSize)
+        .attr("y2", function(row) { return row * vizConfig.cellSize })
+        .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
+
+    var cols = []
+
+    for (var col = 1; col < boardConfig.numCols; col++) {
+        cols.push(col)
+    }
+
+    hundo.viz.boardSvg.selectAll()
+        .data(cols)
+        .enter()
+        .append("line")
+        .attr("class", "grid")
+        .attr("y1", 0)
+        .attr("x1", function(col) { return col * vizConfig.cellSize })
+        .attr("y2", boardConfig.numRows * vizConfig.cellSize)
+        .attr("x2", function(col) { return col * vizConfig.cellSize })
+        .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
+
+
+
+
 }
 
 hundo.viz.drawBoard = function(board) {
@@ -570,6 +614,9 @@ hundo.viz.animateVictory = function() {
         .transition()
         .style("fill", "#FFBF00")
         .duration(vizConfig.flyInDuration * 10);
+
+    hundo.viz.boardSvg.selectAll(".grid")
+        .remove();
 }
 
 hundo.viz.animateSolved = function() {
