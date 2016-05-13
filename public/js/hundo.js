@@ -501,7 +501,6 @@ hundo.viz.drawBoard = function(board) {
         .attr("style", "fill:#eee")
         .attr("class", "ball")
         .attr("id", hundo.viz.pieceId)
-        .attr("xlink:href", "#ballTemplate")
         .attr("transform", function(piece) {
             return hundo.viz.transform(piece, {
                 dx: dxdy,
@@ -712,6 +711,25 @@ hundo.viz.stepAnimate = function(board) {
                 return hundo.viz.transform(ball);
             })
             .duration(vizConfig.stepDuration);
+
+        // leave a trail behind the ball
+        hundo.viz.boardSvg.selectAll()
+            .data([{row: ball.row, col: ball.col}])
+            .enter()
+            .append("circle")
+            .attr("cx", ball.col * vizConfig.cellSize +
+                    vizConfig.cellSize / 2
+            )
+            .attr("cy", ball.row * vizConfig.cellSize +
+                    vizConfig.cellSize / 2
+            )
+            .attr("r", vizConfig.cellSize / 2 - vizConfig.cellSize / 8)
+            .attr("style", "fill:#bbb")
+            .transition()
+            .attr("r", "0")
+            .remove();
+
+
 
         if (animate.move.solved) {
             hundo.viz.animateSolved();
