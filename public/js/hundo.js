@@ -75,6 +75,9 @@ hundo.Goal.prototype.nudge = function(dir) {
     return this.dir == hundo.oppositeDir(dir);
 }
 
+hundo.nextId = 0;
+
+
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
@@ -102,21 +105,19 @@ hundo.Board = function(boardConfig) {
       }
     }
 
-    var nextId = 0;
-
     var THIS = this;
 
     // Add blocks to the matrix
     $.each(boardConfig.blocks, function(index, block) { 
         var row = block.row;
         var col = block.col;
-        THIS.matrix[row][col].push(new hundo.Block(nextId++, row, col));
+        THIS.matrix[row][col].push(new hundo.Block(hundo.nextId++, row, col));
     })
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
-    this.ball = new hundo.Ball(nextId++, row, col, hundo.DirectionEnum.NODIR);
+    this.ball = new hundo.Ball(hundo.nextId++, row, col, hundo.DirectionEnum.NODIR);
     this.matrix[row][col].push(this.ball);
 
     // Add goals to the matrix
@@ -124,7 +125,7 @@ hundo.Board = function(boardConfig) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
-        THIS.matrix[row][col].push(new hundo.Goal(nextId++, row, col, dir));
+        THIS.matrix[row][col].push(new hundo.Goal(hundo.nextId++, row, col, dir));
     })
 }
 
@@ -428,7 +429,7 @@ hundo.viz.drawBoard = function(board) {
 
     var dxdy = vizConfig.cellSize / 2;
 
-    hundo.viz.boardSvg.selectAll(".block")
+    hundo.viz.boardSvg.selectAll()
         .data(board.getBlocks())
         .enter()
         .append("svg:use")
@@ -444,7 +445,7 @@ hundo.viz.drawBoard = function(board) {
         });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
-    hundo.viz.boardSvg.selectAll(".ball")
+    hundo.viz.boardSvg.selectAll()
         .data(board.getBalls())
         .enter()
         .append("ellipse")
@@ -464,7 +465,7 @@ hundo.viz.drawBoard = function(board) {
             });
         });
 
-    hundo.viz.boardSvg.selectAll(".goal")
+    hundo.viz.boardSvg.selectAll()
         .data(board.getGoals())
         .enter()
         .append("svg:use")
@@ -562,6 +563,12 @@ hundo.viz.dxdy = function(dir) {
     }
 }
 
+hundo.viz.animateVictory = function() {
+
+
+
+}
+
 hundo.viz.animateSolved = function() {
 
     var pieces = hundo.board.getPieces(function(){ return true; });
@@ -593,6 +600,8 @@ hundo.viz.animateSolved = function() {
     }
 }
 
+
+
 hundo.viz.stepAnimate = function(board) {
     var animate = board.step();
 
@@ -604,6 +613,19 @@ hundo.viz.stepAnimate = function(board) {
         setTimeout(
             function(){hundo.viz.reset(hundo.board);},
             hundo.viz.animateInterval);
+    }
+
+    if (board.solved) {
+        setTimeout(function(){
+            if (hundo.level < hundo.boardConfigs.length - 1) {
+                hundo.level++;
+                hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level]);
+                hundo.viz.drawBoard(hundo.board);
+            } else {
+                // all levels solved
+                hundo.viz.animateVictory();
+            }
+        }, vizConfig.flyInDuration / 2);
     }
 
     if ("move" in animate) {
@@ -786,6 +808,41 @@ var boardConfig1 = {
     }
 }
 
+var boardConfig2 = {
+    numRows: 20,
+    numCols: 30,
+    blocks : [
+        {
+            row: 2,
+            col: 1
+        },
+        {
+            row: 2,
+            col: 2
+        },
+    ],
+    goals: [
+        {
+            row: 1,
+            col: 7,
+            dir: hundo.DirectionEnum.DOWN
+        },
+        {
+            row: 3,
+            col: 7,
+            dir: hundo.DirectionEnum.UP
+        }
+
+    ],
+    ball: {
+        row: 2,
+        col: 7,
+    }
+}
+
+hundo.boardConfigs = [boardConfig1, boardConfig2];
+hundo.level = 0
+
 var vizConfig = {
     cellSize: 20,
     stepDuration: 50,
@@ -794,6 +851,7 @@ var vizConfig = {
 }
 
 document.onkeydown = hundo.viz.checkKey;
-hundo.board = new hundo.Board(boardConfig1);
-hundo.viz.init(boardConfig1, vizConfig);
+hundo.viz.init(hundo.boardConfigs[hundo.level], vizConfig);
+
+hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level]);
 hundo.viz.drawBoard(hundo.board);
