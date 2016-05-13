@@ -754,8 +754,8 @@ hundo.viz.checkKey = function(e) {
 }
 
 var boardConfig1 = {
-    numRows: 20,
-    numCols: 30,
+    numRows: 15,
+    numCols: 20,
     blocks : [
         {
             row: 2,
@@ -847,7 +847,7 @@ hundo.boardConfigs = [boardConfig1, boardConfig2];
 hundo.level = 0
 
 var vizConfig = {
-    cellSize: 20,
+    cellSize: 26,
     stepDuration: 50,
     flyInDuration: 250,
     blowupScale: 3
