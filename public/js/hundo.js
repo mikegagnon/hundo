@@ -446,12 +446,10 @@ hundo.viz.drawGrid = function(boardConfig) {
         .append("line")
         .attr("class", "grid")
         .attr("x1", vizConfig.perimStrokeWidth)
-        .attr("y1", function(row) { return row * vizConfig.cellSize -
-                vizConfig.perimStrokeWidth})
+        .attr("y1", function(row) { return row * vizConfig.cellSize})
         .attr("x2", boardConfig.numCols * vizConfig.cellSize -
                 vizConfig.perimStrokeWidth)
-        .attr("y2", function(row) { return row * vizConfig.cellSize - 
-            vizConfig.perimStrokeWidth})
+        .attr("y2", function(row) { return row * vizConfig.cellSize})
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
     var cols = []
@@ -466,12 +464,10 @@ hundo.viz.drawGrid = function(boardConfig) {
         .append("line")
         .attr("class", "grid")
         .attr("y1", vizConfig.perimStrokeWidth)
-        .attr("x1", function(col) { return col * vizConfig.cellSize -
-            vizConfig.perimStrokeWidth})
+        .attr("x1", function(col) { return col * vizConfig.cellSize})
         .attr("y2", boardConfig.numRows * vizConfig.cellSize - 
             vizConfig.perimStrokeWidth)
-        .attr("x2", function(col) { return col * vizConfig.cellSize - 
-            vizConfig.perimStrokeWidth})
+        .attr("x2", function(col) { return col * vizConfig.cellSize})
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
 
