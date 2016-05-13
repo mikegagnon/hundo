@@ -363,10 +363,13 @@ hundo.viz.init = function(boardConfig, vizConfig) {
         .attr("height", boardConfig.numRows * vizConfig.cellSize);
 
     hundo.viz.boardSvg.select("#background")
-        .attr("id", "background")
         .attr("width", boardConfig.numCols * vizConfig.cellSize)
         .attr("height", boardConfig.numRows * vizConfig.cellSize)
         .attr("style", "fill:black");
+
+    hundo.viz.boardSvg.select("#perim")
+        .attr("width", boardConfig.numCols * vizConfig.cellSize)
+        .attr("height", boardConfig.numRows * vizConfig.cellSize)
 
     hundo.viz.drawGrid(boardConfig);
 
@@ -442,10 +445,13 @@ hundo.viz.drawGrid = function(boardConfig) {
         .enter()
         .append("line")
         .attr("class", "grid")
-        .attr("x1", 0)
-        .attr("y1", function(row) { return row * vizConfig.cellSize })
-        .attr("x2", boardConfig.numCols * vizConfig.cellSize)
-        .attr("y2", function(row) { return row * vizConfig.cellSize })
+        .attr("x1", vizConfig.perimStrokeWidth)
+        .attr("y1", function(row) { return row * vizConfig.cellSize -
+                vizConfig.perimStrokeWidth})
+        .attr("x2", boardConfig.numCols * vizConfig.cellSize -
+                vizConfig.perimStrokeWidth)
+        .attr("y2", function(row) { return row * vizConfig.cellSize - 
+            vizConfig.perimStrokeWidth})
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
     var cols = []
@@ -459,10 +465,13 @@ hundo.viz.drawGrid = function(boardConfig) {
         .enter()
         .append("line")
         .attr("class", "grid")
-        .attr("y1", 0)
-        .attr("x1", function(col) { return col * vizConfig.cellSize })
-        .attr("y2", boardConfig.numRows * vizConfig.cellSize)
-        .attr("x2", function(col) { return col * vizConfig.cellSize })
+        .attr("y1", vizConfig.perimStrokeWidth)
+        .attr("x1", function(col) { return col * vizConfig.cellSize -
+            vizConfig.perimStrokeWidth})
+        .attr("y2", boardConfig.numRows * vizConfig.cellSize - 
+            vizConfig.perimStrokeWidth)
+        .attr("x2", function(col) { return col * vizConfig.cellSize - 
+            vizConfig.perimStrokeWidth})
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
 
@@ -825,6 +834,10 @@ var boardConfig1 = {
     blocks : [
         {
             row: 2,
+            col: 0
+        },
+        {
+            row: 2,
             col: 1
         },
         {
@@ -916,7 +929,8 @@ var vizConfig = {
     cellSize: 26,
     stepDuration: 50,
     flyInDuration: 250,
-    blowupScale: 3
+    blowupScale: 3,
+    perimStrokeWidth: 3
 }
 
 document.onkeydown = hundo.viz.checkKey;
