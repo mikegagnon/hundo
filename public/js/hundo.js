@@ -671,8 +671,6 @@ hundo.Viz.prototype.animateVictory = function() {
         .attr("r", function(c){return c.r; })
         .attr("fill-opacity", "0")
         .remove()
-
-
 }
 
 hundo.Viz.prototype.animateSolved = function() {
