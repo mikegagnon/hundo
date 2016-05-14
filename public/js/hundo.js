@@ -485,6 +485,7 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
+// TODO: rm board argument
 hundo.Viz.prototype.drawBoard = function(board) {
 
     var dxdy = vizConfig.cellSize / 2;
@@ -707,33 +708,37 @@ hundo.Viz.prototype.animateSolved = function() {
 }
 
 
+// TODO: idGen member of Viz
+hundo.Viz.prototype.stepAnimate = function(idGen) {
 
-hundo.viz.stepAnimate = function(board, idGen) {
-    var animate = board.step();
+    var THIS = this;
 
-    if (board.atRest) {
+    var animate = this.board.step();
+
+    if (this.board.atRest) {
         clearInterval(hundo.viz.animateInterval);
     }
 
-    if (board.done) {
+    if (this.board.done) {
         setTimeout(
-            function(){hundo.vizz.reset(hundo.board);},
+            function(){THIS.reset(hundo.board);},
             hundo.viz.animateInterval);
     }
 
-    if (board.solved) {
+    if (this.board.solved) {
         setTimeout(function(){
+            // TODO: Viz.level and Viz.boardConfigs
             if (hundo.level < hundo.boardConfigs.length - 1) {
                 hundo.level++;
                 // TODO: rm hundo.board
-                hundo.vizz.board = hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
-                    idGen);
-                hundo.vizz.drawBoard(hundo.board);
+                THIS.board = hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
+                    hundo.idGen);
+                THIS.drawBoard(hundo.board);
             } else {
                 // all levels solved
                 hundo.vizz.animateVictory();
             }
-        }, vizConfig.flyInDuration / 2);
+        }, this.vizConfig.flyInDuration / 2);
     }
 
     if ("move" in animate) {
@@ -749,50 +754,49 @@ hundo.viz.stepAnimate = function(board, idGen) {
             dy = 0;
         }
 
-        hundo.vizz.boardSvg.select(ballId)
+        this.boardSvg.select(ballId)
             .transition()
             .ease("linear")
             .attr("rx", function() {
                 if (dy != 0) {
-                    return vizConfig.cellSize / 4;
+                    return THIS.vizConfig.cellSize / 4;
                 } else {
-                    return vizConfig.cellSize / 2;
+                    return THIS.vizConfig.cellSize / 2;
                 }
             })
             .attr("ry", function() {
                 if (dx != 0) {
-                    return vizConfig.cellSize / 4;
+                    return THIS.vizConfig.cellSize / 4;
                 } else {
-                    return vizConfig.cellSize / 2;
+                    return THIS.vizConfig.cellSize / 2;
                 }
             })
             .attr("transform", function() {
-                return hundo.vizz.transform(ball);
+                return THIS.transform(ball);
             })
-            .duration(vizConfig.stepDuration);
+            .duration(this.vizConfig.stepDuration);
 
         // leave a trail behind the ball
-        hundo.vizz.boardSvg.selectAll()
+        this.boardSvg.selectAll()
             .data([{row: ball.row, col: ball.col}])
             .enter()
             .append("circle")
-            .attr("cx", ball.col * vizConfig.cellSize +
-                    vizConfig.cellSize / 2
+            .attr("cx", ball.col * this.vizConfig.cellSize +
+                    this.vizConfig.cellSize / 2
             )
             .attr("cy", ball.row * vizConfig.cellSize +
-                    vizConfig.cellSize / 2
+                    this.vizConfig.cellSize / 2
             )
-            .attr("r", vizConfig.cellSize / 2 - vizConfig.cellSize / 8)
+            .attr("r", this.vizConfig.cellSize / 2 -
+                    this.vizConfig.cellSize / 8)
             .attr("style", "fill:#bbb")
             .transition()
-            .duration(vizConfig.stepDuration * 4)
+            .duration(this.vizConfig.stepDuration * 4)
             .attr("r", "0")
             .remove();
 
-
-
         if (animate.move.solved) {
-            hundo.vizz.animateSolved();
+            this.animateSolved();
         }
 
     } else if ("collide" in animate) {
@@ -801,36 +805,36 @@ hundo.viz.stepAnimate = function(board, idGen) {
         for (var i = 0; i < recipients.length; i++) {
             var piece = recipients[i];
             var id = "#" + hundo.Viz.pieceId(piece);
-            hundo.vizz.boardSvg.select(id)
+            this.boardSvg.select(id)
                 .transition()
                 .ease("linear")
-                .attr("rx", vizConfig.cellSize / 2)
-                .attr("ry", vizConfig.cellSize / 2)
+                .attr("rx", this.vizConfig.cellSize / 2)
+                .attr("ry", this.vizConfig.cellSize / 2)
                 .attr("transform", function() {
 
                     var [dx, dy] = hundo.Viz.dxdy(dir);
 
-                    dx *= vizConfig.cellSize / 3;
-                    dy *= vizConfig.cellSize / 3;
+                    dx *= THIS.vizConfig.cellSize / 3;
+                    dy *= THIS.vizConfig.cellSize / 3;
 
-                    return hundo.vizz.transform(piece, {dx: dx, dy: dy});
+                    return THIS.transform(piece, {dx: dx, dy: dy});
                 })
-                .duration(vizConfig.stepDuration / 2);
+                .duration(this.vizConfig.stepDuration / 2);
         }
 
         setTimeout(function(){
             for (var i = 0; i < recipients.length; i++) {
                 var piece = recipients[i];
                 var id = "#" + hundo.Viz.pieceId(piece);
-                hundo.vizz.boardSvg.select(id)
+                THIS.boardSvg.select(id)
                     .transition()
                     .ease("linear")
                     .attr("transform", function() {
-                        return hundo.vizz.transform(piece);
+                        return THIS.transform(piece);
                     })
-                    .duration(vizConfig.stepDuration / 2);
+                    .duration(THIS.vizConfig.stepDuration / 2);
                 }
-        }, vizConfig.stepDuration / 2);
+        }, this.vizConfig.stepDuration / 2);
     }
 }
 
@@ -864,12 +868,12 @@ hundo.viz.checkKey = function(e) {
 
 
 
-    hundo.viz.stepAnimate(hundo.board, hundo.idGen);
+    hundo.vizz.stepAnimate(hundo.board, hundo.idGen);
 
     if (!hundo.board.atRest) {
         hundo.viz.animateInterval =
             setInterval(
-                function(){hundo.viz.stepAnimate(hundo.board, hundo.idGen);},
+                function(){hundo.vizz.stepAnimate(hundo.board, hundo.idGen);},
                 vizConfig.stepDuration);
     }
 
