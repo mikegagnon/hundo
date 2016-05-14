@@ -1,6 +1,5 @@
 
 var hundo = {}
-hundo.viz = {}
 
 hundo.PieceTypeEnum = {
     BALL: "BALL",
@@ -718,13 +717,13 @@ hundo.Viz.prototype.stepAnimate = function() {
     var animate = this.board.step();
 
     if (this.board.atRest) {
-        clearInterval(hundo.viz.animateInterval);
+        clearInterval(this.animateInterval);
     }
 
     if (this.board.done) {
         setTimeout(
             function(){THIS.reset(hundo.board);},
-            hundo.viz.animateInterval);
+            THIS.animateInterval);
     }
 
     if (this.board.solved) {
@@ -873,17 +872,11 @@ hundo.Viz.checkKey = function(e) {
     hundo.vizz.stepAnimate(hundo.board);
 
     if (!hundo.board.atRest) {
-        hundo.viz.animateInterval =
+        hundo.vizz.animateInterval =
             setInterval(
                 function(){hundo.vizz.stepAnimate(hundo.board);},
                 vizConfig.stepDuration);
     }
-
-    if (hundo.board.done) {
-        hundo.viz.reset(hundo.board);
-    }
-
-
 }
 
 var boardConfig1 = {
@@ -1027,6 +1020,5 @@ var vizConfig = {
 
 document.onkeydown = hundo.Viz.checkKey;
 
-hundo.idGen = new hundo.IdGenerator();
 hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0]);
 hundo.vizz.drawBoard(hundo.board);
