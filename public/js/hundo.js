@@ -267,14 +267,11 @@ hundo.Board.prototype.checkSolved = function() {
 
     var pieces = this.matrix[this.ball.row][this.ball.col]
 
-    for (var i = 0; i < pieces.length; i++) {
-        var piece = pieces[i];
-        if (piece.type == hundo.PieceTypeEnum.GOAL) {
-            return true;
-        }
-    }
+    var result = _.filter(pieces, function(piece){
+        return piece.type == hundo.PieceTypeEnum.GOAL;
+    })
 
-    return false;
+    return result.length == 1;
 }
 
 // returns null on fatal error
