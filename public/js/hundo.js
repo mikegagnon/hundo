@@ -116,7 +116,7 @@ hundo.Board = function(boardConfig, idGen) {
         var row = block.row;
         var col = block.col;
         THIS.matrix[row][col].push(new hundo.Block(idGen.next(), row, col)); 
-    })
+    });
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
@@ -130,20 +130,21 @@ hundo.Board = function(boardConfig, idGen) {
         var col = goal.col;
         var dir = goal.dir;
         THIS.matrix[row][col].push(new hundo.Goal(idGen.next(), row, col, dir));
-    })
+    });
 }
 
 hundo.Board.prototype.reset = function() {
 
+    var THIS = this;
+
     // moved is the set of all pieces that have moved
     var moved = this.getPieces(function(piece) {
         return (piece.row != piece.origRow) || (piece.col != piece.origCol);
-    })
+    });
 
-    for (var i = 0; i < moved.length; i++) {
-        var piece = moved[i];
-        this.movePiece(piece, piece.origRow, piece.origCol);
-    }
+    _.each(moved, function(piece){
+        THIS.movePiece(piece, piece.origRow, piece.origCol); 
+    });
 
     this.done = false;
 
