@@ -612,7 +612,7 @@ hundo.Viz.prototype.reset = function(board) {
 
 }
 
-hundo.viz.dxdy = function(dir) {
+hundo.Viz.dxdy = function(dir) {
     if (dir == hundo.DirectionEnum.UP) {
         return [0, -1];
     } else if (dir == hundo.DirectionEnum.DOWN) {
@@ -742,7 +742,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
         var dx;
         var dy;
         if (ball.dir != hundo.DirectionEnum.NODIR) {
-            [dx, dy] = hundo.viz.dxdy(ball.dir);
+            [dx, dy] = hundo.Viz.dxdy(ball.dir);
         } else {
             dx = 0;
             dy = 0;
@@ -807,7 +807,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                 .attr("ry", vizConfig.cellSize / 2)
                 .attr("transform", function() {
 
-                    var [dx, dy] = hundo.viz.dxdy(dir);
+                    var [dx, dy] = hundo.Viz.dxdy(dir);
 
                     dx *= vizConfig.cellSize / 3;
                     dy *= vizConfig.cellSize / 3;
