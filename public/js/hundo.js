@@ -161,9 +161,9 @@ hundo.Board.prototype.getPieces = function(func) {
 
     var pieces = [];
 
-    $.each(this.matrix, function(i, row) {
-        $.each(row, function(j, col) {
-            $.each(col, function(k, piece) {
+    _.each(this.matrix, function(row) {
+        _.each(row, function(col) {
+            _.each(col, function(piece) {
                 if (func(piece)) {
                     pieces.push(piece);
                 }
@@ -171,7 +171,7 @@ hundo.Board.prototype.getPieces = function(func) {
         })
     });
 
-    $.each(this.oob, function(i, piece){
+    _.each(this.oob, function(piece){
         if (func(piece)) {
             pieces.push(piece);
         }
