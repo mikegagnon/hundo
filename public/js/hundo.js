@@ -112,10 +112,10 @@ hundo.Board = function(boardConfig, idGen) {
     var THIS = this;
 
     // Add blocks to the matrix
-    $.each(boardConfig.blocks, function(index, block) { 
+    _.each(boardConfig.blocks, function(block){
         var row = block.row;
         var col = block.col;
-        THIS.matrix[row][col].push(new hundo.Block(idGen.next(), row, col));
+        THIS.matrix[row][col].push(new hundo.Block(idGen.next(), row, col)); 
     })
     
     // Add the ball to the matrix
@@ -125,7 +125,7 @@ hundo.Board = function(boardConfig, idGen) {
     this.matrix[row][col].push(this.ball);
 
     // Add goals to the matrix
-    $.each(boardConfig.goals, function(index, goal) {
+    _.each(boardConfig.goals, function(goal) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
