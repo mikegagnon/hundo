@@ -361,23 +361,25 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
-hundo.viz.init = function(boardConfig, vizConfig) {
+hundo.Viz = function(vizConfig) {
 
-    hundo.viz.boardSvg = d3.select("#boardSvg")
-        .attr("width", boardConfig.numCols * vizConfig.cellSize)
-        .attr("height", boardConfig.numRows * vizConfig.cellSize);
+    // TODO: validate vizConfig
+    this.vizConfig = vizConfig;
 
-    hundo.viz.boardSvg.select("#background")
-        .attr("width", boardConfig.numCols * vizConfig.cellSize)
-        .attr("height", boardConfig.numRows * vizConfig.cellSize)
+    this.boardSvg = d3.select("#boardSvg")
+        .attr("width", vizConfig.numCols * vizConfig.cellSize)
+        .attr("height", vizConfig.numRows * vizConfig.cellSize);
+
+    this.boardSvg.select("#background")
+        .attr("width", vizConfig.numCols * vizConfig.cellSize)
+        .attr("height", vizConfig.numRows * vizConfig.cellSize)
         .attr("style", "fill:black");
 
-    hundo.viz.boardSvg.select("#perim")
-        .attr("width", boardConfig.numCols * vizConfig.cellSize)
-        .attr("height", boardConfig.numRows * vizConfig.cellSize)
+    this.boardSvg.select("#perim")
+        .attr("width", vizConfig.numCols * vizConfig.cellSize)
+        .attr("height", vizConfig.numRows * vizConfig.cellSize)
 
-    hundo.viz.drawGrid(boardConfig);
-
+    this.drawGrid();
 }
 
 hundo.viz.pieceId = function(piece) {
@@ -437,54 +439,52 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
-hundo.viz.drawGrid = function(boardConfig) {
+hundo.Viz.prototype.drawGrid = function() {
+
+    var vizConfig = this.vizConfig;
 
     var rows = []
 
-    for (var row = 1; row < boardConfig.numRows; row++) {
+    for (var row = 1; row < vizConfig.numRows; row++) {
         rows.push(row)
     }
 
-    hundo.viz.boardSvg.selectAll()
+    this.boardSvg.selectAll()
         .data(rows)
         .enter()
         .append("line")
         .attr("class", "grid")
         .attr("x1", vizConfig.perimStrokeWidth)
-        .attr("y1", function(row) { return row * vizConfig.cellSize})
-        .attr("x2", boardConfig.numCols * vizConfig.cellSize -
+        .attr("y1", function(row) { return row * vizConfig.cellSize; })
+        .attr("x2", vizConfig.numCols * vizConfig.cellSize -
                 vizConfig.perimStrokeWidth)
-        .attr("y2", function(row) { return row * vizConfig.cellSize})
+        .attr("y2", function(row) { return row * vizConfig.cellSize; })
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
     var cols = []
 
-    for (var col = 1; col < boardConfig.numCols; col++) {
+    for (var col = 1; col < vizConfig.numCols; col++) {
         cols.push(col)
     }
 
-    hundo.viz.boardSvg.selectAll()
+    this.boardSvg.selectAll()
         .data(cols)
         .enter()
         .append("line")
         .attr("class", "grid")
         .attr("y1", vizConfig.perimStrokeWidth)
-        .attr("x1", function(col) { return col * vizConfig.cellSize})
-        .attr("y2", boardConfig.numRows * vizConfig.cellSize - 
+        .attr("x1", function(col) { return col * vizConfig.cellSize; })
+        .attr("y2", vizConfig.numRows * vizConfig.cellSize - 
             vizConfig.perimStrokeWidth)
-        .attr("x2", function(col) { return col * vizConfig.cellSize})
+        .attr("x2", function(col) { return col * vizConfig.cellSize; })
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
-
-
-
-
 }
 
 hundo.viz.drawBoard = function(board) {
 
     var dxdy = vizConfig.cellSize / 2;
 
-    hundo.viz.boardSvg.selectAll()
+    hundo.vizz.boardSvg.selectAll()
         .data(board.getBlocks())
         .enter()
         .append("svg:use")
@@ -500,7 +500,7 @@ hundo.viz.drawBoard = function(board) {
         });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
-    hundo.viz.boardSvg.selectAll()
+    hundo.vizz.boardSvg.selectAll()
         .data(board.getBalls())
         .enter()
         .append("ellipse")
@@ -519,7 +519,7 @@ hundo.viz.drawBoard = function(board) {
             });
         });
 
-    hundo.viz.boardSvg.selectAll()
+    hundo.vizz.boardSvg.selectAll()
         .data(board.getGoals())
         .enter()
         .append("svg:use")
@@ -547,7 +547,7 @@ hundo.viz.drawBoard = function(board) {
         var id = "#" + hundo.viz.pieceId(piece);
         var delay = delays[i];
 
-        hundo.viz.boardSvg.select(id)
+        hundo.vizz.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
@@ -566,7 +566,7 @@ hundo.viz.drawBoard = function(board) {
             var piece = pieces[i];
             var id = "#" + hundo.viz.pieceId(piece);
             var delay = delays[i];
-            hundo.viz.boardSvg.select(id)
+            hundo.vizz.boardSvg.select(id)
                 .transition()
                 .ease("linear")
                 .delay(delay)
@@ -590,7 +590,7 @@ hundo.viz.reset = function(board) {
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
-        hundo.viz.boardSvg.select("#" + hundo.viz.pieceId(piece))
+        hundo.vizz.boardSvg.select("#" + hundo.viz.pieceId(piece))
             .transition()
             .ease("linear")
             .attr("rx", vizConfig.cellSize / 2)
@@ -620,12 +620,12 @@ hundo.viz.dxdy = function(dir) {
 // TODO: Cleanup
 hundo.viz.animateVictory = function() {
 
-    hundo.viz.boardSvg.select("#background")
+    hundo.vizz.boardSvg.select("#background")
         .transition()
         .style("fill", "#EEE")
         .duration(vizConfig.flyInDuration * 10);
 
-    hundo.viz.boardSvg.selectAll(".grid")
+    hundo.vizz.boardSvg.selectAll(".grid")
         .remove();
 
     var circles = [];
@@ -647,7 +647,7 @@ hundo.viz.animateVictory = function() {
         });
     }
 
-    hundo.viz.boardSvg.selectAll()
+    hundo.vizz.boardSvg.selectAll()
         .data(circles)
         .enter()
         .append("circle")
@@ -681,7 +681,7 @@ hundo.viz.animateSolved = function() {
         var id = "#" + hundo.viz.pieceId(piece);
         var delay = delays[i];
 
-        hundo.viz.boardSvg.select(id)
+        hundo.vizz.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
@@ -739,7 +739,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
             dy = 0;
         }
 
-        hundo.viz.boardSvg.select(ballId)
+        hundo.vizz.boardSvg.select(ballId)
             .transition()
             .ease("linear")
             .attr("rx", function() {
@@ -762,7 +762,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
             .duration(vizConfig.stepDuration);
 
         // leave a trail behind the ball
-        hundo.viz.boardSvg.selectAll()
+        hundo.vizz.boardSvg.selectAll()
             .data([{row: ball.row, col: ball.col}])
             .enter()
             .append("circle")
@@ -791,7 +791,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
         for (var i = 0; i < recipients.length; i++) {
             var piece = recipients[i];
             var id = "#" + hundo.viz.pieceId(piece);
-            hundo.viz.boardSvg.select(id)
+            hundo.vizz.boardSvg.select(id)
                 .transition()
                 .ease("linear")
                 .attr("rx", vizConfig.cellSize / 2)
@@ -812,7 +812,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
             for (var i = 0; i < recipients.length; i++) {
                 var piece = recipients[i];
                 var id = "#" + hundo.viz.pieceId(piece);
-                hundo.viz.boardSvg.select(id)
+                hundo.vizz.boardSvg.select(id)
                     .transition()
                     .ease("linear")
                     .attr("transform", function() {
@@ -972,12 +972,14 @@ var vizConfig = {
     stepDuration: 50,
     flyInDuration: 250,
     blowupScale: 3,
-    perimStrokeWidth: 3
+    perimStrokeWidth: 3,
+    numRows: 15,
+    numCols: 20
 }
 
 document.onkeydown = hundo.viz.checkKey;
-hundo.viz.init(hundo.boardConfigs[hundo.level], vizConfig);
 
+hundo.vizz = new hundo.Viz(vizConfig);
 
 hundo.idGen = new hundo.IdGenerator();
 
