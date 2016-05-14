@@ -75,11 +75,16 @@ hundo.Goal.prototype.nudge = function(dir) {
     return this.dir == hundo.oppositeDir(dir);
 }
 
-hundo.nextId = 0;
+hundo.IdGenerator = function() {
+    this.nextId = 0;
+}
 
+hundo.IdGenerator.prototype.next = function() {
+    return this.nextId++;
+}
 
 // TODO: Assume boardConfig is untrusted
-hundo.Board = function(boardConfig) {
+hundo.Board = function(boardConfig, idGen) {
 
     // is the ball at rest?
     this.atRest = true;
@@ -111,13 +116,13 @@ hundo.Board = function(boardConfig) {
     $.each(boardConfig.blocks, function(index, block) { 
         var row = block.row;
         var col = block.col;
-        THIS.matrix[row][col].push(new hundo.Block(hundo.nextId++, row, col));
+        THIS.matrix[row][col].push(new hundo.Block(idGen.next(), row, col));
     })
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
-    this.ball = new hundo.Ball(hundo.nextId++, row, col, hundo.DirectionEnum.NODIR);
+    this.ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
     this.matrix[row][col].push(this.ball);
 
     // Add goals to the matrix
@@ -125,7 +130,7 @@ hundo.Board = function(boardConfig) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
-        THIS.matrix[row][col].push(new hundo.Goal(hundo.nextId++, row, col, dir));
+        THIS.matrix[row][col].push(new hundo.Goal(idGen.next(), row, col, dir));
     })
 }
 
@@ -694,7 +699,7 @@ hundo.viz.animateSolved = function() {
 
 
 
-hundo.viz.stepAnimate = function(board) {
+hundo.viz.stepAnimate = function(board, idGen) {
     var animate = board.step();
 
     if (board.atRest) {
@@ -711,7 +716,8 @@ hundo.viz.stepAnimate = function(board) {
         setTimeout(function(){
             if (hundo.level < hundo.boardConfigs.length - 1) {
                 hundo.level++;
-                hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level]);
+                hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
+                    idGen);
                 hundo.viz.drawBoard(hundo.board);
             } else {
                 // all levels solved
@@ -846,12 +852,14 @@ hundo.viz.checkKey = function(e) {
 
     hundo.board.setDir(direction);
 
-    hundo.viz.stepAnimate(hundo.board);
+
+
+    hundo.viz.stepAnimate(hundo.board, hundo.idGen);
 
     if (!hundo.board.atRest) {
         hundo.viz.animateInterval =
             setInterval(
-                function(){hundo.viz.stepAnimate(hundo.board);},
+                function(){hundo.viz.stepAnimate(hundo.board, hundo.idGen);},
                 vizConfig.stepDuration);
     }
 
@@ -970,5 +978,8 @@ var vizConfig = {
 document.onkeydown = hundo.viz.checkKey;
 hundo.viz.init(hundo.boardConfigs[hundo.level], vizConfig);
 
-hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level]);
+
+hundo.idGen = new hundo.IdGenerator();
+
+hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level], hundo.idGen);
 hundo.viz.drawBoard(hundo.board);

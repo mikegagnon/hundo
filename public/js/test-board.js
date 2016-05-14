@@ -91,7 +91,8 @@ var config2 = {
  **************************************************/
 TEST = "Board constructor"
 
-var board = new hundo.Board(config1);
+var idGen = new hundo.IdGenerator();
+var board = new hundo.Board(config1, idGen);
 var NODIR = hundo.DirectionEnum.NODIR;
 assertEquals(1, board.numRows, 5);
 assertEquals(2, board.numCols, 10);
@@ -106,7 +107,7 @@ assert(6, board.matrix[1][7][0].equals(
  **************************************************/
 TEST = "Board.getBlocks"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 var blocks = board.getBlocks();
 assertEquals(1, blocks.length, 2);
@@ -117,7 +118,7 @@ assert(2, blocks[0].equals(new hundo.Block(0, 2,1)));
  **************************************************/
 TEST = "Board.getBalls"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 var blocks = board.getBalls();
 assertEquals(1, blocks.length, 1);
@@ -128,7 +129,7 @@ assertEquals(1, blocks.length, 1);
 
 TEST = "Board.movePiece in bound to inbound"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 var ball = board.ball;
 
@@ -141,7 +142,7 @@ assert(4, board.matrix[2][4][0].equals(new hundo.Ball(2, 2, 4, NODIR)));
 
 TEST = "Board.movePiece out of bounds"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 var ball = board.ball;
 
@@ -166,7 +167,7 @@ assert(4, board.matrix[4][4][0].equals(new hundo.Ball(2, 4, 4, NODIR)));
  * Board.reset
  **************************************************/
 TEST = "Board.reset ball"
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.setDir(hundo.DirectionEnum.RIGHT);
 
@@ -176,7 +177,7 @@ board.reset();
 assertEquals(2, board.ball.col, 3);
 
 TEST = "Board.reset oob"
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 board.setDir(hundo.DirectionEnum.UP);
 board.movePiece(board.ball, -1, 3);
 board.ball.dir = hundo.DirectionEnum.NODIR;
@@ -189,7 +190,7 @@ assert(3, board.matrix[2][3][0],
     new hundo.Ball(3, 2, 3, hundo.DirectionEnum.NODIR));
 
 TEST = "Board.reset multiple oob"
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 board.setDir(hundo.DirectionEnum.UP);
 board.movePiece(board.ball, -1, 3);
 board.ball.dir = hundo.DirectionEnum.NODIR;
@@ -209,7 +210,7 @@ assert(5, board.matrix[2][2][0],
     new hundo.Block(2, 2, 2));
 
 TEST = "Board.reset in bounds and out of bounds"
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.movePiece(board.matrix[2][2][0], -1, -1);
 assert(1, board.oob[0].equals(
@@ -234,7 +235,7 @@ TEST = "Board.step once"
 
 
 // UP
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.ball.dir = hundo.DirectionEnum.UP;
 
@@ -245,7 +246,7 @@ assert(2, board.ball.equals(expectedBall));
 assertEquals(3, result.move.dir, hundo.DirectionEnum.UP);
 
 // DOWN
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.ball.dir = hundo.DirectionEnum.DOWN;
 
@@ -256,7 +257,7 @@ assert(5, board.ball.equals(expectedBall));
 assertEquals(6, result.move.dir, hundo.DirectionEnum.DOWN);
 
 // LEFT collide
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.ball.dir = hundo.DirectionEnum.LEFT;
 
@@ -269,7 +270,7 @@ assert(10, result.collide.recipients[0].equals(
     new hundo.Block(1, 2, 2)));
 
 // RIGHT
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 board.ball.dir = hundo.DirectionEnum.RIGHT;
 
@@ -285,7 +286,7 @@ assertEquals(13, result.move.dir, hundo.DirectionEnum.RIGHT);
 
 TEST = "Board.step three times"
 
-var board = new hundo.Board(config2);
+var board = new hundo.Board(config2, idGen);
 
 board.ball.dir = hundo.DirectionEnum.RIGHT;
 
@@ -302,7 +303,7 @@ assertEquals(1, board.ball.col, 3);
  **************************************************/
 TEST = "Board.nudge"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 // nudging empty space
 assertEquals(1, true, board.nudge(0,0, hundo.DirectionEnum.UP));
@@ -327,7 +328,7 @@ assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT));
  **************************************************/
 TEST = "Board.checkSolved"
 
-var board = new hundo.Board(config1);
+var board = new hundo.Board(config1, idGen);
 
 assert(1, !board.checkSolved());
 
