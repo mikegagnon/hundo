@@ -624,21 +624,23 @@ hundo.Viz.prototype.animateVictory = function() {
     var circles = [];
     var numCircles = 100;
     var duration = 2000;
-    for (var i = 0; i < numCircles; i++) {
-        var color = d3.hsl(Math.floor(Math.random() * 360),
-            1.0, 0.5);
-        var x = Math.floor(Math.random() * this.board.numCols * vizConfig.cellSize);
-        var y = Math.floor(Math.random() * this.board.numRows * vizConfig.cellSize);
-        var r = Math.floor(Math.random() * 200) + 50;
-        var delay = Math.floor(Math.random() * duration);
-        circles.push({
-            color: color,
-            x: x,
-            y: y,
-            r: r,
-            delay: delay
+    _.range(0, numCircles)
+        .map(function(i){
+            var color = d3.hsl(hundo.getRandom(0, 360),
+                1.0, 0.5);
+            var x = hundo.getRandom(0, this.board.numCols * 2 * vizConfig.cellSize);
+            var y = hundo.getRandom(0, this.board.numRows * 2 * vizConfig.cellSize);
+            var r = hundo.getRandom(50, 200);
+            var delay = hundo.getRandom(0, duration);
+            console.log(x, y);
+            circles.push({
+                color: color,
+                x: x,
+                y: y,
+                r: r,
+                delay: delay
+            });
         });
-    }
 
     this.boardSvg.selectAll()
         .data(circles)
