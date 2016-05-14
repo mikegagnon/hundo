@@ -442,14 +442,14 @@ hundo.Viz.dirToDegrees = function(dir) {
     }
 }
 
-hundo.viz.transform = function(piece, transformation) {
+hundo.Viz.prototype.transform = function(piece, transformation) {
 
     if (typeof transformation == "undefined") {
         transformation = {};
     }
 
-    var x = piece.col * vizConfig.cellSize;
-    var y = piece.row * vizConfig.cellSize;
+    var x = piece.col * this.vizConfig.cellSize;
+    var y = piece.row * this.vizConfig.cellSize;
 
     if ("dx" in transformation) {
         x += transformation.dx;
@@ -469,7 +469,7 @@ hundo.viz.transform = function(piece, transformation) {
         piece.type == hundo.PieceTypeEnum.BLOCK) {
         return t;
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
-        var z = vizConfig.cellSize / 2;
+        var z = this.vizConfig.cellSize / 2;
         var degrees = hundo.Viz.dirToDegrees(piece.dir);
         return t + "rotate(" + degrees + ", " + z + ", " + z + ") " ;
     } else {
@@ -481,9 +481,11 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
-hundo.viz.drawBoard = function(board) {
+hundo.Viz.prototype.drawBoard = function(board) {
 
     var dxdy = vizConfig.cellSize / 2;
+
+    var THIS = this;
 
     hundo.vizz.boardSvg.selectAll()
         .data(board.getBlocks())
@@ -493,7 +495,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
         .attr("transform", function(piece) {
-            return hundo.viz.transform(piece, {
+            return THIS.transform(piece, {
                 dx: dxdy,
                 dy: dxdy,
                 scale: 0
@@ -501,7 +503,7 @@ hundo.viz.drawBoard = function(board) {
         });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
-    hundo.vizz.boardSvg.selectAll()
+    this.boardSvg.selectAll()
         .data(board.getBalls())
         .enter()
         .append("ellipse")
@@ -513,14 +515,14 @@ hundo.viz.drawBoard = function(board) {
         .attr("class", "ball")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
-            return hundo.viz.transform(piece, {
+            return THIS.transform(piece, {
                 dx: dxdy,
                 dy: dxdy,
                 scale: 0
             });
         });
 
-    hundo.vizz.boardSvg.selectAll()
+    this.boardSvg.selectAll()
         .data(board.getGoals())
         .enter()
         .append("svg:use")
@@ -528,19 +530,21 @@ hundo.viz.drawBoard = function(board) {
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(piece) {
-            return hundo.viz.transform(piece, {
+            return THIS.transform(piece, {
                 dx: dxdy,
                 dy: dxdy,
                 scale: 0
             });
         });
 
-    var dxdy = -(vizConfig.cellSize / 2) * vizConfig.blowupScale;
+    var dxdy = -(this.vizConfig.cellSize / 2) * this.vizConfig.blowupScale;
 
+    // TODO
     var pieces = hundo.board.getPieces(function(){ return true; });
+    
     var delays = []
     for (var i = 0; i < pieces.length; i++) {
-        delays.push(hundo.getRandom(0, vizConfig.flyInDuration / 2));
+        delays.push(hundo.getRandom(0, this.vizConfig.flyInDuration / 2));
     }
 
     for (var i = 0; i < pieces.length; i++) {
@@ -548,18 +552,18 @@ hundo.viz.drawBoard = function(board) {
         var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
-        hundo.vizz.boardSvg.select(id)
+        this.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
             .attr("transform", function() {
-                return hundo.viz.transform(piece, {
+                return THIS.transform(piece, {
                     dx: dxdy,
                     dy: dxdy,
-                    scale: vizConfig.blowupScale
+                    scale: THIS.vizConfig.blowupScale
                 });
             })
-            .duration(vizConfig.flyInDuration / 2);
+            .duration(this.vizConfig.flyInDuration / 2);
     }
 
     setTimeout(function(){
@@ -572,7 +576,7 @@ hundo.viz.drawBoard = function(board) {
                 .ease("linear")
                 .delay(delay)
                 .attr("transform", function() {
-                    return hundo.viz.transform(piece);
+                    return THIS.transform(piece);
                 })
                 .duration(vizConfig.flyInDuration / 2);
             }
@@ -597,7 +601,7 @@ hundo.viz.reset = function(board) {
             .attr("rx", vizConfig.cellSize / 2)
             .attr("ry", vizConfig.cellSize / 2)
             .attr("transform", function() {
-                return hundo.viz.transform(piece);
+                return hundo.vizz.transform(piece);
             })
             .duration(0);
     }
@@ -687,7 +691,7 @@ hundo.viz.animateSolved = function() {
             .ease("linear")
             .delay(delay)
             .attr("transform", function() {
-                return hundo.viz.transform(piece, {
+                return hundo.vizz.transform(piece, {
                     dx: dxdy,
                     dy: dxdy,
                     scale: 0
@@ -719,7 +723,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                 hundo.level++;
                 hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
                     idGen);
-                hundo.viz.drawBoard(hundo.board);
+                hundo.vizz.drawBoard(hundo.board);
             } else {
                 // all levels solved
                 hundo.viz.animateVictory();
@@ -758,7 +762,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                 }
             })
             .attr("transform", function() {
-                return hundo.viz.transform(ball);
+                return hundo.vizz.transform(ball);
             })
             .duration(vizConfig.stepDuration);
 
@@ -804,7 +808,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                     dx *= vizConfig.cellSize / 3;
                     dy *= vizConfig.cellSize / 3;
 
-                    return hundo.viz.transform(piece, {dx: dx, dy: dy});
+                    return hundo.vizz.transform(piece, {dx: dx, dy: dy});
                 })
                 .duration(vizConfig.stepDuration / 2);
         }
@@ -817,7 +821,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                     .transition()
                     .ease("linear")
                     .attr("transform", function() {
-                        return hundo.viz.transform(piece);
+                        return hundo.vizz.transform(piece);
                     })
                     .duration(vizConfig.stepDuration / 2);
                 }
@@ -985,4 +989,4 @@ hundo.vizz = new hundo.Viz(vizConfig);
 hundo.idGen = new hundo.IdGenerator();
 
 hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level], hundo.idGen);
-hundo.viz.drawBoard(hundo.board);
+hundo.vizz.drawBoard(hundo.board);
