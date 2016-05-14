@@ -581,7 +581,7 @@ hundo.Viz.prototype.reset = function(board) {
 
     board.reset();
 
-    for (var i = 0; i < pieces.length; i++) {
+    _.each(pieces, function(piece, i){
         var piece = pieces[i];
         hundo.vizz.boardSvg.select("#" + hundo.Viz.pieceId(piece))
             .transition()
@@ -592,7 +592,7 @@ hundo.Viz.prototype.reset = function(board) {
                 return hundo.vizz.transform(piece);
             })
             .duration(0);
-    }
+    });
 
 }
 
