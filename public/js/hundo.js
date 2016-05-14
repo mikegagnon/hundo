@@ -840,7 +840,7 @@ hundo.Viz.prototype.stepAnimate = function() {
     }
 }
 
-hundo.viz.checkKey = function(e) {
+hundo.Viz.checkKey = function(e) {
 
     if (!hundo.board.atRest) {
         return;
@@ -1025,7 +1025,7 @@ var vizConfig = {
     numCols: 20
 }
 
-document.onkeydown = hundo.viz.checkKey;
+document.onkeydown = hundo.Viz.checkKey;
 
 hundo.idGen = new hundo.IdGenerator();
 hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0]);
