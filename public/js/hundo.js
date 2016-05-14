@@ -424,7 +424,7 @@ hundo.Viz.prototype.drawGrid = function() {
 }
 
 
-hundo.viz.pieceId = function(piece) {
+hundo.Viz.pieceId = function(piece) {
     return "piece" + piece.id;
 }
 
@@ -490,7 +490,7 @@ hundo.viz.drawBoard = function(board) {
         .enter()
         .append("svg:use")
         .attr("class", "block")
-        .attr("id", hundo.viz.pieceId)
+        .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
         .attr("transform", function(piece) {
             return hundo.viz.transform(piece, {
@@ -511,7 +511,7 @@ hundo.viz.drawBoard = function(board) {
         .attr("ry", vizConfig.cellSize / 2)
         .attr("style", "fill:#eee")
         .attr("class", "ball")
-        .attr("id", hundo.viz.pieceId)
+        .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return hundo.viz.transform(piece, {
                 dx: dxdy,
@@ -525,7 +525,7 @@ hundo.viz.drawBoard = function(board) {
         .enter()
         .append("svg:use")
         .attr("class", "goal")
-        .attr("id", hundo.viz.pieceId)
+        .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(piece) {
             return hundo.viz.transform(piece, {
@@ -545,7 +545,7 @@ hundo.viz.drawBoard = function(board) {
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
-        var id = "#" + hundo.viz.pieceId(piece);
+        var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
         hundo.vizz.boardSvg.select(id)
@@ -565,7 +565,7 @@ hundo.viz.drawBoard = function(board) {
     setTimeout(function(){
         for (var i = 0; i < pieces.length; i++) {
             var piece = pieces[i];
-            var id = "#" + hundo.viz.pieceId(piece);
+            var id = "#" + hundo.Viz.pieceId(piece);
             var delay = delays[i];
             hundo.vizz.boardSvg.select(id)
                 .transition()
@@ -591,7 +591,7 @@ hundo.viz.reset = function(board) {
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
-        hundo.vizz.boardSvg.select("#" + hundo.viz.pieceId(piece))
+        hundo.vizz.boardSvg.select("#" + hundo.Viz.pieceId(piece))
             .transition()
             .ease("linear")
             .attr("rx", vizConfig.cellSize / 2)
@@ -679,7 +679,7 @@ hundo.viz.animateSolved = function() {
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
-        var id = "#" + hundo.viz.pieceId(piece);
+        var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
         hundo.vizz.boardSvg.select(id)
@@ -729,7 +729,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
 
     if ("move" in animate) {
         ball = animate.move.ball;
-        ballId = "#" + hundo.viz.pieceId(ball);
+        ballId = "#" + hundo.Viz.pieceId(ball);
 
         var dx;
         var dy;
@@ -791,7 +791,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
         var dir = animate.collide.dir;
         for (var i = 0; i < recipients.length; i++) {
             var piece = recipients[i];
-            var id = "#" + hundo.viz.pieceId(piece);
+            var id = "#" + hundo.Viz.pieceId(piece);
             hundo.vizz.boardSvg.select(id)
                 .transition()
                 .ease("linear")
@@ -812,7 +812,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
         setTimeout(function(){
             for (var i = 0; i < recipients.length; i++) {
                 var piece = recipients[i];
-                var id = "#" + hundo.viz.pieceId(piece);
+                var id = "#" + hundo.Viz.pieceId(piece);
                 hundo.vizz.boardSvg.select(id)
                     .transition()
                     .ease("linear")
