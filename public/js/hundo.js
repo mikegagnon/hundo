@@ -381,8 +381,10 @@ hundo.Viz = function(vizConfig, boardConfig) {
 
     this.drawGrid();
 
+    this.idGen = new hundo.IdGenerator();
+
     // TODO: rm hundo.board
-    this.board = hundo.board = new hundo.Board(boardConfig, hundo.idGen);
+    this.board = hundo.board = new hundo.Board(boardConfig, this.idGen);
 
 }
 
@@ -709,7 +711,7 @@ hundo.Viz.prototype.animateSolved = function() {
 
 
 // TODO: idGen member of Viz
-hundo.Viz.prototype.stepAnimate = function(idGen) {
+hundo.Viz.prototype.stepAnimate = function() {
 
     var THIS = this;
 
@@ -732,7 +734,7 @@ hundo.Viz.prototype.stepAnimate = function(idGen) {
                 hundo.level++;
                 // TODO: rm hundo.board
                 THIS.board = hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
-                    hundo.idGen);
+                    THIS.idGen);
                 THIS.drawBoard(hundo.board);
             } else {
                 // all levels solved
@@ -868,12 +870,12 @@ hundo.viz.checkKey = function(e) {
 
 
 
-    hundo.vizz.stepAnimate(hundo.board, hundo.idGen);
+    hundo.vizz.stepAnimate(hundo.board);
 
     if (!hundo.board.atRest) {
         hundo.viz.animateInterval =
             setInterval(
-                function(){hundo.vizz.stepAnimate(hundo.board, hundo.idGen);},
+                function(){hundo.vizz.stepAnimate(hundo.board);},
                 vizConfig.stepDuration);
     }
 
