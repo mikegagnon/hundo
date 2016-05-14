@@ -382,11 +382,7 @@ hundo.Viz.prototype.drawGrid = function() {
 
     var vizConfig = this.vizConfig;
 
-    var rows = []
-
-    for (var row = 1; row < vizConfig.numRows; row++) {
-        rows.push(row)
-    }
+    var rows = _.range(1, vizConfig.numRows);
 
     this.boardSvg.selectAll()
         .data(rows)
@@ -400,11 +396,7 @@ hundo.Viz.prototype.drawGrid = function() {
         .attr("y2", function(row) { return row * vizConfig.cellSize; })
         .attr("style", "stroke:rgb(0,0,255);stroke-width:1;opacity:0.3");
 
-    var cols = []
-
-    for (var col = 1; col < vizConfig.numCols; col++) {
-        cols.push(col)
-    }
+    var cols = _.range(1, vizConfig.numCols);
 
     this.boardSvg.selectAll()
         .data(cols)
