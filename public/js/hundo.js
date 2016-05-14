@@ -202,15 +202,9 @@ hundo.Board.prototype.getGoals = function() {
 // if an element is removed, returns the index of the element removed
 // otherwise, returns -1
 hundo.arrayRemove = function(array, func) {
+    var i = _.findIndex(array, func);
 
-    var i;
-    for (i = 0; i < array.length; i++) {
-        if (func(array[i])) {
-            break;
-        }
-    }
-
-    if (i == array.length) {
+    if (i < 0) {
         return -1;
     }
 
