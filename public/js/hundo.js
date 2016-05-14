@@ -530,18 +530,17 @@ hundo.Viz.prototype.drawBoard = function(board) {
 
     // TODO
     var pieces = hundo.board.getPieces(function(){ return true; });
-    
-    var delays = []
-    for (var i = 0; i < pieces.length; i++) {
-        delays.push(hundo.getRandom(0, this.vizConfig.flyInDuration / 2));
-    }
 
-    for (var i = 0; i < pieces.length; i++) {
-        var piece = pieces[i];
+    var delays = _.range(0, pieces.length)
+        .map(function(){
+            return hundo.getRandom(0, this.vizConfig.flyInDuration / 2);
+        });
+
+    _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
-        this.boardSvg.select(id)
+        THIS.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
@@ -553,10 +552,10 @@ hundo.Viz.prototype.drawBoard = function(board) {
                 });
             })
             .duration(this.vizConfig.flyInDuration / 2);
-    }
+    });
 
     setTimeout(function(){
-        for (var i = 0; i < pieces.length; i++) {
+        _.each(pieces, function(piece, i){
             var piece = pieces[i];
             var id = "#" + hundo.Viz.pieceId(piece);
             var delay = delays[i];
@@ -568,7 +567,7 @@ hundo.Viz.prototype.drawBoard = function(board) {
                     return THIS.transform(piece);
                 })
                 .duration(vizConfig.flyInDuration / 2);
-            }
+        });            
     }, vizConfig.flyInDuration / 2);
 
 }
