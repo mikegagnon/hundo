@@ -361,7 +361,7 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
-hundo.Viz = function(vizConfig) {
+hundo.Viz = function(vizConfig, boardConfig) {
 
     // TODO: validate vizConfig
     this.vizConfig = vizConfig;
@@ -380,6 +380,10 @@ hundo.Viz = function(vizConfig) {
         .attr("height", vizConfig.numRows * vizConfig.cellSize)
 
     this.drawGrid();
+
+    // TODO: rm hundo.board
+    this.board = hundo.board = new hundo.Board(boardConfig, hundo.idGen);
+
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -584,8 +588,8 @@ hundo.Viz.prototype.drawBoard = function(board) {
 
 }
 
-
-hundo.viz.reset = function(board) {
+// TODO
+hundo.Viz.prototype.reset = function(board) {
 
     var pieces = board.getPieces(function(piece) {
         return (piece.row != piece.origRow) || (piece.col != piece.origCol);
@@ -713,7 +717,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
 
     if (board.done) {
         setTimeout(
-            function(){hundo.viz.reset(hundo.board);},
+            function(){hundo.vizz.reset(hundo.board);},
             hundo.viz.animateInterval);
     }
 
@@ -984,9 +988,6 @@ var vizConfig = {
 
 document.onkeydown = hundo.viz.checkKey;
 
-hundo.vizz = new hundo.Viz(vizConfig);
-
 hundo.idGen = new hundo.IdGenerator();
-
-hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level], hundo.idGen);
+hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0]);
 hundo.vizz.drawBoard(hundo.board);
