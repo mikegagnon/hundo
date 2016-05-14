@@ -621,6 +621,43 @@ hundo.viz.animateVictory = function() {
 
     hundo.viz.boardSvg.selectAll(".grid")
         .remove();
+
+    var circles = [];
+    var numCircles = 100;
+    var duration = 2000;
+    for (var i = 0; i < numCircles; i++) {
+        var color = d3.hsl(Math.floor(Math.random() * 360),
+            1.0, 0.5);
+        var x = Math.floor(Math.random() * hundo.board.numCols * vizConfig.cellSize);
+        var y = Math.floor(Math.random() * hundo.board.numRows * vizConfig.cellSize);
+        var r = Math.floor(Math.random() * 200) + 50;
+        var delay = Math.floor(Math.random() * duration);
+        circles.push({
+            color: color,
+            x: x,
+            y: y,
+            r: r,
+            delay: delay
+        });
+    }
+
+    hundo.viz.boardSvg.selectAll()
+        .data(circles)
+        .enter()
+        .append("circle")
+        .attr("class", "firework")
+        .attr("cx", function(c){ return c.x; })
+        .attr("cy", function(c){ return c.y; })
+        .attr("r", 0)
+        .attr("fill", function(c){ return c.color; })
+        .attr("fill-opacity", "1")
+        .transition()
+        .delay(function(c){ return c.delay; })
+        .attr("r", function(c){return c.r; })
+        .attr("fill-opacity", "0")
+        .remove()
+
+
 }
 
 hundo.viz.animateSolved = function() {
