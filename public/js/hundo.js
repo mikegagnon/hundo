@@ -253,14 +253,13 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
 
     var pieces = this.matrix[row][col];
 
-    for (var i = 0; i < pieces.length; i++) {
-        var piece = pieces[i];
-        if (!piece.nudge(dir)) {
-            return false;
-        }
-    }
+    var result = true;
 
-    return true;
+    _.each(pieces, function(piece) {
+        result &= piece.nudge(dir);
+    });
+
+    return result;
 
 }
 
