@@ -627,14 +627,14 @@ hundo.Viz.dxdy = function(dir) {
 }
 
 // TODO: Cleanup
-hundo.viz.animateVictory = function() {
+hundo.Viz.prototype.animateVictory = function() {
 
-    hundo.vizz.boardSvg.select("#background")
+    this.boardSvg.select("#background")
         .transition()
         .style("fill", "#EEE")
         .duration(vizConfig.flyInDuration * 10);
 
-    hundo.vizz.boardSvg.selectAll(".grid")
+    this.boardSvg.selectAll(".grid")
         .remove();
 
     var circles = [];
@@ -643,8 +643,8 @@ hundo.viz.animateVictory = function() {
     for (var i = 0; i < numCircles; i++) {
         var color = d3.hsl(Math.floor(Math.random() * 360),
             1.0, 0.5);
-        var x = Math.floor(Math.random() * hundo.board.numCols * vizConfig.cellSize);
-        var y = Math.floor(Math.random() * hundo.board.numRows * vizConfig.cellSize);
+        var x = Math.floor(Math.random() * this.board.numCols * vizConfig.cellSize);
+        var y = Math.floor(Math.random() * this.board.numRows * vizConfig.cellSize);
         var r = Math.floor(Math.random() * 200) + 50;
         var delay = Math.floor(Math.random() * duration);
         circles.push({
@@ -656,7 +656,7 @@ hundo.viz.animateVictory = function() {
         });
     }
 
-    hundo.vizz.boardSvg.selectAll()
+    this.boardSvg.selectAll()
         .data(circles)
         .enter()
         .append("circle")
@@ -730,7 +730,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
                 hundo.vizz.drawBoard(hundo.board);
             } else {
                 // all levels solved
-                hundo.viz.animateVictory();
+                hundo.vizz.animateVictory();
             }
         }, vizConfig.flyInDuration / 2);
     }
