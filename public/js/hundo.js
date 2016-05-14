@@ -101,9 +101,9 @@ hundo.Board = function(boardConfig, idGen) {
     this.oob = [];
 
     // this.matrix[row][call] == array of piece objects
-    this.matrix = new Array(this.numRows);
+    this.matrix = new Array();
     for (var i = 0; i < this.numRows; i++) {
-      this.matrix[i] = new Array(this.numCols);
+      this.matrix[i] = new Array();
       for (var j = 0; j < this.numCols; j++) {
         this.matrix[i][j] = new Array();
       }
