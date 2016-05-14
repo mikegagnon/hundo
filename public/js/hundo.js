@@ -612,11 +612,12 @@ hundo.viz.dxdy = function(dir) {
     }
 }
 
+// TODO: Cleanup
 hundo.viz.animateVictory = function() {
 
     hundo.viz.boardSvg.select("#background")
         .transition()
-        .style("fill", "#FFBF00")
+        .style("fill", "#EEE")
         .duration(vizConfig.flyInDuration * 10);
 
     hundo.viz.boardSvg.selectAll(".grid")
