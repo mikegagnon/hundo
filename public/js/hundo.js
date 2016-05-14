@@ -687,7 +687,7 @@ hundo.Viz.prototype.animateSolved = function() {
                     scale: 0
                 });
             })
-            .duration(this.vizConfig.flyInDuration)
+            .duration(THIS.vizConfig.flyInDuration)
             .remove();
     });
 }
