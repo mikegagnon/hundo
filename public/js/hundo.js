@@ -664,19 +664,19 @@ hundo.Viz.prototype.animateSolved = function() {
     var pieces = this.board.getPieces(function(){ return true; });
 
     var dxdy = this.vizConfig.cellSize / 2;
-    var delays = []
-    for (var i = 0; i < pieces.length; i++) {
-        delays.push(hundo.getRandom(0, this.vizConfig.flyInDuration / 2));
-    }
+
+    var delays = _.range(0, pieces.length)
+        .map(function(){
+            return hundo.getRandom(0, this.vizConfig.flyInDuration / 2);
+        })
 
     var THIS = this;
 
-    for (var i = 0; i < pieces.length; i++) {
-        var piece = pieces[i];
+    _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
-        this.boardSvg.select(id)
+        THIS.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
@@ -689,7 +689,7 @@ hundo.Viz.prototype.animateSolved = function() {
             })
             .duration(this.vizConfig.flyInDuration)
             .remove();
-    }
+    });
 }
 
 
