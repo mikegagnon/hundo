@@ -675,33 +675,35 @@ hundo.Viz.prototype.animateVictory = function() {
 
 }
 
-hundo.viz.animateSolved = function() {
+hundo.Viz.prototype.animateSolved = function() {
 
-    var pieces = hundo.board.getPieces(function(){ return true; });
+    var pieces = this.board.getPieces(function(){ return true; });
 
-    var dxdy = vizConfig.cellSize / 2;
+    var dxdy = this.vizConfig.cellSize / 2;
     var delays = []
     for (var i = 0; i < pieces.length; i++) {
-        delays.push(hundo.getRandom(0, vizConfig.flyInDuration / 2));
+        delays.push(hundo.getRandom(0, this.vizConfig.flyInDuration / 2));
     }
+
+    var THIS = this;
 
     for (var i = 0; i < pieces.length; i++) {
         var piece = pieces[i];
         var id = "#" + hundo.Viz.pieceId(piece);
         var delay = delays[i];
 
-        hundo.vizz.boardSvg.select(id)
+        this.boardSvg.select(id)
             .transition()
             .ease("linear")
             .delay(delay)
             .attr("transform", function() {
-                return hundo.vizz.transform(piece, {
+                return THIS.transform(piece, {
                     dx: dxdy,
                     dy: dxdy,
                     scale: 0
                 });
             })
-            .duration(vizConfig.flyInDuration)
+            .duration(this.vizConfig.flyInDuration)
             .remove();
     }
 }
@@ -725,7 +727,8 @@ hundo.viz.stepAnimate = function(board, idGen) {
         setTimeout(function(){
             if (hundo.level < hundo.boardConfigs.length - 1) {
                 hundo.level++;
-                hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
+                // TODO: rm hundo.board
+                hundo.vizz.board = hundo.board = new hundo.Board(hundo.boardConfigs[hundo.level],
                     idGen);
                 hundo.vizz.drawBoard(hundo.board);
             } else {
@@ -791,7 +794,7 @@ hundo.viz.stepAnimate = function(board, idGen) {
 
 
         if (animate.move.solved) {
-            hundo.viz.animateSolved();
+            hundo.vizz.animateSolved();
         }
 
     } else if ("collide" in animate) {
@@ -973,7 +976,39 @@ var boardConfig2 = {
     }
 }
 
-hundo.boardConfigs = [boardConfig1, boardConfig2];
+var boardConfig3 = {
+    numRows: 15,
+    numCols: 20,
+    blocks : [
+        {
+            row: 5,
+            col: 1
+        },
+        {
+            row: 2,
+            col: 2
+        },
+    ],
+    goals: [
+        {
+            row: 1,
+            col: 7,
+            dir: hundo.DirectionEnum.DOWN
+        },
+        {
+            row: 3,
+            col: 7,
+            dir: hundo.DirectionEnum.UP
+        }
+
+    ],
+    ball: {
+        row: 2,
+        col: 7,
+    }
+}
+
+hundo.boardConfigs = [boardConfig1, boardConfig2, boardConfig3];
 hundo.level = 0
 
 var vizConfig = {
