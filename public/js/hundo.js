@@ -428,7 +428,7 @@ hundo.Viz.pieceId = function(piece) {
     return "piece" + piece.id;
 }
 
-hundo.viz.dirToDegrees = function(dir) {
+hundo.Viz.dirToDegrees = function(dir) {
     if (dir == hundo.DirectionEnum.UP) {
         return 0;
     } else if (dir == hundo.DirectionEnum.DOWN) {
@@ -470,7 +470,7 @@ hundo.viz.transform = function(piece, transformation) {
         return t;
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = vizConfig.cellSize / 2;
-        var degrees = hundo.viz.dirToDegrees(piece.dir);
+        var degrees = hundo.Viz.dirToDegrees(piece.dir);
         return t + "rotate(" + degrees + ", " + z + ", " + z + ") " ;
     } else {
         console.error("Bad piece type: " + piece.type);
