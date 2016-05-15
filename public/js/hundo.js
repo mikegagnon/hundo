@@ -351,6 +351,9 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
+hundo.instances = {}
+
+hundo.vizz = null;
 
 Hundo = function(config) {
 
@@ -361,7 +364,15 @@ Hundo = function(config) {
     var levels = config.levels;
     var id = config.id;
 
-    return new hundo.Viz(vizConfig, levels, id);
+    viz = new hundo.Viz(vizConfig, levels, id);
+
+    hundo.instances[id] = viz;
+
+    if (_.size(hundo.instances) == 1) {
+        hundo.vizz = viz;
+    }
+
+    return viz;
 }
 
 hundo.Viz = function(vizConfig, levels, id) {
@@ -410,6 +421,7 @@ hundo.Viz = function(vizConfig, levels, id) {
             </svg>
         </div>
         <div id="console">
+            <button onclick="hundo.clickPlay(${this.id})" type="button" class="button">Play</button>
             <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
             Level 1
             <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
@@ -453,6 +465,10 @@ hundo.Viz.prototype.boardDivId = function() {
 
 hundo.Viz.prototype.boardSvgId = function() {
     return "boardSvg" + this.id;
+}
+
+hundo.Viz.prototype.playButtonId = function() {
+    return "playButton" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -942,6 +958,11 @@ hundo.Viz.checkKey = function(e) {
     }
 }
 
+hundo.clickPlay = function(id) {
+    console.log(id);
+    hundo.vizz = hundo.instances[id];
+}
+
 var starter = {
     numRows: 15,
     numCols: 21,
@@ -1160,11 +1181,3 @@ hundo.vizz2 = new Hundo({
     levels: levels,
     id: 2
 });
-
-
-/*
-hundo.vizz2 = new Hundo({}, hundo.boardConfigs[1], 2);
-hundo.vizz1.drawBoard();
-hundo.vizz2.drawBoard();
-hundo.vizz = hundo.vizz1;
-*/

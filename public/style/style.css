@@ -8,4 +8,5 @@ body {
 .button {
     position: relative;
     top: -3px;
+    font-weight: bold;
 }
