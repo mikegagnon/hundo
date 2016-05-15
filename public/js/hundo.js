@@ -357,16 +357,24 @@ hundo.vizz = null;
 
 Hundo = function(config) {
 
-    if (!vizConfig in config) {
+    // clone hundo.defaultVizConfig so it doesn't get clobbered by extend
+    var defaultVizConfig = jQuery.extend(true, {}, hundo.defaultVizConfig);
+
+    console.log(config.viz);
+
+    if (!"vizConfig" in config) {
         config.viz = {};
     }
-    var vizConfig = $.extend(hundo.defaultVizConfig, config.viz);
-    var levels = config.levels;
-    var id = config.id;
 
-    viz = new hundo.Viz(vizConfig, levels, id);
+    config.viz = $.extend(defaultVizConfig, config.viz);
 
-    hundo.instances[id] = viz;
+    console.log(config.viz)
+
+    console.log(config.viz.playButton);
+
+    viz = new hundo.Viz(config);
+
+    hundo.instances[config.id] = viz;
 
     if (_.size(hundo.instances) == 1) {
         hundo.vizz = viz;
@@ -375,13 +383,13 @@ Hundo = function(config) {
     return viz;
 }
 
-hundo.Viz = function(vizConfig, levels, id) {
+hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
-    this.vizConfig = vizConfig;
-    this.levels = levels;
+    this.vizConfig = config.viz;
+    this.levels = config.levels;
     boardConfig = this.levels[0];
-    this.id = id;
+    this.id = config.id;
     this.level = 0;
 
     var svgContents = `
@@ -420,8 +428,7 @@ hundo.Viz = function(vizConfig, levels, id) {
                 </text>
             </svg>
         </div>
-        <div id="console">
-            <button onclick="hundo.clickPlay(${this.id})" type="button" class="button">Play</button>
+        <div id="${this.consoleId()}">
             <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
             Level 1
             <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
@@ -432,18 +439,22 @@ hundo.Viz = function(vizConfig, levels, id) {
 
     $("#" + this.hundoId()).append(svg);
 
+    if (config.viz.playButton) {
+        this.addPlayButton();
+    }
+
     this.boardSvg = d3.select("#" + this.boardSvgId())
-        .attr("width", vizConfig.numCols * vizConfig.cellSize)
-        .attr("height", vizConfig.numRows * vizConfig.cellSize);
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize);
 
     this.boardSvg.select("#background")
-        .attr("width", vizConfig.numCols * vizConfig.cellSize)
-        .attr("height", vizConfig.numRows * vizConfig.cellSize)
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
         .attr("style", "fill:black");
 
     this.boardSvg.select("#perim")
-        .attr("width", vizConfig.numCols * vizConfig.cellSize)
-        .attr("height", vizConfig.numRows * vizConfig.cellSize)
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
 
     this.drawGrid();
 
@@ -453,6 +464,17 @@ hundo.Viz = function(vizConfig, levels, id) {
 
     this.drawBoard();
 
+}
+
+hundo.Viz.prototype.addPlayButton = function() {
+    var contents = `<button onclick="hundo.clickPlay(${this.id})" type="button"
+     class="button">Play</button>`
+
+    var playButton = $("<div/>").html(contents).contents();
+
+    console.log("#" + this.consoleId());
+
+     $("#" + this.consoleId()).append(playButton);
 }
 
 hundo.Viz.prototype.hundoId = function() {
@@ -469,6 +491,10 @@ hundo.Viz.prototype.boardSvgId = function() {
 
 hundo.Viz.prototype.playButtonId = function() {
     return "playButton" + this.id;
+}
+
+hundo.Viz.prototype.consoleId = function() {
+    return "console" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -969,7 +995,8 @@ hundo.defaultVizConfig = {
     blowupScale: 3,
     perimStrokeWidth: 3,
     numRows: 15,
-    numCols: 21
+    numCols: 21,
+    playButton: false
 }
 
 var starter = {
@@ -1175,10 +1202,16 @@ document.onkeydown = hundo.Viz.checkKey;
 
 new Hundo({
     levels: levels,
-    id: 1
+    id: 1,
+    viz: {
+        playButton: true
+    }
 });
 
 new Hundo({
     levels: levels,
-    id: 2
+    id: 2,
+    viz: {
+        playButton: true
+    }
 });
