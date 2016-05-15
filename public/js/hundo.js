@@ -473,15 +473,13 @@ hundo.Viz.prototype.addPlayButton = function() {
 hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
         <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
-        Level 1
+        <span id="${this.levelTextId()}""></span>
         <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
 
     $("#" + this.consoleId()).append(levelSelect);
-
-
 }
 
 hundo.Viz.prototype.hundoId = function() {
@@ -502,6 +500,10 @@ hundo.Viz.prototype.playButtonId = function() {
 
 hundo.Viz.prototype.consoleId = function() {
     return "console" + this.id;
+}
+
+hundo.Viz.prototype.levelTextId = function() {
+    return "levelText" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -597,6 +599,11 @@ hundo.getRandom = function (min, max) {
 
 // TODO: rm board argument
 hundo.Viz.prototype.drawBoard = function() {
+
+    var levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
+
+    $("#" + this.levelTextId()).text(levelText);
+
 
     var dxdy = this.vizConfig.cellSize / 2;
 
