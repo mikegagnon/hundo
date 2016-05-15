@@ -606,16 +606,7 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
-// TODO: rm board argument
 hundo.Viz.prototype.drawBoard = function() {
-
-    // update level selector buttons and text
-
-
-
-    // Draw the svg board
-
-
 
     var dxdy = this.vizConfig.cellSize / 2;
 
