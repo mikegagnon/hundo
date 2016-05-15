@@ -474,7 +474,7 @@ hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
         <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
         <span id="${this.levelTextId()}""></span>
-        <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
+        <button type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
