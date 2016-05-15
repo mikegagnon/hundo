@@ -745,6 +745,18 @@ hundo.Viz.dxdy = function(dir) {
     }
 }
 
+hundo.Viz.prototype.undoAnimateVictory = function() {
+
+    this.boardSvg.select("#background")
+        //.transition()
+        .style("fill", "#000")
+        //.duration(THIS.vizConfig.flyInDuration * 10);
+
+    this.drawGrid();
+
+
+}
+
 // TODO: Cleanup
 hundo.Viz.prototype.animateVictory = function() {
 
@@ -845,6 +857,10 @@ hundo.Viz.prototype.prevLevel = function() {
     }, this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
+
+    if (this.level == this.levels.length - 1 && this.board.solved) {
+        this.undoAnimateVictory();
+    }
 
 }
 
