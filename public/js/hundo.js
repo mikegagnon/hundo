@@ -351,7 +351,9 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
-hundo.Viz = function(vizConfig, boardConfig) {
+hundo.Viz = function(vizConfig, boardConfig, id) {
+
+    this.id = id;
 
     var svgContents = `
     <div>
@@ -398,7 +400,7 @@ hundo.Viz = function(vizConfig, boardConfig) {
 `
     var svg = $('<div/>').html(svgContents).contents();
 
-    $("#hundo1").append(svg);
+    $("#" + this.hundoId()).append(svg);
 
 
 
@@ -425,6 +427,10 @@ hundo.Viz = function(vizConfig, boardConfig) {
     // TODO: rm hundo.board
     this.board = hundo.board = new hundo.Board(boardConfig, this.idGen);
 
+}
+
+hundo.Viz.prototype.hundoId = function() {
+    return "hundo" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -1122,5 +1128,6 @@ var vizConfig = {
 
 document.onkeydown = hundo.Viz.checkKey;
 
-hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0]);
+hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0], 1);
+hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[1], 2);
 hundo.vizz.drawBoard(hundo.board);
