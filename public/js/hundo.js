@@ -361,7 +361,7 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
         <div id="${this.boardDivId()}">
             <svg id="${this.boardSvgId()}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <g id="blockTemplate" height="20" width="20" >
+                    <g id="${this.blockTemplateId()}" height="20" width="20" >
                       <rect x="0" y="0" width="20" height="20" fill="#888" />
                       <path d="M0 0 L26 0 L20 6 L6 6 Z"
                         stroke="none" fill="#aaa"/>
@@ -439,6 +439,10 @@ hundo.Viz.prototype.boardDivId = function() {
 
 hundo.Viz.prototype.boardSvgId = function() {
     return "boardSvg" + this.id;
+}
+
+hundo.Viz.prototype.blockTemplateId = function() {
+    return "blockTemplate" + this.id;
 }
 
 
@@ -540,13 +544,15 @@ hundo.Viz.prototype.drawBoard = function() {
 
     var THIS = this;
 
-    hundo.vizz.boardSvg.selectAll()
+    console.log(this.boardSvg);
+
+    this.boardSvg.selectAll()
         .data(this.board.getBlocks())
         .enter()
         .append("svg:use")
         .attr("class", "block")
         .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#blockTemplate")
+        .attr("xlink:href", "#" + this.blockTemplateId())
         .attr("transform", function(piece) {
             return THIS.transform(piece, {
                 dx: dxdy,
@@ -623,7 +629,7 @@ hundo.Viz.prototype.drawBoard = function() {
             var piece = pieces[i];
             var id = "#" + hundo.Viz.pieceId(piece);
             var delay = delays[i];
-            hundo.vizz.boardSvg.select(id)
+            THIS.boardSvg.select(id)
                 .transition()
                 .ease("linear")
                 .delay(delay)
@@ -645,15 +651,17 @@ hundo.Viz.prototype.reset = function() {
 
     this.board.reset();
 
+    var THIS = this;
+
     _.each(pieces, function(piece, i){
         var piece = pieces[i];
-        hundo.vizz.boardSvg.select("#" + hundo.Viz.pieceId(piece))
+        THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
             .transition()
             .ease("linear")
             .attr("rx", vizConfig.cellSize / 2)
             .attr("ry", vizConfig.cellSize / 2)
             .attr("transform", function() {
-                return hundo.vizz.transform(piece);
+                return THIS.transform(piece);
             })
             .duration(0);
     });
@@ -784,7 +792,7 @@ hundo.Viz.prototype.stepAnimate = function() {
                 THIS.drawBoard(this.board);
             } else {
                 // all levels solved
-                hundo.vizz.animateVictory();
+                THIS.animateVictory();
             }
         }, this.vizConfig.flyInDuration / 2);
     }
@@ -1136,6 +1144,8 @@ var vizConfig = {
 
 document.onkeydown = hundo.Viz.checkKey;
 
-hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[0]);
-hundo.vizz = new hundo.Viz(vizConfig, hundo.boardConfigs[1], 2);
-hundo.vizz.drawBoard();
+hundo.vizz1 = new hundo.Viz(vizConfig, hundo.boardConfigs[0], 1);
+hundo.vizz2 = new hundo.Viz(vizConfig, hundo.boardConfigs[1], 2);
+hundo.vizz1.drawBoard();
+hundo.vizz2.drawBoard();
+hundo.vizz = hundo.vizz1;
