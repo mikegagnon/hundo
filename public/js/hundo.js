@@ -351,14 +351,15 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
+
 hundo.Viz = function(vizConfig, boardConfig, id) {
 
     this.id = id;
 
     var svgContents = `
     <div>
-        <div id="boardDiv">
-            <svg id="boardSvg" xmlns="http://www.w3.org/2000/svg">
+        <div id="${this.boardDivId()}">
+            <svg id="${this.boardSvgId()}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <g id="blockTemplate" height="20" width="20" >
                       <rect x="0" y="0" width="20" height="20" fill="#888" />
@@ -407,7 +408,7 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
     // TODO: validate vizConfig
     this.vizConfig = vizConfig;
 
-    this.boardSvg = d3.select("#boardSvg")
+    this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", vizConfig.numCols * vizConfig.cellSize)
         .attr("height", vizConfig.numRows * vizConfig.cellSize);
 
@@ -432,6 +433,15 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
 hundo.Viz.prototype.hundoId = function() {
     return "hundo" + this.id;
 }
+
+hundo.Viz.prototype.boardDivId = function() {
+    return "boardDiv" + this.id;
+}
+
+hundo.Viz.prototype.boardSvgId = function() {
+    return "boardSvg" + this.id;
+}
+
 
 hundo.Viz.prototype.drawGrid = function() {
 
