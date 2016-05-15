@@ -474,7 +474,7 @@ hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
         <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
         <span id="${this.levelTextId()}""></span>
-        <button type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
+        <button onClick="hundo.clickLevelForward(${this.id})"type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
@@ -829,6 +829,25 @@ hundo.Viz.prototype.animateSolved = function() {
 }
 
 
+hundo.Viz.prototype.nextLevel = function() {
+
+    var THIS = this;
+
+    setTimeout(function(){
+        if (THIS.level < THIS.levels.length - 1) {
+            THIS.level++;
+            THIS.board = new hundo.Board(THIS.levels[THIS.level],
+                THIS.idGen);
+            THIS.drawBoard(this.board);
+        } else {
+            // all levels solved
+            THIS.animateVictory();
+        }
+    }, this.vizConfig.flyInDuration / 2);
+
+    this.animateSolved();
+}
+
 // TODO: idGen member of Viz
 hundo.Viz.prototype.stepAnimate = function() {
 
@@ -844,21 +863,6 @@ hundo.Viz.prototype.stepAnimate = function() {
         setTimeout(
             function(){THIS.reset(this.board);},
             THIS.animateInterval);
-    }
-
-    if (this.board.solved) {
-
-        setTimeout(function(){
-            if (THIS.level < THIS.levels.length - 1) {
-                THIS.level++;
-                THIS.board = new hundo.Board(THIS.levels[THIS.level],
-                    THIS.idGen);
-                THIS.drawBoard(this.board);
-            } else {
-                // all levels solved
-                THIS.animateVictory();
-            }
-        }, this.vizConfig.flyInDuration / 2);
     }
 
     if ("move" in animate) {
@@ -915,10 +919,6 @@ hundo.Viz.prototype.stepAnimate = function() {
             .attr("r", "0")
             .remove();
 
-        if (animate.move.solved) {
-            this.animateSolved();
-        }
-
     } else if ("collide" in animate) {
         var recipients = animate.collide.recipients;
         var dir = animate.collide.dir;
@@ -955,6 +955,10 @@ hundo.Viz.prototype.stepAnimate = function() {
                     .duration(THIS.vizConfig.stepDuration / 2);
                 }
         }, this.vizConfig.stepDuration / 2);
+    }
+
+    if (this.board.solved) {
+        this.nextLevel();
     }
 }
 
@@ -1005,6 +1009,10 @@ hundo.Viz.checkKey = function(e) {
 
 hundo.clickPlay = function(id) {
     hundo.vizz = hundo.instances[id];
+}
+
+hundo.clickLevelForward = function(id) {
+    hundo.vizz.nextLevel();
 }
 
 hundo.defaultVizConfig = {
