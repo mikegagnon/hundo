@@ -352,9 +352,26 @@ hundo.Board.prototype.step = function() {
 }
 
 
-hundo.Viz = function(vizConfig, boardConfig, id) {
+Hundo = function(config) {
 
+    if (!vizConfig in config) {
+        config.viz = {};
+    }
+    var vizConfig = $.extend(hundo.defaultVizConfig, config.viz);
+    var levels = config.levels;
+    var id = config.id;
+
+    return new hundo.Viz(vizConfig, levels, id);
+}
+
+hundo.Viz = function(vizConfig, levels, id) {
+
+    // TODO: validate vizConfig and levels
+    this.vizConfig = vizConfig;
+    this.levels = levels;
+    boardConfig = this.levels[0];
     this.id = id;
+    this.level = 0;
 
     var svgContents = `
     <div>
@@ -403,11 +420,6 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
 
     $("#" + this.hundoId()).append(svg);
 
-
-
-    // TODO: validate vizConfig
-    this.vizConfig = vizConfig;
-
     this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", vizConfig.numCols * vizConfig.cellSize)
         .attr("height", vizConfig.numRows * vizConfig.cellSize);
@@ -426,6 +438,8 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
     this.idGen = new hundo.IdGenerator();
 
     this.board = new hundo.Board(boardConfig, this.idGen);
+
+    this.drawBoard();
 
 }
 
@@ -535,11 +549,9 @@ hundo.getRandom = function (min, max) {
 // TODO: rm board argument
 hundo.Viz.prototype.drawBoard = function() {
 
-    var dxdy = vizConfig.cellSize / 2;
+    var dxdy = this.vizConfig.cellSize / 2;
 
     var THIS = this;
-
-    console.log(this.boardSvg);
 
     this.boardSvg.selectAll()
         .data(this.board.getBlocks())
@@ -561,10 +573,10 @@ hundo.Viz.prototype.drawBoard = function() {
         .data(this.board.getBalls())
         .enter()
         .append("ellipse")
-        .attr("cx", vizConfig.cellSize / 2)
-        .attr("cy", vizConfig.cellSize / 2)
-        .attr("rx", vizConfig.cellSize / 2)
-        .attr("ry", vizConfig.cellSize / 2)
+        .attr("cx", this.vizConfig.cellSize / 2)
+        .attr("cy", this.vizConfig.cellSize / 2)
+        .attr("rx", this.vizConfig.cellSize / 2)
+        .attr("ry", this.vizConfig.cellSize / 2)
         .attr("style", "fill:#eee")
         .attr("class", "ball")
         .attr("id", hundo.Viz.pieceId)
@@ -598,7 +610,7 @@ hundo.Viz.prototype.drawBoard = function() {
 
     var delays = _.range(0, pieces.length)
         .map(function(){
-            return hundo.getRandom(0, this.vizConfig.flyInDuration / 2);
+            return hundo.getRandom(0, THIS.vizConfig.flyInDuration / 2);
         });
 
     _.each(pieces, function(piece, i){
@@ -616,7 +628,7 @@ hundo.Viz.prototype.drawBoard = function() {
                     scale: THIS.vizConfig.blowupScale
                 });
             })
-            .duration(this.vizConfig.flyInDuration / 2);
+            .duration(THIS.vizConfig.flyInDuration / 2);
     });
 
     setTimeout(function(){
@@ -631,9 +643,9 @@ hundo.Viz.prototype.drawBoard = function() {
                 .attr("transform", function() {
                     return THIS.transform(piece);
                 })
-                .duration(vizConfig.flyInDuration / 2);
+                .duration(THIS.vizConfig.flyInDuration / 2);
         });            
-    }, vizConfig.flyInDuration / 2);
+    }, this.vizConfig.flyInDuration / 2);
 
 }
 
@@ -653,8 +665,8 @@ hundo.Viz.prototype.reset = function() {
         THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
             .transition()
             .ease("linear")
-            .attr("rx", vizConfig.cellSize / 2)
-            .attr("ry", vizConfig.cellSize / 2)
+            .attr("rx", THIS.vizConfig.cellSize / 2)
+            .attr("ry", THIS.vizConfig.cellSize / 2)
             .attr("transform", function() {
                 return THIS.transform(piece);
             })
@@ -680,10 +692,12 @@ hundo.Viz.dxdy = function(dir) {
 // TODO: Cleanup
 hundo.Viz.prototype.animateVictory = function() {
 
+    var THIS = this;
+
     this.boardSvg.select("#background")
         .transition()
         .style("fill", "#EEE")
-        .duration(vizConfig.flyInDuration * 10);
+        .duration(THIS.vizConfig.flyInDuration * 10);
 
     this.boardSvg.selectAll(".grid")
         .remove();
@@ -695,11 +709,10 @@ hundo.Viz.prototype.animateVictory = function() {
         .map(function(i){
             var color = d3.hsl(hundo.getRandom(0, 360),
                 1.0, 0.5);
-            var x = hundo.getRandom(0, this.board.numCols * 2 * vizConfig.cellSize);
-            var y = hundo.getRandom(0, this.board.numRows * 2 * vizConfig.cellSize);
+            var x = hundo.getRandom(0, this.board.numCols * 2 * THIS.vizConfig.cellSize);
+            var y = hundo.getRandom(0, this.board.numRows * 2 * THIS.vizConfig.cellSize);
             var r = hundo.getRandom(50, 200);
             var delay = hundo.getRandom(0, duration);
-            console.log(x, y);
             circles.push({
                 color: color,
                 x: x,
@@ -732,12 +745,12 @@ hundo.Viz.prototype.animateSolved = function() {
 
     var dxdy = this.vizConfig.cellSize / 2;
 
+    var THIS = this;
+
     var delays = _.range(0, pieces.length)
         .map(function(){
-            return hundo.getRandom(0, this.vizConfig.flyInDuration / 2);
+            return hundo.getRandom(0, THIS.vizConfig.flyInDuration / 2);
         })
-
-    var THIS = this;
 
     _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
@@ -778,11 +791,11 @@ hundo.Viz.prototype.stepAnimate = function() {
     }
 
     if (this.board.solved) {
+
         setTimeout(function(){
-            // TODO: Viz.level and Viz.boardConfigs
-            if (hundo.level < hundo.boardConfigs.length - 1) {
-                hundo.level++;
-                THIS.board = new hundo.Board(hundo.boardConfigs[hundo.level],
+            if (THIS.level < THIS.levels.length - 1) {
+                THIS.level++;
+                THIS.board = new hundo.Board(THIS.levels[THIS.level],
                     THIS.idGen);
                 THIS.drawBoard(this.board);
             } else {
@@ -835,7 +848,7 @@ hundo.Viz.prototype.stepAnimate = function() {
             .attr("cx", ball.col * this.vizConfig.cellSize +
                     this.vizConfig.cellSize / 2
             )
-            .attr("cy", ball.row * vizConfig.cellSize +
+            .attr("cy", ball.row * this.vizConfig.cellSize +
                     this.vizConfig.cellSize / 2
             )
             .attr("r", this.vizConfig.cellSize / 2 -
@@ -925,7 +938,7 @@ hundo.Viz.checkKey = function(e) {
         hundo.vizz.animateInterval =
             setInterval(
                 function(){hundo.vizz.stepAnimate(hundo.vizz.board);},
-                vizConfig.stepDuration);
+                hundo.vizz.vizConfig.stepDuration);
     }
 }
 
@@ -1124,10 +1137,7 @@ var boardConfig3 = {
     }
 }
 
-hundo.boardConfigs = [starter, boardConfig1, boardConfig2, boardConfig3];
-hundo.level = 0
-
-var vizConfig = {
+hundo.defaultVizConfig = {
     cellSize: 26,
     stepDuration: 50,
     flyInDuration: 250,
@@ -1137,10 +1147,24 @@ var vizConfig = {
     numCols: 21
 }
 
+levels = [starter, boardConfig1, boardConfig2, boardConfig3];
+
 document.onkeydown = hundo.Viz.checkKey;
 
-hundo.vizz1 = new hundo.Viz(vizConfig, hundo.boardConfigs[0], 1);
-hundo.vizz2 = new hundo.Viz(vizConfig, hundo.boardConfigs[1], 2);
+hundo.vizz = new Hundo({
+    levels: levels,
+    id: 1
+});
+
+hundo.vizz2 = new Hundo({
+    levels: levels,
+    id: 2
+});
+
+
+/*
+hundo.vizz2 = new Hundo({}, hundo.boardConfigs[1], 2);
 hundo.vizz1.drawBoard();
 hundo.vizz2.drawBoard();
 hundo.vizz = hundo.vizz1;
+*/
