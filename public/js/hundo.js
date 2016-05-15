@@ -815,7 +815,7 @@ hundo.Viz.prototype.animateSolved = function() {
     });
 }
 
-hundo.Viz.prototype.prevLevel = function(quick) {
+hundo.Viz.prototype.prevLevel = function() {
 
     if (this.level <= 0) {
         return;
@@ -825,21 +825,18 @@ hundo.Viz.prototype.prevLevel = function(quick) {
         this.level = this.levels.length;
     }
 
-    var THIS = this;
+    this.animateSolvedQuick();
 
-    setTimeout(function(){
-        THIS.level--;
-        THIS.board = new hundo.Board(THIS.levels[THIS.level],
-            THIS.idGen);
-        THIS.drawBoard(true);
-        THIS.updateLevelSelect();
+    this.level--;
+    this.board = new hundo.Board(this.levels[this.level],
+        this.idGen);
+    this.drawBoard(true);
+    this.updateLevelSelect();
 
-        if (THIS.level == this.levels.length - 1) {
-            THIS.undoAnimateVictory();
-        }
-    }, quick ? 0 : this.vizConfig.flyInDuration / 2);
+    if (this.level == this.levels.length - 1) {
+        this.undoAnimateVictory();
+    }
 
-    this.animateSolved();
 }
 
 hundo.Viz.prototype.loadNextLevel = function(quick) {
@@ -1096,7 +1093,7 @@ hundo.clickLevelForward = function(id) {
 }
 
 hundo.clickLevelBack = function(id) {
-    hundo.vizz.prevLevel(true);
+    hundo.vizz.prevLevel();
 }
 
 hundo.defaultVizConfig = {
