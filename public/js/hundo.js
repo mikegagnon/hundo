@@ -777,7 +777,7 @@ hundo.Viz.prototype.animateVictory = function() {
     this.boardSvg.select("#background")
         .transition()
         .style("fill", "#EEE")
-        .duration(THIS.vizConfig.flyInDuration * 10);
+        .duration(0);
 
     this.boardSvg.selectAll(".grid")
         .remove();
