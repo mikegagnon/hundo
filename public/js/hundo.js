@@ -1171,12 +1171,12 @@ levels = [starter, boardConfig1, boardConfig2, boardConfig3];
 
 document.onkeydown = hundo.Viz.checkKey;
 
-hundo.vizz = new Hundo({
+new Hundo({
     levels: levels,
     id: 1
 });
 
-hundo.vizz2 = new Hundo({
+new Hundo({
     levels: levels,
     id: 2
 });
