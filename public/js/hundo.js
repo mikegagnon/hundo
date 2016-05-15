@@ -361,7 +361,7 @@ hundo.Viz = function(vizConfig, boardConfig, id) {
         <div id="${this.boardDivId()}">
             <svg id="${this.boardSvgId()}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <g id="${this.blockTemplateId()}" height="20" width="20" >
+                    <g id="blockTemplate" height="20" width="20" >
                       <rect x="0" y="0" width="20" height="20" fill="#888" />
                       <path d="M0 0 L26 0 L20 6 L6 6 Z"
                         stroke="none" fill="#aaa"/>
@@ -440,11 +440,6 @@ hundo.Viz.prototype.boardDivId = function() {
 hundo.Viz.prototype.boardSvgId = function() {
     return "boardSvg" + this.id;
 }
-
-hundo.Viz.prototype.blockTemplateId = function() {
-    return "blockTemplate" + this.id;
-}
-
 
 hundo.Viz.prototype.drawGrid = function() {
 
@@ -552,7 +547,7 @@ hundo.Viz.prototype.drawBoard = function() {
         .append("svg:use")
         .attr("class", "block")
         .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#" + this.blockTemplateId())
+        .attr("xlink:href", "#blockTemplate")
         .attr("transform", function(piece) {
             return THIS.transform(piece, {
                 dx: dxdy,
