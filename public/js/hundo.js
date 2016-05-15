@@ -760,13 +760,9 @@ hundo.Viz.dxdy = function(dir) {
 hundo.Viz.prototype.undoAnimateVictory = function() {
 
     this.boardSvg.select("#background")
-        //.transition()
         .style("fill", "#000")
-        //.duration(THIS.vizConfig.flyInDuration * 10);
 
     this.drawGrid();
-
-
 }
 
 // TODO: Cleanup
