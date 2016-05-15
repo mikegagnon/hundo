@@ -759,6 +759,8 @@ hundo.Viz.dxdy = function(dir) {
 
 hundo.Viz.prototype.undoAnimateVictory = function() {
 
+    console.log("foo")
+
     this.boardSvg.select("#background")
         .style("fill", "#000")
 
@@ -818,6 +820,10 @@ hundo.Viz.prototype.prevLevel = function() {
         return;
     }
 
+    if (this.level == "victory") {
+        this.level = this.levels.length;
+    }
+
     var THIS = this;
 
     setTimeout(function(){
@@ -827,14 +833,12 @@ hundo.Viz.prototype.prevLevel = function() {
         THIS.drawBoard(this.board);
         THIS.updateLevelSelect();
 
+        if (THIS.level == this.levels.length - 1) {
+            THIS.undoAnimateVictory();
+        }
     }, this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
-
-    if (this.level == this.levels.length - 1 && this.board.solved) {
-        this.undoAnimateVictory();
-    }
-
 }
 
 hundo.Viz.prototype.nextLevel = function() {
@@ -849,6 +853,7 @@ hundo.Viz.prototype.nextLevel = function() {
             THIS.drawBoard(this.board);
         } else {
             // all levels solved
+            THIS.level = "victory";
             THIS.animateVictory();
         }
         THIS.updateLevelSelect();
@@ -859,11 +864,19 @@ hundo.Viz.prototype.nextLevel = function() {
 }
 
 hundo.Viz.prototype.updateLevelSelect = function() {
-    var levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
+
+    var levelText;
+
+    if (this.level == "victory" ) {
+        levelText = "VICTORY"
+    } else {
+        levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
+    }
+
     $("#" + this.levelTextId()).text(levelText);
 
 
-    if (this.level > 0) {
+    if (this.level == "victory" || this.level > 0) {
         $("#" + this.levelBackButtonId())
             .css({
                 color: "#000",
@@ -877,7 +890,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
             })
     }
 
-    if (this.level < this.levels.length && !this.board.solved) {
+    if (this.level != "victory") {
         $("#" + this.levelForwardButtonId())
             .css({
                 color: "#000",
