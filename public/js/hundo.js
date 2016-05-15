@@ -962,6 +962,16 @@ hundo.clickPlay = function(id) {
     hundo.vizz = hundo.instances[id];
 }
 
+hundo.defaultVizConfig = {
+    cellSize: 26,
+    stepDuration: 50,
+    flyInDuration: 250,
+    blowupScale: 3,
+    perimStrokeWidth: 3,
+    numRows: 15,
+    numCols: 21
+}
+
 var starter = {
     numRows: 15,
     numCols: 21,
@@ -1157,15 +1167,7 @@ var boardConfig3 = {
     }
 }
 
-hundo.defaultVizConfig = {
-    cellSize: 26,
-    stepDuration: 50,
-    flyInDuration: 250,
-    blowupScale: 3,
-    perimStrokeWidth: 3,
-    numRows: 15,
-    numCols: 21
-}
+
 
 levels = [starter, boardConfig1, boardConfig2, boardConfig3];
 
