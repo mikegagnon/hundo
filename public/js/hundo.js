@@ -959,7 +959,6 @@ hundo.Viz.checkKey = function(e) {
 }
 
 hundo.clickPlay = function(id) {
-    console.log(id);
     hundo.vizz = hundo.instances[id];
 }
 
