@@ -385,6 +385,7 @@ hundo.Viz = function(config) {
     boardConfig = this.levels[0];
     this.id = config.id;
     this.level = 0;
+    this.levelMax = config.viz.levelMax;
 
     var svgContents = `
     <div>
@@ -608,8 +609,6 @@ hundo.getRandom = function (min, max) {
 
 hundo.Viz.prototype.drawBoard = function(quick) {
 
-    console.log(quick);
-
     var dxdy = this.vizConfig.cellSize / 2;
 
     var THIS = this;
@@ -752,8 +751,6 @@ hundo.Viz.dxdy = function(dir) {
 
 hundo.Viz.prototype.undoAnimateVictory = function() {
 
-    console.log("foo")
-
     this.boardSvg.select("#background")
         .style("fill", "#000")
 
@@ -780,7 +777,6 @@ hundo.Viz.prototype.animateSolvedQuick = function() {
 
     _.each(pieces, function(piece,i){
         var id = "#" + hundo.Viz.pieceId(piece);
-        console.log(id)
         $(id).remove();
     })
 }
@@ -850,8 +846,15 @@ hundo.Viz.prototype.loadNextLevel = function(quick) {
 
     var THIS = this;
 
+
+
     if (THIS.level < THIS.levels.length - 1) {
         THIS.level++;
+
+        if (this.level > this.levelMax) {
+            this.levelMax = this.level;
+        }
+
         THIS.board = new hundo.Board(THIS.levels[THIS.level],
             THIS.idGen);
         THIS.drawBoard(quick);
@@ -859,6 +862,8 @@ hundo.Viz.prototype.loadNextLevel = function(quick) {
         // all levels solved
         THIS.level = "victory";
         THIS.animateVictory();
+
+        this.levelMax = this.levels.length;
     }
 
     THIS.updateLevelSelect();
@@ -895,7 +900,6 @@ hundo.Viz.prototype.updateLevelSelect = function() {
 
     $("#" + this.levelTextId()).text(levelText);
 
-
     if (this.level == "victory" || this.level > 0) {
         $("#" + this.levelBackButtonId())
             .css({
@@ -910,7 +914,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
             })
     }
 
-    if (this.level != "victory") {
+    if (this.level != "victory" && this.level < this.levelMax) {
         $("#" + this.levelForwardButtonId())
             .css({
                 color: "#000",
@@ -1089,7 +1093,10 @@ hundo.clickPlay = function(id) {
 }
 
 hundo.clickLevelForward = function(id) {
-    hundo.vizz.nextLevel(true);
+
+    if (hundo.vizz.level != "victory" && hundo.vizz.level < hundo.vizz.levelMax) {
+        hundo.vizz.nextLevel(true);
+    }
 }
 
 hundo.clickLevelBack = function(id) {
@@ -1105,7 +1112,8 @@ hundo.defaultVizConfig = {
     numRows: 15,
     numCols: 21,
     playButton: false,
-    levelSelect: true
+    levelSelect: true,
+    levelMax: 0
 }
 
 var starter = {
