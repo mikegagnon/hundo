@@ -353,6 +353,55 @@ hundo.Board.prototype.step = function() {
 
 hundo.Viz = function(vizConfig, boardConfig) {
 
+    var svgContents = `
+    <div>
+        <div id="boardDiv">
+            <svg id="boardSvg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <g id="blockTemplate" height="20" width="20" >
+                      <rect x="0" y="0" width="20" height="20" fill="#888" />
+                      <path d="M0 0 L26 0 L20 6 L6 6 Z"
+                        stroke="none" fill="#aaa"/>
+                      <path d="M0 0 L6 6 L6 20 L0 26 Z"
+                        stroke="none" fill="#aaa"/>
+                      <path d="M26 0 L20 6 L20 20 L26 26 Z"
+                        stroke="none" fill="#666"/>
+                      <path d="M26 26 L20 20 L6 20 L0 26 Z"
+                        stroke="none" fill="#666"/>
+                    </g>
+                    <g id="goalTemplate" height="20" width="20">
+                        <polygon points="0,26 0,13 13,26" style="fill:red" />
+                        <polygon points="13,26 26, 13 26,26" style="fill:red" />
+                        <rect x="0" y="23" width="26" height="3" fill="red" />
+                    </g>
+
+                </defs>
+
+                <rect id="background" x="0" y="0" style="fill:black" />
+
+                <rect id="perim" x="0" y="0" style="stroke-width:3;stroke:#999" fill-opacity="0.0"/>
+
+                <!-- hard coded to standard numCols numRows -->
+                <text x="85" y="150"
+                    font-family="Impact"
+                    font-size="55">
+                    TOTAL VICTORY!
+                </text>
+            </svg>
+        </div>
+        <div id="console">
+            <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
+            Level 1
+            <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
+        </div>
+    </div>
+`
+    var svg = $('<div/>').html(svgContents).contents();
+
+    $("#hundo1").append(svg);
+
+
+
     // TODO: validate vizConfig
     this.vizConfig = vizConfig;
 
