@@ -863,6 +863,75 @@ hundo.Viz.checkKey = function(e) {
     }
 }
 
+var starter = {
+    numRows: 15,
+    numCols: 21,
+    blocks: [
+        {
+            row: 3,
+            col: 9
+        },
+        {
+            row: 3,
+            col: 10
+        },
+        {
+            row: 3,
+            col: 11
+        },
+        {
+            row: 11,
+            col: 9
+        },
+        {
+            row: 11,
+            col: 10
+        },
+        {
+            row: 11,
+            col: 11
+        },
+        {
+            row: 6,
+            col: 6
+        },
+        {
+            row: 7,
+            col: 6
+        },
+        {
+            row: 8,
+            col: 6
+        },
+        {
+            row: 6,
+            col: 14
+        },
+        {
+            row: 7,
+            col: 14
+        },
+        {
+            row: 8,
+            col: 14
+        },
+
+
+    ],
+    goals: [
+        {
+            row: 2,
+            col: 7,
+            dir: hundo.DirectionEnum.DOWN
+        },
+
+    ],
+    ball: {
+        row: 7,
+        col: 10
+    }
+}
+
 var boardConfig1 = {
     numRows: 15,
     numCols: 20,
@@ -989,7 +1058,7 @@ var boardConfig3 = {
     }
 }
 
-hundo.boardConfigs = [boardConfig1, boardConfig2, boardConfig3];
+hundo.boardConfigs = [starter, boardConfig1, boardConfig2, boardConfig3];
 hundo.level = 0
 
 var vizConfig = {
@@ -999,7 +1068,7 @@ var vizConfig = {
     blowupScale: 3,
     perimStrokeWidth: 3,
     numRows: 15,
-    numCols: 20
+    numCols: 21
 }
 
 document.onkeydown = hundo.Viz.checkKey;
