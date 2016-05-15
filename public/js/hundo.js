@@ -844,29 +844,25 @@ hundo.Viz.prototype.prevLevel = function(quick) {
 
 hundo.Viz.prototype.loadNextLevel = function(quick) {
 
-    var THIS = this;
-
-
-
-    if (THIS.level < THIS.levels.length - 1) {
-        THIS.level++;
+    if (this.level < this.levels.length - 1) {
+        this.level++;
 
         if (this.level > this.levelMax) {
             this.levelMax = this.level;
         }
 
-        THIS.board = new hundo.Board(THIS.levels[THIS.level],
-            THIS.idGen);
-        THIS.drawBoard(quick);
+        this.board = new hundo.Board(this.levels[this.level],
+            this.idGen);
+        this.drawBoard(quick);
     } else {
         // all levels solved
-        THIS.level = "victory";
-        THIS.animateVictory();
+        this.level = "victory";
+        this.animateVictory();
 
         this.levelMax = this.levels.length;
     }
 
-    THIS.updateLevelSelect();
+    this.updateLevelSelect();
 }
 
 hundo.Viz.prototype.nextLevel = function(quick) {
