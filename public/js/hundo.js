@@ -606,7 +606,9 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
-hundo.Viz.prototype.drawBoard = function() {
+hundo.Viz.prototype.drawBoard = function(quick) {
+
+    console.log(quick);
 
     var dxdy = this.vizConfig.cellSize / 2;
 
@@ -674,7 +676,7 @@ hundo.Viz.prototype.drawBoard = function() {
 
     _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
-        var delay = delays[i];
+        var delay = quick ? 0 : delays[i];
 
         THIS.boardSvg.select(id)
             .transition()
@@ -694,7 +696,7 @@ hundo.Viz.prototype.drawBoard = function() {
         _.each(pieces, function(piece, i){
             var piece = pieces[i];
             var id = "#" + hundo.Viz.pieceId(piece);
-            var delay = delays[i];
+            var delay = quick ? 0 : delays[i];
             THIS.boardSvg.select(id)
                 .transition()
                 .ease("linear")
@@ -704,7 +706,7 @@ hundo.Viz.prototype.drawBoard = function() {
                 })
                 .duration(THIS.vizConfig.flyInDuration / 2);
         });            
-    }, this.vizConfig.flyInDuration / 2);
+    }, quick ? 0 : this.vizConfig.flyInDuration / 2);
 
 }
 
@@ -772,6 +774,17 @@ hundo.Viz.prototype.animateVictory = function() {
         .remove();
 }
 
+hundo.Viz.prototype.animateSolvedQuick = function() {
+
+    var pieces = this.board.getPieces(function(){ return true; });
+
+    _.each(pieces, function(piece,i){
+        var id = "#" + hundo.Viz.pieceId(piece);
+        console.log(id)
+        $(id).remove();
+    })
+}
+
 hundo.Viz.prototype.animateSolved = function() {
 
     var pieces = this.board.getPieces(function(){ return true; });
@@ -787,6 +800,7 @@ hundo.Viz.prototype.animateSolved = function() {
 
     _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
+
         var delay = delays[i];
 
         THIS.boardSvg.select(id)
@@ -805,7 +819,7 @@ hundo.Viz.prototype.animateSolved = function() {
     });
 }
 
-hundo.Viz.prototype.prevLevel = function() {
+hundo.Viz.prototype.prevLevel = function(quick) {
 
     if (this.level <= 0) {
         return;
@@ -821,36 +835,51 @@ hundo.Viz.prototype.prevLevel = function() {
         THIS.level--;
         THIS.board = new hundo.Board(THIS.levels[THIS.level],
             THIS.idGen);
-        THIS.drawBoard(this.board);
+        THIS.drawBoard(true);
         THIS.updateLevelSelect();
 
         if (THIS.level == this.levels.length - 1) {
             THIS.undoAnimateVictory();
         }
-    }, this.vizConfig.flyInDuration / 2);
+    }, quick ? 0 : this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
 }
 
-hundo.Viz.prototype.nextLevel = function() {
+hundo.Viz.prototype.loadNextLevel = function(quick) {
 
     var THIS = this;
 
-    setTimeout(function(){
-        if (THIS.level < THIS.levels.length - 1) {
-            THIS.level++;
-            THIS.board = new hundo.Board(THIS.levels[THIS.level],
-                THIS.idGen);
-            THIS.drawBoard(this.board);
-        } else {
-            // all levels solved
-            THIS.level = "victory";
-            THIS.animateVictory();
-        }
-        THIS.updateLevelSelect();
-    }, this.vizConfig.flyInDuration / 2);
+    if (THIS.level < THIS.levels.length - 1) {
+        THIS.level++;
+        THIS.board = new hundo.Board(THIS.levels[THIS.level],
+            THIS.idGen);
+        THIS.drawBoard(quick);
+    } else {
+        // all levels solved
+        THIS.level = "victory";
+        THIS.animateVictory();
+    }
 
-    this.animateSolved();
+    THIS.updateLevelSelect();
+}
+
+hundo.Viz.prototype.nextLevel = function(quick) {
+
+    var THIS = this;
+
+    if (quick) {
+        this.animateSolvedQuick();
+        this.loadNextLevel(quick);
+    } else {
+        setTimeout(function(){
+            THIS.loadNextLevel();
+        }, this.vizConfig.flyInDuration / 2);
+
+        this.animateSolved(); 
+    }
+
+
 
 }
 
@@ -1060,11 +1089,11 @@ hundo.clickPlay = function(id) {
 }
 
 hundo.clickLevelForward = function(id) {
-    hundo.vizz.nextLevel();
+    hundo.vizz.nextLevel(true);
 }
 
 hundo.clickLevelBack = function(id) {
-    hundo.vizz.prevLevel();
+    hundo.vizz.prevLevel(true);
 }
 
 hundo.defaultVizConfig = {
