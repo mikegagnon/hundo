@@ -958,6 +958,11 @@ hundo.Viz.checkKey = function(e) {
 
     var direction;
 
+    // diable browser scrolling on arrow keys
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+
     if (e.keyCode == '38') {
         direction = hundo.DirectionEnum.UP;
     } else if (e.keyCode == '40') {
