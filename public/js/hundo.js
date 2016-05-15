@@ -459,6 +459,7 @@ hundo.Viz = function(config) {
 
     this.drawBoard();
 
+    this.updateLevelSelect();
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
@@ -472,9 +473,9 @@ hundo.Viz.prototype.addPlayButton = function() {
 
 hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
-        <button onClick="hundo.clickLevelBack(${this.id})" type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
+        <button id="${this.levelBackButtonId()}" onClick="hundo.clickLevelBack(${this.id})" type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
         <span id="${this.levelTextId()}""></span>
-        <button onClick="hundo.clickLevelForward(${this.id})" type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
+        <button id="${this.levelForwardButtonId()}" onClick="hundo.clickLevelForward(${this.id})" type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
@@ -504,6 +505,14 @@ hundo.Viz.prototype.consoleId = function() {
 
 hundo.Viz.prototype.levelTextId = function() {
     return "levelText" + this.id;
+}
+
+hundo.Viz.prototype.levelBackButtonId = function() {
+    return "levelBackButton" + this.id;
+}
+
+hundo.Viz.prototype.levelForwardButtonId = function() {
+    return "levelForwardButton" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -600,9 +609,12 @@ hundo.getRandom = function (min, max) {
 // TODO: rm board argument
 hundo.Viz.prototype.drawBoard = function() {
 
-    var levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
+    // update level selector buttons and text
 
-    $("#" + this.levelTextId()).text(levelText);
+
+
+    // Draw the svg board
+
 
 
     var dxdy = this.vizConfig.cellSize / 2;
@@ -853,7 +865,8 @@ hundo.Viz.prototype.prevLevel = function() {
         THIS.board = new hundo.Board(THIS.levels[THIS.level],
             THIS.idGen);
         THIS.drawBoard(this.board);
-        
+        THIS.updateLevelSelect();
+
     }, this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
@@ -877,10 +890,48 @@ hundo.Viz.prototype.nextLevel = function() {
         } else {
             // all levels solved
             THIS.animateVictory();
+
         }
+        THIS.updateLevelSelect();
+
     }, this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
+}
+
+hundo.Viz.prototype.updateLevelSelect = function() {
+    var levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
+
+    $("#" + this.levelTextId()).text(levelText);
+
+
+    if (this.level > 0) {
+        $("#" + this.levelBackButtonId())
+            .css({
+                color: "#000",
+                "cursor": "pointer"
+            });
+    } else {
+        $("#" + this.levelBackButtonId())
+            .css({
+                color: "#bbb",
+                cursor: ""
+            })
+    }
+
+    if (this.level < this.levels.length && !this.board.solved) {
+        $("#" + this.levelForwardButtonId())
+            .css({
+                color: "#000",
+                "cursor": "pointer"
+            });
+    } else {
+        $("#" + this.levelForwardButtonId())
+            .css({
+                color: "#bbb",
+                cursor: ""
+            })
+    }
 }
 
 // TODO: idGen member of Viz
