@@ -1204,15 +1204,7 @@ new Hundo({
     levels: levels,
     id: 1,
     viz: {
-        playButton: true
+        playButton: false
     }
 });
 
-new Hundo({
-    levels: levels,
-    id: 2,
-    viz: {
-        playButton: true,
-        numRows: 10
-    }
-});
