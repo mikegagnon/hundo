@@ -472,9 +472,9 @@ hundo.Viz.prototype.addPlayButton = function() {
 
 hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
-        <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
+        <button onClick="hundo.clickLevelBack(${this.id})" type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
         <span id="${this.levelTextId()}""></span>
-        <button onClick="hundo.clickLevelForward(${this.id})"type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
+        <button onClick="hundo.clickLevelForward(${this.id})" type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
@@ -828,6 +828,25 @@ hundo.Viz.prototype.animateSolved = function() {
     });
 }
 
+hundo.Viz.prototype.prevLevel = function() {
+
+    if (this.level <= 0) {
+        return;
+    }
+
+    var THIS = this;
+
+    setTimeout(function(){
+        THIS.level--;
+        THIS.board = new hundo.Board(THIS.levels[THIS.level],
+            THIS.idGen);
+        THIS.drawBoard(this.board);
+        
+    }, this.vizConfig.flyInDuration / 2);
+
+    this.animateSolved();
+
+}
 
 hundo.Viz.prototype.nextLevel = function() {
 
@@ -1013,6 +1032,10 @@ hundo.clickPlay = function(id) {
 
 hundo.clickLevelForward = function(id) {
     hundo.vizz.nextLevel();
+}
+
+hundo.clickLevelBack = function(id) {
+    hundo.vizz.prevLevel();
 }
 
 hundo.defaultVizConfig = {
