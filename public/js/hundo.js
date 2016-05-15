@@ -360,17 +360,11 @@ Hundo = function(config) {
     // clone hundo.defaultVizConfig so it doesn't get clobbered by extend
     var defaultVizConfig = jQuery.extend(true, {}, hundo.defaultVizConfig);
 
-    console.log(config.viz);
-
     if (!"vizConfig" in config) {
         config.viz = {};
     }
 
     config.viz = $.extend(defaultVizConfig, config.viz);
-
-    console.log(config.viz)
-
-    console.log(config.viz.playButton);
 
     viz = new hundo.Viz(config);
 
@@ -429,9 +423,6 @@ hundo.Viz = function(config) {
             </svg>
         </div>
         <div id="${this.consoleId()}">
-            <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
-            Level 1
-            <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
         </div>
     </div>
 `
@@ -441,6 +432,10 @@ hundo.Viz = function(config) {
 
     if (config.viz.playButton) {
         this.addPlayButton();
+    }
+
+    if (config.viz.levelSelect) {
+        this.addLevelSelect();
     }
 
     this.boardSvg = d3.select("#" + this.boardSvgId())
@@ -472,9 +467,21 @@ hundo.Viz.prototype.addPlayButton = function() {
 
     var playButton = $("<div/>").html(contents).contents();
 
-    console.log("#" + this.consoleId());
-
      $("#" + this.consoleId()).append(playButton);
+}
+
+hundo.Viz.prototype.addLevelSelect = function() {
+    var contents = `
+        <button type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
+        Level 1
+        <button type="button" class="button" onmouseover="" style="cursor: pointer; color:#999" >▶</button>
+        `
+
+    var levelSelect = $("<div/>").html(contents).contents();
+
+    $("#" + this.consoleId()).append(levelSelect);
+
+
 }
 
 hundo.Viz.prototype.hundoId = function() {
@@ -1001,7 +1008,8 @@ hundo.defaultVizConfig = {
     perimStrokeWidth: 3,
     numRows: 15,
     numCols: 21,
-    playButton: false
+    playButton: false,
+    levelSelect: true
 }
 
 var starter = {
@@ -1209,7 +1217,8 @@ new Hundo({
     levels: levels,
     id: 1,
     viz: {
-        playButton: false
+        playButton: false,
+        levelSelect: true
     }
 });
 
