@@ -781,42 +781,6 @@ hundo.Viz.prototype.animateVictory = function() {
 
     this.boardSvg.selectAll(".grid")
         .remove();
-
-    var circles = [];
-    var numCircles = 100;
-    var duration = 2000;
-    _.range(0, numCircles)
-        .map(function(i){
-            var color = d3.hsl(hundo.getRandom(0, 360),
-                1.0, 0.5);
-            var x = hundo.getRandom(0, this.board.numCols * 2 * THIS.vizConfig.cellSize);
-            var y = hundo.getRandom(0, this.board.numRows * 2 * THIS.vizConfig.cellSize);
-            var r = hundo.getRandom(50, 200);
-            var delay = hundo.getRandom(0, duration);
-            circles.push({
-                color: color,
-                x: x,
-                y: y,
-                r: r,
-                delay: delay
-            });
-        });
-
-    this.boardSvg.selectAll()
-        .data(circles)
-        .enter()
-        .append("circle")
-        .attr("class", "firework")
-        .attr("cx", function(c){ return c.x; })
-        .attr("cy", function(c){ return c.y; })
-        .attr("r", 0)
-        .attr("fill", function(c){ return c.color; })
-        .attr("fill-opacity", "1")
-        .transition()
-        .delay(function(c){ return c.delay; })
-        .attr("r", function(c){return c.r; })
-        .attr("fill-opacity", "0")
-        .remove()
 }
 
 hundo.Viz.prototype.animateSolved = function() {
@@ -890,18 +854,16 @@ hundo.Viz.prototype.nextLevel = function() {
         } else {
             // all levels solved
             THIS.animateVictory();
-
         }
         THIS.updateLevelSelect();
-
     }, this.vizConfig.flyInDuration / 2);
 
     this.animateSolved();
+
 }
 
 hundo.Viz.prototype.updateLevelSelect = function() {
     var levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
-
     $("#" + this.levelTextId()).text(levelText);
 
 
