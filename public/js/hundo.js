@@ -577,14 +577,14 @@ hundo.Viz.prototype.addPalette = function() {
     var contents = `
         <img src="img/block.png"
             onClick="hundo.clickPalette(${this.id},
-            hundo.PieceTypeEnum.BLOCK)"
+                hundo.PieceTypeEnum.BLOCK)"
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />
 
         <img src="img/goal-down.png"
             onClick="hundo.clickPalette(${this.id},
-            hundo.PieceTypeEnum.GOAL, {dir: hundo.DirectionEnum.DOWN})"
+                hundo.PieceTypeEnum.GOAL, {dir: hundo.DirectionEnum.DOWN})"
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />
@@ -1204,6 +1204,9 @@ hundo.clickPlay = function(id) {
     hundo.vizz = hundo.instances[id];
 }
 
+// TODO: bug, hundo.vizz is unsafe here because
+// you might click level left on one Hundo and do nextLevel
+// on another level
 hundo.clickLevelForward = function(id) {
 
     if (hundo.vizz.level != "victory" && hundo.vizz.level < hundo.vizz.levelMax) {
@@ -1213,6 +1216,10 @@ hundo.clickLevelForward = function(id) {
 
 hundo.clickLevelBack = function(id) {
     hundo.vizz.prevLevel();
+}
+
+hundo.clickPalette = function(id, block, config) {
+    console.log(id, block, config);
 }
 
 hundo.defaultVizConfig = {
@@ -1446,5 +1453,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: false
+    maker: true
 });
