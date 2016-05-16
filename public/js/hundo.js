@@ -113,24 +113,41 @@ hundo.Board = function(boardConfig, idGen) {
 
     // Add blocks to the matrix
     _.each(boardConfig.blocks, function(block){
-        var row = block.row;
-        var col = block.col;
-        THIS.matrix[row][col].push(new hundo.Block(idGen.next(), row, col)); 
+        var piece = new hundo.Block(idGen.next(), block.row, block.col)
+        THIS.addPiece(piece);
     });
     
     // Add the ball to the matrix
     var row = boardConfig.ball.row;
     var col = boardConfig.ball.col;
     this.ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
-    this.matrix[row][col].push(this.ball);
+    this.addPiece(this.ball);
 
     // Add goals to the matrix
     _.each(boardConfig.goals, function(goal) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
-        THIS.matrix[row][col].push(new hundo.Goal(idGen.next(), row, col, dir));
+        var piece = new hundo.Goal(idGen.next(), row, col, dir);
+        THIS.addPiece(piece);
     });
+}
+
+hundo.Board.prototype.addPiece = function(piece) {
+
+    if (piece.type == hundo.PieceTypeEnum.BLOCK ||
+        piece.type == hundo.PieceTypeEnum.BALL ||
+        piece.type == hundo.PieceTypeEnum.GOAL) {
+        if (this.matrix[piece.row][piece.col].length == 0) {
+            this.matrix[piece.row][piece.col].push(piece)
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        console.error("Unimplemented addPiece for " + piece);
+        return false;
+    }
 }
 
 hundo.Board.prototype.reset = function() {
