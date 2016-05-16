@@ -437,6 +437,10 @@ hundo.Viz = function(config) {
         this.addLevelSelect();
     }
 
+    if (this.maker) {
+        this.addPalette();
+    }
+
     this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
         .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
@@ -567,6 +571,21 @@ hundo.Viz.prototype.addLevelSelect = function() {
     var levelSelect = $("<div/>").html(contents).contents();
 
     $("#" + this.consoleId()).append(levelSelect);
+}
+
+hundo.Viz.prototype.addPalette = function() {
+    var contents = `
+        <img src="img/block.png"
+            onClick="hundo.clickPalette(${this.id},
+            hundo.PieceTypeEnum.Block)"
+            onmouseover=""
+            style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
+                height: ${this.vizConfig.cellSize}px" />
+    `
+
+    var palette = $("<div/>").html(contents).contents();
+
+    $("#" + this.consoleId()).append(palette);
 }
 
 hundo.Viz.prototype.hundoId = function() {
