@@ -111,6 +111,8 @@ hundo.Board = function(boardConfig, idGen) {
 
     var THIS = this;
 
+    // TODO: check return values for addPiece
+
     // Add blocks to the matrix
     _.each(boardConfig.blocks, function(block){
         var piece = new hundo.Block(idGen.next(), block.row, block.col)
@@ -493,6 +495,15 @@ hundo.Viz.prototype.handleClick = function(x, y) {
     var [row, col] = this.cellFromXY(x, y);
 
     // add to matrix, add to Viz
+    var block = new hundo.Block(this.idGen.next(), row, col);
+
+    if (this.board.addPiece(block)) {
+        this.animateSolvedQuick();
+        this.drawBoardQuick();
+    } else {
+        console.log("Could not add: " + block);
+    }
+
 }
 
 hundo.Viz.boardClick = function(){
