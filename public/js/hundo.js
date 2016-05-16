@@ -442,7 +442,7 @@ hundo.Viz = function(config) {
     this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
         .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
-        .on("click", hundo.Viz.boardClick)
+        .on("click", hundo.Viz.boardClick);
 
     this.boardSvg.select("#background")
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
