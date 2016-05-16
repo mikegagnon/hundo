@@ -857,7 +857,13 @@ hundo.Viz.prototype.loadNextLevel = function(quick) {
 
         this.board = new hundo.Board(this.levels[this.level],
             this.idGen);
-        this.drawBoard(quick);
+
+        if (quick) {
+            this.drawBoardQuick();
+        } else {
+            this.drawBoard();
+        }
+        
     } else {
         // all levels solved
         this.level = "victory";
