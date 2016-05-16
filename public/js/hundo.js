@@ -658,7 +658,7 @@ hundo.Viz.prototype.drawBoardQuick = function() {
     this.drawPieces({})
 }
 
-hundo.Viz.prototype.drawBoard = function(quick) {
+hundo.Viz.prototype.drawBoard = function() {
 
     var dxdy = this.vizConfig.cellSize / 2;
 
@@ -682,7 +682,7 @@ hundo.Viz.prototype.drawBoard = function(quick) {
 
     _.each(pieces, function(piece, i){
         var id = "#" + hundo.Viz.pieceId(piece);
-        var delay = quick ? 0 : delays[i];
+        var delay = delays[i];
 
         THIS.boardSvg.select(id)
             .transition()
@@ -702,7 +702,7 @@ hundo.Viz.prototype.drawBoard = function(quick) {
         _.each(pieces, function(piece, i){
             var piece = pieces[i];
             var id = "#" + hundo.Viz.pieceId(piece);
-            var delay = quick ? 0 : delays[i];
+            var delay = delays[i];
             THIS.boardSvg.select(id)
                 .transition()
                 .ease("linear")
@@ -712,7 +712,7 @@ hundo.Viz.prototype.drawBoard = function(quick) {
                 })
                 .duration(THIS.vizConfig.flyInDuration / 2);
         });            
-    }, quick ? 0 : this.vizConfig.flyInDuration / 2);
+    }, this.vizConfig.flyInDuration / 2);
 
 }
 
@@ -863,7 +863,7 @@ hundo.Viz.prototype.loadNextLevel = function(quick) {
         } else {
             this.drawBoard();
         }
-        
+
     } else {
         // all levels solved
         this.level = "victory";
