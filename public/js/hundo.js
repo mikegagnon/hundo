@@ -418,6 +418,11 @@ hundo.Viz = function(config) {
         this.levels = config.levels;
     }
 
+
+    if (this.maker) {
+        config.viz.levelSelect = false
+    }
+
     this.id = config.id;
     this.level = 0;
     this.levelMax = config.viz.levelMax;
@@ -470,7 +475,7 @@ hundo.Viz = function(config) {
         this.addPlayButton();
     }
 
-    if (!this.maker && config.viz.levelSelect) {
+    if (config.viz.levelSelect) {
         this.addLevelSelect();
     }
 
