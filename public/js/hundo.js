@@ -420,7 +420,11 @@ hundo.Viz = function(config) {
 
 
     if (this.maker) {
-        config.viz.levelSelect = false
+        config.viz.levelSelect = false;
+        this.paletteSelection = {
+            pieceType: hundo.PieceTypeEnum.BLOCK
+        };
+
     }
 
     this.id = config.id;
@@ -577,14 +581,18 @@ hundo.Viz.prototype.addPalette = function() {
     var contents = `
         <img src="img/block.png"
             onClick="hundo.clickPalette(${this.id},
-                hundo.PieceTypeEnum.BLOCK)"
+                {
+                    pieceType: hundo.PieceTypeEnum.BLOCK
+                })"
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />
 
         <img src="img/goal-down.png"
             onClick="hundo.clickPalette(${this.id},
-                hundo.PieceTypeEnum.GOAL, {dir: hundo.DirectionEnum.DOWN})"
+                {   pieceType: hundo.PieceTypeEnum.GOAL,
+                    dir: hundo.DirectionEnum.DOWN
+                })"
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />
@@ -1218,8 +1226,12 @@ hundo.clickLevelBack = function(id) {
     hundo.vizz.prevLevel();
 }
 
-hundo.clickPalette = function(id, block, config) {
-    console.log(id, block, config);
+hundo.clickPalette = function(id, config) {
+    var viz = hundo.instances[id]
+
+    viz.paletteSelection = config;
+
+    console.log(id, config);
 }
 
 hundo.defaultVizConfig = {
