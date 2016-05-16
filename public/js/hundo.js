@@ -428,8 +428,7 @@ hundo.Viz = function(config) {
     this.levelMax = config.viz.levelMax;
 
     var svgContents = `
-    <div>
-        <div id="${this.boardDivId()}">
+        <div>
             <svg id="${this.boardSvgId()}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <g id="blockTemplate" height="20" width="20" >
@@ -464,9 +463,8 @@ hundo.Viz = function(config) {
             </svg>
         </div>
         <div id="${this.consoleId()}">
-        </div>
-    </div>
-`
+        </div>`
+
     var svg = $('<div/>').html(svgContents).contents();
 
     $("#" + this.hundoId()).append(svg);
