@@ -585,19 +585,22 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
         y += transformation.dy;
     }
 
-    var t = "translate(" + x + ", " + y + ") ";
+    var t = [];
+
+    t.push("translate(" + x + ", " + y + ")");
 
     if ("scale" in transformation) {
-        t += "scale(" + transformation.scale + ") ";
+        t.push("scale(" + transformation.scale + ")");
     }
 
     if (piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.BLOCK) {
-        return t;
+        return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = this.vizConfig.cellSize / 2;
         var degrees = hundo.Viz.dirToDegrees(piece.dir);
-        return t + "rotate(" + degrees + ", " + z + ", " + z + ") " ;
+        t.push("rotate(" + degrees + ", " + z + ", " + z + ")");
+        return _.join(t, ",");
     } else {
         console.error("Bad piece type: " + piece.type);
     }
@@ -605,6 +608,51 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
 
 hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
+}
+
+hundo.Viz.prototype.drawBoardQuick = function() {
+    
+    var THIS = this;
+
+    this.boardSvg.selectAll()
+        .data(this.board.getBlocks())
+        .enter()
+        .append("svg:use")
+        .attr("class", "block")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", "#blockTemplate")
+        .attr("transform", function(piece) {
+            return THIS.transform(piece);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getBalls())
+        .enter()
+        .append("ellipse")
+        .attr("cx", this.vizConfig.cellSize / 2)
+        .attr("cy", this.vizConfig.cellSize / 2)
+        .attr("rx", this.vizConfig.cellSize / 2)
+        .attr("ry", this.vizConfig.cellSize / 2)
+        .attr("style", "fill:#eee")
+        .attr("class", "ball")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getGoals())
+        .enter()
+        .append("svg:use")
+        .attr("class", "goal")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", "#goalTemplate")
+        .attr("transform", function(piece) {
+            return THIS.transform(piece);
+        });
+
+
+
 }
 
 hundo.Viz.prototype.drawBoard = function(quick) {
@@ -830,7 +878,7 @@ hundo.Viz.prototype.prevLevel = function() {
     this.level--;
     this.board = new hundo.Board(this.levels[this.level],
         this.idGen);
-    this.drawBoard(true);
+    this.drawBoardQuick();
     this.updateLevelSelect();
 
     if (this.level == this.levels.length - 1) {
