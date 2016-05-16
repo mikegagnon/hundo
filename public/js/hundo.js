@@ -569,10 +569,6 @@ hundo.Viz.prototype.hundoId = function() {
     return "hundo" + this.id;
 }
 
-hundo.Viz.prototype.boardDivId = function() {
-    return "boardDiv" + this.id;
-}
-
 hundo.Viz.prototype.boardSvgId = function() {
     return "boardSvg" + this.id;
 }
