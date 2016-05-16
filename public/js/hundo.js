@@ -516,7 +516,6 @@ hundo.Viz.prototype.handleClick = function(x, y) {
         return false;
     }
 
-
     var [row, col] = this.cellFromXY(x, y);
 
     // add to matrix, add to Viz
