@@ -1045,7 +1045,7 @@ hundo.Viz.prototype.stepAnimate = function() {
     }
 
     if (this.board.solved) {
-        this.nextLevel();
+        this.nextLevel(false);
     }
 }
 
