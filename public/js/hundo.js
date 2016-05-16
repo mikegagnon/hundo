@@ -427,9 +427,48 @@ hundo.Viz = function(config) {
     this.level = 0;
     this.levelMax = config.viz.levelMax;
 
-    var svgContents = `
+    this.drawSvgGrid();
+
+    if (config.viz.playButton) {
+        this.addPlayButton();
+    }
+
+    if (config.viz.levelSelect) {
+        this.addLevelSelect();
+    }
+
+    this.boardSvg = d3.select("#" + this.boardSvgId())
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
+        .on("click", hundo.Viz.boardClick);
+
+    this.boardSvg.select("#background")
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
+        .attr("style", "fill:black");
+
+    this.boardSvg.select("#perim")
+        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
+
+    this.drawGrid();
+
+    this.idGen = hundo.idGenerator;
+
+    var boardConfig = this.levels[0];
+
+    console.log(boardConfig);
+    this.board = new hundo.Board(boardConfig, this.idGen);
+
+    this.drawBoard();
+
+    this.updateLevelSelect();
+}
+
+hundo.Viz.prototype.drawSvgGrid = function(name) {
+  var svgContents = `
         <div>
-            <svg id="${this.boardSvgId()}" xmlns="http://www.w3.org/2000/svg">
+            <svg id="${this.boardSvgId(name)}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <g id="blockTemplate" height="20" width="20" >
                       <rect x="0" y="0" width="20" height="20" fill="#888" />
@@ -468,41 +507,6 @@ hundo.Viz = function(config) {
     var svg = $('<div/>').html(svgContents).contents();
 
     $("#" + this.hundoId()).append(svg);
-
-    if (config.viz.playButton) {
-        this.addPlayButton();
-    }
-
-    if (config.viz.levelSelect) {
-        this.addLevelSelect();
-    }
-
-    this.boardSvg = d3.select("#" + this.boardSvgId())
-        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
-        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
-        .on("click", hundo.Viz.boardClick);
-
-    this.boardSvg.select("#background")
-        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
-        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
-        .attr("style", "fill:black");
-
-    this.boardSvg.select("#perim")
-        .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
-        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
-
-    this.drawGrid();
-
-    this.idGen = hundo.idGenerator;
-
-    var boardConfig = this.levels[0];
-
-    console.log(boardConfig);
-    this.board = new hundo.Board(boardConfig, this.idGen);
-
-    this.drawBoard();
-
-    this.updateLevelSelect();
 }
 
 hundo.Viz.prototype.cellFromXY = function(x, y) {
