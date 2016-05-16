@@ -511,6 +511,12 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
 }
 
 hundo.Viz.prototype.handleClick = function(x, y) {
+
+    if (!this.maker) {
+        return false;
+    }
+
+
     var [row, col] = this.cellFromXY(x, y);
 
     // add to matrix, add to Viz
@@ -526,8 +532,14 @@ hundo.Viz.prototype.handleClick = function(x, y) {
 }
 
 hundo.Viz.boardClick = function(){
+
+    var boardSvgId = this.getAttribute("id")
+    var id = _.split(boardSvgId, "boardSvg")[1]
+
     var [x, y] = d3.mouse(this);
-    hundo.vizz.handleClick(x, y);
+
+    var viz = hundo.instances[id]
+    viz.handleClick(x, y);
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
