@@ -366,15 +366,15 @@ Hundo = function(config) {
 
     config.viz = $.extend(defaultVizConfig, config.viz);
 
-    viz = new hundo.Viz(config);
+    this.viz = new hundo.Viz(config);
 
-    hundo.instances[config.id] = viz;
+    hundo.instances[config.id] = this.viz;
 
     if (_.size(hundo.instances) == 1) {
-        hundo.vizz = viz;
+        hundo.vizz = this.viz;
     }
 
-    return viz;
+    return this;
 }
 
 hundo.Viz = function(config) {
@@ -441,7 +441,8 @@ hundo.Viz = function(config) {
 
     this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
-        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize);
+        .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
+        .on("click", hundo.Viz.boardClick)
 
     this.boardSvg.select("#background")
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
@@ -461,6 +462,26 @@ hundo.Viz = function(config) {
     this.drawBoard();
 
     this.updateLevelSelect();
+}
+
+hundo.Viz.prototype.cellFromXY = function(x, y) {
+
+    var row = Math.floor(y / this.vizConfig.cellSize);
+    var col = Math.floor(x / this.vizConfig.cellSize);
+
+    return [row, col];
+
+}
+
+hundo.Viz.prototype.handleClick = function(x, y) {
+    console.log(this.vizConfig, x, y);
+    var [row, col] = this.cellFromXY(x, y);
+    console.log(row, col);
+}
+
+hundo.Viz.boardClick = function(){
+    var [x, y] = d3.mouse(this);
+    hundo.vizz.handleClick(x, y);
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
@@ -1082,8 +1103,6 @@ hundo.Viz.checkKey = function(e) {
 
     hundo.vizz.board.setDir(direction);
 
-
-
     hundo.vizz.stepAnimate(hundo.vizz.board);
 
     if (!hundo.vizz.board.atRest) {
@@ -1327,8 +1346,18 @@ new Hundo({
     levels: levels,
     id: 1,
     viz: {
-        playButton: false,
+        playButton: true,
         levelSelect: true
-    }
+    },
+    maker: true
 });
 
+new Hundo({
+    levels: levels,
+    id: 2,
+    viz: {
+        playButton: true,
+        levelSelect: true
+    },
+    maker: true
+});
