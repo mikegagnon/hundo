@@ -82,6 +82,8 @@ hundo.IdGenerator.prototype.next = function() {
     return this.nextId++;
 }
 
+hundo.idGenerator = new hundo.IdGenerator();
+
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig, idGen) {
 
@@ -120,10 +122,12 @@ hundo.Board = function(boardConfig, idGen) {
     });
     
     // Add the ball to the matrix
-    var row = boardConfig.ball.row;
-    var col = boardConfig.ball.col;
-    this.ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
-    this.addPiece(this.ball);
+    if ("ball" in boardConfig) {
+        var row = boardConfig.ball.row;
+        var col = boardConfig.ball.col;
+        this.ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
+        this.addPiece(this.ball);
+    }
 
     // Add goals to the matrix
     _.each(boardConfig.goals, function(goal) {
@@ -393,15 +397,27 @@ Hundo = function(config) {
         hundo.vizz = this.viz;
     }
 
-    return this;
 }
 
 hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
     this.vizConfig = config.viz;
-    this.levels = config.levels;
-    boardConfig = this.levels[0];
+    this.maker = config.maker;
+
+    if (this.maker) {
+
+        // one empty level
+        this.levels = [
+            {
+                numRows: config.viz.numRows,
+                numCols: config.viz.numCols
+            }
+        ]
+    } else {
+        this.levels = config.levels;
+    }
+
     this.id = config.id;
     this.level = 0;
     this.levelMax = config.viz.levelMax;
@@ -454,7 +470,7 @@ hundo.Viz = function(config) {
         this.addPlayButton();
     }
 
-    if (config.viz.levelSelect) {
+    if (!this.maker && config.viz.levelSelect) {
         this.addLevelSelect();
     }
 
@@ -474,8 +490,11 @@ hundo.Viz = function(config) {
 
     this.drawGrid();
 
-    this.idGen = new hundo.IdGenerator();
+    this.idGen = hundo.idGenerator;
 
+    var boardConfig = this.levels[0];
+
+    console.log(boardConfig);
     this.board = new hundo.Board(boardConfig, this.idGen);
 
     this.drawBoard();
@@ -1386,5 +1405,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: true
+    maker: false
 });
