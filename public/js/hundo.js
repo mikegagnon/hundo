@@ -470,13 +470,12 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
     var col = Math.floor(x / this.vizConfig.cellSize);
 
     return [row, col];
-
 }
 
 hundo.Viz.prototype.handleClick = function(x, y) {
-    console.log(this.vizConfig, x, y);
     var [row, col] = this.cellFromXY(x, y);
-    console.log(row, col);
+
+    // add to matrix, add to Viz
 }
 
 hundo.Viz.boardClick = function(){
