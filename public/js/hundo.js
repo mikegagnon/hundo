@@ -610,54 +610,7 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
-hundo.Viz.prototype.drawBoardQuick = function() {
-    
-    var THIS = this;
-
-    this.boardSvg.selectAll()
-        .data(this.board.getBlocks())
-        .enter()
-        .append("svg:use")
-        .attr("class", "block")
-        .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#blockTemplate")
-        .attr("transform", function(piece) {
-            return THIS.transform(piece);
-        });
-
-    this.boardSvg.selectAll()
-        .data(this.board.getBalls())
-        .enter()
-        .append("ellipse")
-        .attr("cx", this.vizConfig.cellSize / 2)
-        .attr("cy", this.vizConfig.cellSize / 2)
-        .attr("rx", this.vizConfig.cellSize / 2)
-        .attr("ry", this.vizConfig.cellSize / 2)
-        .attr("style", "fill:#eee")
-        .attr("class", "ball")
-        .attr("id", hundo.Viz.pieceId)
-        .attr("transform", function(piece) {
-            return THIS.transform(piece);
-        });
-
-    this.boardSvg.selectAll()
-        .data(this.board.getGoals())
-        .enter()
-        .append("svg:use")
-        .attr("class", "goal")
-        .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#goalTemplate")
-        .attr("transform", function(piece) {
-            return THIS.transform(piece);
-        });
-
-
-
-}
-
-hundo.Viz.prototype.drawBoard = function(quick) {
-
-    var dxdy = this.vizConfig.cellSize / 2;
+hundo.Viz.prototype.drawPieces = function(transformation) {
 
     var THIS = this;
 
@@ -669,11 +622,7 @@ hundo.Viz.prototype.drawBoard = function(quick) {
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#blockTemplate")
         .attr("transform", function(piece) {
-            return THIS.transform(piece, {
-                dx: dxdy,
-                dy: dxdy,
-                scale: 0
-            });
+            return THIS.transform(piece, transformation);
         });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
@@ -689,11 +638,8 @@ hundo.Viz.prototype.drawBoard = function(quick) {
         .attr("class", "ball")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
-            return THIS.transform(piece, {
-                dx: dxdy,
-                dy: dxdy,
-                scale: 0
-            });
+            return THIS.transform(piece, transformation);
+
         });
 
     this.boardSvg.selectAll()
@@ -704,12 +650,25 @@ hundo.Viz.prototype.drawBoard = function(quick) {
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(piece) {
-            return THIS.transform(piece, {
-                dx: dxdy,
-                dy: dxdy,
-                scale: 0
-            });
+            return THIS.transform(piece, transformation);
         });
+}
+
+hundo.Viz.prototype.drawBoardQuick = function() {
+    this.drawPieces({})
+}
+
+hundo.Viz.prototype.drawBoard = function(quick) {
+
+    var dxdy = this.vizConfig.cellSize / 2;
+
+    var THIS = this;
+
+    this.drawPieces({
+        dx: dxdy,
+        dy: dxdy,
+        scale: 0
+    })
 
     var dxdy = -(this.vizConfig.cellSize / 2) * this.vizConfig.blowupScale;
 
