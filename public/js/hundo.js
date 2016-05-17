@@ -156,29 +156,36 @@ hundo.Board.prototype.clearCell = function(row, col) {
     this.matrix[row][col] = [];
 }
 
-hundo.Board.prototype.addPiece = function(piece) {
-
+hundo.Board.prototype.canAddPiece = function(piece) {
     if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
         return false;
     }
-
 
     if (piece.type == hundo.PieceTypeEnum.BLOCK ||
         piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.GOAL) {
         if (this.matrix[piece.row][piece.col].length == 0) {
-            this.matrix[piece.row][piece.col].push(piece)
-
-            if (piece.type == hundo.PieceTypeEnum.BALL) {
-                this.ball = piece;
-            }
-
             return true;
         } else {
             return false;
         }
     } else {
         console.error("Unimplemented addPiece for " + piece);
+        return false;
+    }
+}
+
+hundo.Board.prototype.addPiece = function(piece) {
+
+    if (this.canAddPiece(piece)) {
+        this.matrix[piece.row][piece.col].push(piece)
+
+        if (piece.type == hundo.PieceTypeEnum.BALL) {
+            this.ball = piece;
+        }
+
+        return true;
+    } else {
         return false;
     }
 }
