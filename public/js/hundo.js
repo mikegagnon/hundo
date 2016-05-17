@@ -1262,6 +1262,8 @@ hundo.Viz.prototype.stepAnimate = function() {
     }
 }
 
+
+// TODO: hoist code into Viz.prototype.checkKey
 hundo.Viz.checkKey = function(e) {
 
     if (!hundo.vizz.board.atRest) {
@@ -1269,6 +1271,10 @@ hundo.Viz.checkKey = function(e) {
     }
 
     if (hundo.vizz.board.solved) {
+        return;
+    }
+
+    if (hundo.vizz.makerMode && !hundo.vizz.makerPlay) {
         return;
     }
 
