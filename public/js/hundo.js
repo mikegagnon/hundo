@@ -1301,14 +1301,14 @@ hundo.Viz.prototype.checkKey = function(e) {
 
     this.board.setDir(direction);
 
-    this.stepAnimate(this.board);
+    this.stepAnimate();
 
     var THIS = this;
 
     if (!this.board.atRest) {
         this.animateInterval =
             setInterval(
-                function(){THIS.stepAnimate(THIS.board);},
+                function(){THIS.stepAnimate();},
                 this.vizConfig.stepDuration);
     }
 }
