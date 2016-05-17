@@ -1265,18 +1265,16 @@ hundo.Viz.prototype.stepAnimate = function() {
 }
 
 
-// TODO: hoist code into Viz.prototype.checkKey
-hundo.Viz.checkKey = function(e) {
-
-    if (!hundo.vizz.board.atRest) {
+hundo.Viz.prototype.checkKey = function(e) {
+    if (!this.board.atRest) {
         return;
     }
 
-    if (hundo.vizz.board.solved) {
+    if (this.board.solved) {
         return;
     }
 
-    if (hundo.vizz.maker.on && !hundo.vizz.maker.play) {
+    if (this.maker.on && !this.maker.play) {
         return;
     }
 
@@ -1301,16 +1299,23 @@ hundo.Viz.checkKey = function(e) {
         return;
     }
 
-    hundo.vizz.board.setDir(direction);
+    this.board.setDir(direction);
 
-    hundo.vizz.stepAnimate(hundo.vizz.board);
+    this.stepAnimate(this.board);
 
-    if (!hundo.vizz.board.atRest) {
-        hundo.vizz.animateInterval =
+    var THIS = this;
+
+    if (!this.board.atRest) {
+        this.animateInterval =
             setInterval(
-                function(){hundo.vizz.stepAnimate(hundo.vizz.board);},
-                hundo.vizz.vizConfig.stepDuration);
+                function(){THIS.stepAnimate(THIS.board);},
+                this.vizConfig.stepDuration);
     }
+}
+
+// TODO: hoist code into Viz.prototype.checkKey
+hundo.Viz.checkKey = function(e) {
+    hundo.vizz.checkKey(e);
 }
 
 hundo.Viz.prototype.clickPlay = function() {
