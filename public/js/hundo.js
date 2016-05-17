@@ -533,42 +533,33 @@ hundo.Viz.prototype.mousemove = function(x, y) {
 
     var [row, col] = this.cellFromXY(x, y)
 
-    if (typeof this.maker.mouseRow == "undefined" ||
-        typeof this.maker.mouseCol == "undefined" ||
-        row != this.maker.mouseRow ||
-        col != this.maker.mouseCol) {
+    this.removeHighlight();
 
-        this.removeHighlight();
-
-        if (this.paletteSelection.delete) {
-            if (this.board.isEmptyCell(row, col)) {
-                return;
-            }
-        } else {
-            var piece = this.getPieceFromPalette(row, col);
-
-            if (!this.board.canAddPiece(piece)) {
-                return;
-            }
+    if (this.paletteSelection.delete) {
+        if (this.board.isEmptyCell(row, col)) {
+            return;
         }
+    } else {
+        var piece = this.getPieceFromPalette(row, col);
 
-        this.maker.mouseRow = row;
-        this.maker.mouseCol = col;
-
-        this.boardSvg.selectAll()
-            .data([0])
-            .enter()
-            .append("rect")
-            .attr("x", col * this.vizConfig.cellSize)
-            .attr("y", row * this.vizConfig.cellSize)
-            .attr("height", this.vizConfig.cellSize)
-            .attr("width", this.vizConfig.cellSize)
-            .attr("style", "fill:#3D8E37; fill-opacity: 0.5; cursor: pointer;")
-            .attr("id", this.highlightId())
-
-        console.log(row, col)
-
+        if (!this.board.canAddPiece(piece)) {
+            return;
+        }
     }
+
+    this.maker.mouseRow = row;
+    this.maker.mouseCol = col;
+
+    this.boardSvg.selectAll()
+        .data([0])
+        .enter()
+        .append("rect")
+        .attr("x", col * this.vizConfig.cellSize)
+        .attr("y", row * this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.cellSize)
+        .attr("width", this.vizConfig.cellSize)
+        .attr("style", "fill:#3D8E37; fill-opacity: 0.5; cursor: pointer;")
+        .attr("id", this.highlightId())
 
 }
 
