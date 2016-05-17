@@ -119,8 +119,8 @@ hundo.Board = function(boardConfig, idGen) {
     if ("ball" in boardConfig) {
         var row = boardConfig.ball.row;
         var col = boardConfig.ball.col;
-        this.ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
-        this.addPiece(this.ball);
+        var ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
+        this.addPiece(ball);
     }
 
     // Add blocks to the matrix
@@ -171,6 +171,11 @@ hundo.Board.prototype.addPiece = function(piece) {
         piece.type == hundo.PieceTypeEnum.GOAL) {
         if (this.matrix[piece.row][piece.col].length == 0) {
             this.matrix[piece.row][piece.col].push(piece)
+
+            if (piece.type == hundo.PieceTypeEnum.BALL) {
+                this.ball = piece;
+            }
+
             return true;
         } else {
             return false;
@@ -574,7 +579,7 @@ hundo.Viz.prototype.boardClick = function(x, y) {
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
         piece = new hundo.Block(this.idGen.next(), row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
-        piece = new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir)
+        piece = new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
     }
 
     // add to matrix, add to Viz
