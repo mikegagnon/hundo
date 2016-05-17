@@ -534,7 +534,9 @@ hundo.Viz.prototype.boardClick = function(x, y) {
 
     var piece;
 
-    if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
+    if (this.paletteSelection.type == hundo.PieceTypeEnum.BALL) {
+        piece = new hundo.Ball(this.idGen.next(), row, col);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
         piece = new hundo.Block(this.idGen.next(), row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
         piece = new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir)
@@ -595,6 +597,12 @@ hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
 hundo.Viz.prototype.addPalette = function() {
 
     var buttons = [
+        {
+            image: "ball",
+            config: {
+                type: hundo.PieceTypeEnum.BALL
+            }
+        },
         {
             image: "block",
             config: {
