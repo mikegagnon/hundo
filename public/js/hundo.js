@@ -511,7 +511,8 @@ hundo.Viz = function(config) {
     this.updateLevelSelect();
 
     this.boardSvg
-        .on("mousemove", hundo.Viz.mousemove);
+        .on("mousemove", hundo.Viz.mousemove)
+        .on("mouseleave", hundo.Viz.mouseleave);
 
 }
 
@@ -563,7 +564,19 @@ hundo.Viz.mousemove = function() {
     var id = hundo.Viz.getIdFromBoardSvg(this);
     var viz = hundo.instances[id]
     viz.mousemove(x, y);
+}
 
+hundo.Viz.prototype.mouseleave = function() {
+
+
+    this.boardSvg.select("#" + this.highlightId())
+        .remove();
+}
+
+hundo.Viz.mouseleave = function() {
+    var id = hundo.Viz.getIdFromBoardSvg(this);
+    var viz = hundo.instances[id]
+    viz.mouseleave();
 }
 
 hundo.Viz.prototype.drawSvgGrid = function(name) {
