@@ -449,7 +449,10 @@ hundo.Viz = function(config) {
         this.paletteSelection = {
             type: hundo.PieceTypeEnum.BLOCK
         };
+    }
 
+    if (this.makerMode) {
+        this.makerPlay = false;
     }
 
     this.id = config.id;
@@ -597,7 +600,7 @@ hundo.Viz.boardClick = function(){
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
-    var contents = `<button onclick="hundo.clickPlay(${this.id})" type="button"
+    var contents = `<button id="${this.playButtonId()}" onclick="hundo.clickPlay(${this.id})" type="button"
      class="button">Play</button>`
 
     var playButton = $("<div/>").html(contents).contents();
@@ -1297,8 +1300,27 @@ hundo.Viz.checkKey = function(e) {
     }
 }
 
+hundo.Viz.prototype.clickPlay = function() {
+
+    if (!this.makerMode) {
+        return;
+    }
+
+    this.makerPlay = !this.makerPlay;
+
+    if (this.makerPlay) {
+        $("#" + this.playButtonId()).text("Edit")
+        console.log("play mode")
+    } else {
+        $("#" + this.playButtonId()).text("Play")
+        console.log("edit mode")
+    }
+
+}
+
 hundo.clickPlay = function(id) {
     hundo.vizz = hundo.instances[id];
+    hundo.vizz.clickPlay();
 }
 
 // TODO: bug, hundo.vizz is unsafe here because
@@ -1547,7 +1569,7 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    makerMode: false
+    makerMode: true
 });
 
 new Hundo({
@@ -1557,5 +1579,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    makerMode: true
+    makerMode: false
 });
