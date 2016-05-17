@@ -518,7 +518,7 @@ hundo.Viz = function(config) {
 
 hundo.Viz.prototype.mousemove = function(x, y) {
 
-    if (!this.maker.on) {
+    if (!this.maker.on || this.maker.play) {
         return;
     }
 
