@@ -557,7 +557,7 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
 
 hundo.Viz.prototype.clickBoard = function(x, y) {
 
-    if (!this.makerMode) {
+    if (!this.makerMode || this.makerPlay) {
         return false;
     }
 
