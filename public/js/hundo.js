@@ -403,9 +403,9 @@ hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
     this.vizConfig = config.viz;
-    this.maker = config.maker;
+    this.makerMode = config.makerMode;
 
-    if (this.maker) {
+    if (this.makerMode) {
 
         // one empty level
         this.levels = [
@@ -419,7 +419,7 @@ hundo.Viz = function(config) {
     }
 
 
-    if (this.maker) {
+    if (this.makerMode) {
         config.viz.levelSelect = false;
         this.paletteSelection = {
             pieceType: hundo.PieceTypeEnum.BLOCK
@@ -441,7 +441,7 @@ hundo.Viz = function(config) {
         this.addLevelSelect();
     }
 
-    if (this.maker) {
+    if (this.makerMode) {
         this.addPalette();
     }
 
@@ -526,7 +526,7 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
 
 hundo.Viz.prototype.handleClick = function(x, y) {
 
-    if (!this.maker) {
+    if (!this.makerMode) {
         return false;
     }
 
@@ -1455,7 +1455,7 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: true
+    makerMode: true
 });
 
 new Hundo({
@@ -1465,5 +1465,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: true
+    makerMode: true
 });
