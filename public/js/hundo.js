@@ -482,7 +482,7 @@ hundo.Viz = function(config) {
     this.boardSvg = d3.select("#" + this.boardSvgId())
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
         .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
-        .on("click", hundo.Viz.boardClick);
+        .on("click", hundo.Viz.clickBoard);
 
     this.boardSvg.select("#background")
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
@@ -558,7 +558,7 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
     return [row, col];
 }
 
-hundo.Viz.prototype.boardClick = function(x, y) {
+hundo.Viz.prototype.clickBoard = function(x, y) {
 
     if (!this.makerMode) {
         return false;
@@ -594,7 +594,7 @@ hundo.Viz.prototype.boardClick = function(x, y) {
 
 }
 
-hundo.Viz.boardClick = function(){
+hundo.Viz.clickBoard = function(){
 
     var boardSvgId = this.getAttribute("id")
     var id = _.split(boardSvgId, "boardSvg")[1]
@@ -602,7 +602,7 @@ hundo.Viz.boardClick = function(){
     var [x, y] = d3.mouse(this);
 
     var viz = hundo.instances[id]
-    viz.boardClick(x, y);
+    viz.clickBoard(x, y);
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
@@ -629,7 +629,7 @@ hundo.Viz.prototype.addLevelSelect = function() {
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
         <img src="img/${image}.png"
-            onclick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
+            onlick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />`
