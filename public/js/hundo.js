@@ -115,6 +115,12 @@ hundo.Board = function(boardConfig, idGen) {
 
     // TODO: check return values for addPiece
 
+    // Add blocks to the matrix
+    _.each(boardConfig.blocks, function(block){
+        var piece = new hundo.Block(idGen.next(), block.row, block.col)
+        THIS.addPiece(piece);
+    });
+
     // Add the ball to the matrix
     if ("ball" in boardConfig) {
         var row = boardConfig.ball.row;
@@ -122,12 +128,6 @@ hundo.Board = function(boardConfig, idGen) {
         var ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
         this.addPiece(ball);
     }
-
-    // Add blocks to the matrix
-    _.each(boardConfig.blocks, function(block){
-        var piece = new hundo.Block(idGen.next(), block.row, block.col)
-        THIS.addPiece(piece);
-    });
 
     // Add goals to the matrix
     _.each(boardConfig.goals, function(goal) {
