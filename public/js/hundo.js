@@ -422,7 +422,7 @@ hundo.Viz = function(config) {
     if (this.makerMode) {
         config.viz.levelSelect = false;
         this.paletteSelection = {
-            pieceType: hundo.PieceTypeEnum.BLOCK
+            type: hundo.PieceTypeEnum.BLOCK
         };
 
     }
@@ -532,14 +532,21 @@ hundo.Viz.prototype.boardClick = function(x, y) {
 
     var [row, col] = this.cellFromXY(x, y);
 
-    // add to matrix, add to Viz
-    var block = new hundo.Block(this.idGen.next(), row, col);
+    var piece;
 
-    if (this.board.addPiece(block)) {
+    if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
+        piece = new hundo.Block(this.idGen.next(), row, col);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
+        piece = new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir)
+    }
+
+    // add to matrix, add to Viz
+
+    if (this.board.addPiece(piece)) {
         this.animateSolvedQuick();
         this.drawBoardQuick();
     } else {
-        console.log("Could not add: " + block);
+        console.log("Could not add: " + piece);
     }
 
 }
@@ -581,7 +588,7 @@ hundo.Viz.prototype.addPalette = function() {
         <img src="img/block.png"
             onClick="hundo.clickPalette(${this.id},
                 {
-                    pieceType: hundo.PieceTypeEnum.BLOCK
+                    type: hundo.PieceTypeEnum.BLOCK
                 })"
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
@@ -589,7 +596,7 @@ hundo.Viz.prototype.addPalette = function() {
 
         <img src="img/goal-down.png"
             onClick="hundo.clickPalette(${this.id},
-                {   pieceType: hundo.PieceTypeEnum.GOAL,
+                {   type: hundo.PieceTypeEnum.GOAL,
                     dir: hundo.DirectionEnum.DOWN
                 })"
             onmouseover=""
@@ -1227,6 +1234,7 @@ hundo.clickLevelBack = function(id) {
 
 hundo.Viz.prototype.clickPalette = function(config) {
     console.log(this.id, config);
+    this.paletteSelection = config;
 }
 
 hundo.clickPalette = function(id, config) {
