@@ -602,6 +602,13 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
+            image: "goal-up",
+            config: {
+                type: hundo.PieceTypeEnum.GOAL,
+                dir: hundo.DirectionEnum.UP
+            }
+        },
+        {
             image: "goal-down",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
@@ -609,10 +616,17 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "goal-up",
+            image: "goal-left",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
-                dir: hundo.DirectionEnum.UP
+                dir: hundo.DirectionEnum.LEFT
+            }
+        },
+        {
+            image: "goal-right",
+            config: {
+                type: hundo.PieceTypeEnum.GOAL,
+                dir: hundo.DirectionEnum.RIGHT
             }
         },
 
@@ -1400,7 +1414,7 @@ var boardConfig1 = {
         {
             row: 10,
             col: 5,
-            dir: hundo.DirectionEnum.UP
+            dir: hundo.DirectionEnum.RIGHT
         }
 
     ],
