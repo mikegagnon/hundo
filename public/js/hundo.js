@@ -442,20 +442,17 @@ hundo.Viz = function(config) {
                 numCols: config.viz.numCols
             }
         ]
-    } else {
-        this.levels = config.levels;
-    }
 
-
-    if (this.makerMode) {
         config.viz.levelSelect = false;
+
         this.paletteSelection = {
             type: hundo.PieceTypeEnum.BLOCK
         };
-    }
 
-    if (this.makerMode) {
         this.makerPlay = false;
+
+    } else {
+        this.levels = config.levels;
     }
 
     this.id = config.id;
