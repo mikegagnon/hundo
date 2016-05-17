@@ -465,7 +465,6 @@ hundo.Viz = function(config) {
 
     var boardConfig = this.levels[0];
 
-    console.log(boardConfig);
     this.board = new hundo.Board(boardConfig, this.idGen);
 
     this.drawBoard();
@@ -1226,12 +1225,13 @@ hundo.clickLevelBack = function(id) {
     hundo.vizz.prevLevel();
 }
 
+hundo.Viz.prototype.clickPalette = function(config) {
+    console.log(this.id, config);
+}
+
 hundo.clickPalette = function(id, config) {
     var viz = hundo.instances[id]
-
-    viz.paletteSelection = config;
-
-    console.log(id, config);
+    viz.clickPalette(config);
 }
 
 hundo.defaultVizConfig = {
