@@ -631,6 +631,18 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
     return [row, col];
 }
 
+hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
+
+    if (this.paletteSelection.type == hundo.PieceTypeEnum.BALL) {
+        return new hundo.Ball(this.idGen.next(), row, col);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
+        return new hundo.Block(this.idGen.next(), row, col);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
+        return new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
+    }
+
+}
+
 hundo.Viz.prototype.clickBoard = function(x, y) {
 
     if (!this.maker.on || this.maker.play) {
@@ -646,17 +658,7 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
         return;
     }
 
-    var piece;
-
-    if (this.paletteSelection.type == hundo.PieceTypeEnum.BALL) {
-        piece = new hundo.Ball(this.idGen.next(), row, col);
-    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
-        piece = new hundo.Block(this.idGen.next(), row, col);
-    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
-        piece = new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
-    }
-
-    // add to matrix, add to Viz
+    var piece = this.getPieceFromPalette(row, col);
 
     if (this.board.addPiece(piece)) {
         this.animateSolvedQuick();
