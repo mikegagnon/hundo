@@ -139,7 +139,21 @@ hundo.Board = function(boardConfig, idGen) {
     });
 }
 
+hundo.Board.prototype.hasBall = function() {
+
+    var balls = this.getPieces(function(piece) {
+        return piece.type == hundo.PieceTypeEnum.BALL;
+    });
+
+    return balls.length >= 1;
+}
+
 hundo.Board.prototype.addPiece = function(piece) {
+
+    if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
+        return false;
+    }
+
 
     if (piece.type == hundo.PieceTypeEnum.BLOCK ||
         piece.type == hundo.PieceTypeEnum.BALL ||
