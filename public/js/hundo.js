@@ -148,6 +148,17 @@ hundo.Board.prototype.hasBall = function() {
     return balls.length >= 1;
 }
 
+hundo.Board.prototype.clearCell = function(row, col) {
+
+    console.log("clearCell")
+
+    if (typeof this.ball != "undefined" &&
+        this.ball.row == row && this.ball.col == col) {
+        this.ball = undefined;
+    }
+    this.matrix[row][col] = [];
+}
+
 hundo.Board.prototype.addPiece = function(piece) {
 
     if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
@@ -545,6 +556,13 @@ hundo.Viz.prototype.boardClick = function(x, y) {
     }
 
     var [row, col] = this.cellFromXY(x, y);
+
+    if (this.paletteSelection.delete) {
+        this.board.clearCell(row, col);
+        this.animateSolvedQuick();
+        this.drawBoardQuick();
+        return;
+    }
 
     var piece;
 
