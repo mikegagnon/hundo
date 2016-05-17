@@ -431,9 +431,13 @@ hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
     this.vizConfig = config.viz;
-    this.makerMode = config.maker;
+    
+    this.maker = {
+        on: config.maker,
+        play: false
+    }
 
-    if (this.makerMode) {
+    if (this.maker.on) {
 
         // one empty level
         this.levels = [
@@ -448,8 +452,6 @@ hundo.Viz = function(config) {
         this.paletteSelection = {
             type: hundo.PieceTypeEnum.BLOCK
         };
-
-        this.makerPlay = false;
 
     } else {
         this.levels = config.levels;
@@ -469,7 +471,7 @@ hundo.Viz = function(config) {
         this.addLevelSelect();
     }
 
-    if (this.makerMode) {
+    if (this.maker.on) {
         this.addPalette();
     }
 
@@ -554,7 +556,7 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
 
 hundo.Viz.prototype.clickBoard = function(x, y) {
 
-    if (!this.makerMode || this.makerPlay) {
+    if (!this.maker.on || this.maker.play) {
         return false;
     }
 
@@ -1254,7 +1256,7 @@ hundo.Viz.prototype.stepAnimate = function() {
 
 
     if (this.board.solved) {
-        if (this.makerMode) {
+        if (this.maker.on) {
             this.reset(this.board);
         } else {
             this.nextLevel(false);
@@ -1274,7 +1276,7 @@ hundo.Viz.checkKey = function(e) {
         return;
     }
 
-    if (hundo.vizz.makerMode && !hundo.vizz.makerPlay) {
+    if (hundo.vizz.maker.on && !hundo.vizz.maker.play) {
         return;
     }
 
@@ -1313,13 +1315,13 @@ hundo.Viz.checkKey = function(e) {
 
 hundo.Viz.prototype.clickPlay = function() {
 
-    if (!this.makerMode) {
+    if (!this.maker.on) {
         return;
     }
 
-    this.makerPlay = !this.makerPlay;
+    this.maker.play = !this.maker.play;
 
-    if (this.makerPlay) {
+    if (this.maker.play) {
         $("#" + this.playButtonId()).text("Edit")
     } else {
         $("#" + this.playButtonId()).text("Play")
