@@ -607,7 +607,15 @@ hundo.Viz.prototype.addPalette = function() {
                 type: hundo.PieceTypeEnum.GOAL,
                 dir: hundo.DirectionEnum.DOWN
             }
-        }
+        },
+        {
+            image: "goal-up",
+            config: {
+                type: hundo.PieceTypeEnum.GOAL,
+                dir: hundo.DirectionEnum.UP
+            }
+        },
+
     ]
 
     var THIS = this;
