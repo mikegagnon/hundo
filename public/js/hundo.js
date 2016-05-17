@@ -612,6 +612,12 @@ hundo.Viz.prototype.addPalette = function() {
 
     var buttons = [
         {
+            image: "delete",
+            config: {
+                delete: true
+            }
+        },
+        {
             image: "ball",
             config: {
                 type: hundo.PieceTypeEnum.BALL
