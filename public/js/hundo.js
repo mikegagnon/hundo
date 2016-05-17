@@ -629,7 +629,7 @@ hundo.Viz.prototype.addLevelSelect = function() {
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
         <img src="img/${image}.png"
-            onlick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
+            onclick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />`
