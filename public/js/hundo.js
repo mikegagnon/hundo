@@ -558,8 +558,8 @@ hundo.Viz.prototype.boardClick = function(x, y) {
     var [row, col] = this.cellFromXY(x, y);
 
     if (this.paletteSelection.delete) {
-        this.board.clearCell(row, col);
         this.animateSolvedQuick();
+        this.board.clearCell(row, col);
         this.drawBoardQuick();
         return;
     }
