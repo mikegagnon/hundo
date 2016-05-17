@@ -616,9 +616,9 @@ hundo.Viz.prototype.addPlayButton = function() {
 
 hundo.Viz.prototype.addLevelSelect = function() {
     var contents = `
-        <button id="${this.levelBackButtonId()}" onClick="hundo.clickLevelBack(${this.id})" type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
+        <button id="${this.levelBackButtonId()}" onclick="hundo.clickLevelBack(${this.id})" type="button" class="button" onmouseover="" style="cursor: pointer;">◀</button>
         <span id="${this.levelTextId()}""></span>
-        <button id="${this.levelForwardButtonId()}" onClick="hundo.clickLevelForward(${this.id})" type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
+        <button id="${this.levelForwardButtonId()}" onclick="hundo.clickLevelForward(${this.id})" type="button" class="button" onmouseover="" style="color:#bbb">▶</button>
         `
 
     var levelSelect = $("<div/>").html(contents).contents();
@@ -629,7 +629,7 @@ hundo.Viz.prototype.addLevelSelect = function() {
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
         <img src="img/${image}.png"
-            onClick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
+            onclick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
                 height: ${this.vizConfig.cellSize}px" />`
