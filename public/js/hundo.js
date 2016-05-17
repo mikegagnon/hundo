@@ -431,7 +431,7 @@ hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
     this.vizConfig = config.viz;
-    this.makerMode = config.makerMode;
+    this.makerMode = config.maker;
 
     if (this.makerMode) {
 
@@ -1576,7 +1576,7 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    makerMode: true
+    maker: true
 });
 
 new Hundo({
@@ -1586,5 +1586,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    makerMode: false
+    maker: false
 });
