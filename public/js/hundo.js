@@ -583,27 +583,42 @@ hundo.Viz.prototype.addLevelSelect = function() {
     $("#" + this.consoleId()).append(levelSelect);
 }
 
-hundo.Viz.prototype.addPalette = function() {
-    var contents = `
-        <img src="img/block.png"
-            onClick="hundo.clickPalette(${this.id},
-                {
-                    type: hundo.PieceTypeEnum.BLOCK
-                })"
+hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
+    return `
+        <img src="img/${image}.png"
+            onClick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
-                height: ${this.vizConfig.cellSize}px" />
+                height: ${this.vizConfig.cellSize}px" />`
+}
 
-        <img src="img/goal-down.png"
-            onClick="hundo.clickPalette(${this.id},
-                {   type: hundo.PieceTypeEnum.GOAL,
-                    dir: hundo.DirectionEnum.DOWN
-                })"
-            onmouseover=""
-            style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
-                height: ${this.vizConfig.cellSize}px" />
-           
-    `
+hundo.Viz.prototype.addPalette = function() {
+
+    var buttons = [
+        {
+            image: "block",
+            config: {
+                type: hundo.PieceTypeEnum.BLOCK
+            }
+        },
+        {
+            image: "goal-down",
+            config: {
+                type: hundo.PieceTypeEnum.GOAL,
+                dir: hundo.DirectionEnum.DOWN
+            }
+        }
+    ]
+
+    var THIS = this;
+
+    var contents = _.map(buttons, function(pieceDescription) {
+            return THIS.paletteButtonHtml(
+                    pieceDescription.image,
+                    pieceDescription.config
+                )
+        })
+        .join("")
 
     var palette = $("<div/>").html(contents).contents();
 
@@ -1238,6 +1253,7 @@ hundo.Viz.prototype.clickPalette = function(config) {
 }
 
 hundo.clickPalette = function(id, config) {
+    console.log("foo")
     var viz = hundo.instances[id]
     viz.clickPalette(config);
 }
@@ -1463,7 +1479,7 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    makerMode: true
+    makerMode: false
 });
 
 new Hundo({
