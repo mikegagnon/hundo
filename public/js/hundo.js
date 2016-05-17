@@ -200,6 +200,7 @@ hundo.Board.prototype.reset = function() {
     });
 
     this.done = false;
+    this.solved = false;
 
     return moved;
 }
@@ -1257,8 +1258,13 @@ hundo.Viz.prototype.stepAnimate = function() {
         }, this.vizConfig.stepDuration / 2);
     }
 
+
     if (this.board.solved) {
-        this.nextLevel(false);
+        if (this.makerMode) {
+            this.reset(this.board);
+        } else {
+            this.nextLevel(false);
+        }
     }
 }
 
@@ -1266,17 +1272,30 @@ hundo.Viz.prototype.stepAnimate = function() {
 // TODO: hoist code into Viz.prototype.checkKey
 hundo.Viz.checkKey = function(e) {
 
+    console.log(hundo.vizz.board.atRest)
+    console.log(hundo.vizz.board.sovled)
+    console.log(hundo.vizz.makerMode)
+    console.log(hundo.vizz.makerPlay)
+
     if (!hundo.vizz.board.atRest) {
         return;
     }
+
+    console.log(1);
 
     if (hundo.vizz.board.solved) {
         return;
     }
 
+    console.log(2);
+
     if (hundo.vizz.makerMode && !hundo.vizz.makerPlay) {
         return;
     }
+
+
+    console.log(3);
+
 
     var e = e || window.event;
 
