@@ -260,6 +260,33 @@ hundo.Board.prototype.getGoals = function() {
     });
 };
 
+hundo.Board.prototype.getJson = function() {
+
+    var j = {
+        numRows: this.numRows,
+        numCols: this.numCols,
+        blocks: _.map(this.getBlocks(), function(block) {
+                return {
+                    row: block.row,
+                    col: block.col
+                }
+            }),
+        goals: _.map(this.getGoals(), function(goal) {
+                return {
+                    row: goal.row,
+                    col: goal.col,
+                    dir: goal.dir
+                }
+            }),
+        ball: {
+            row: this.ball.row,
+            col: this.ball.col
+        }
+    }
+
+    return JSON.stringify(j)
+}
+
 // removes the first element in array for which func(element) is true
 // if an element is removed, returns the index of the element removed
 // otherwise, returns -1
@@ -1666,7 +1693,8 @@ var boardConfig3 = {
 
 
 
-levels = [starter, boardConfig1, boardConfig2, boardConfig3];
+var foo = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":1},{"row":1,"col":2},{"row":1,"col":3},{"row":1,"col":14},{"row":2,"col":18},{"row":3,"col":1},{"row":3,"col":10},{"row":3,"col":11},{"row":3,"col":12},{"row":3,"col":13},{"row":3,"col":14},{"row":3,"col":18},{"row":4,"col":1},{"row":4,"col":18},{"row":5,"col":1},{"row":5,"col":18},{"row":6,"col":1},{"row":6,"col":18},{"row":7,"col":1},{"row":7,"col":18},{"row":8,"col":1},{"row":8,"col":12},{"row":9,"col":1},{"row":9,"col":12},{"row":10,"col":1},{"row":10,"col":12},{"row":10,"col":16},{"row":10,"col":17},{"row":10,"col":18},{"row":11,"col":12},{"row":12,"col":1},{"row":12,"col":2},{"row":12,"col":3},{"row":12,"col":12},{"row":14,"col":12},{"row":14,"col":13},{"row":14,"col":14}],"goals":[{"row":13,"col":6,"dir":"RIGHT"}],"ball":{"row":6,"col":9}}
+levels = [foo, starter, boardConfig1, boardConfig2, boardConfig3];
 
 document.onkeydown = hundo.Viz.checkKey;
 
@@ -1677,7 +1705,7 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: true
+    maker: false
 });
 
 new Hundo({
@@ -1689,3 +1717,5 @@ new Hundo({
     },
     maker: true
 });
+
+
