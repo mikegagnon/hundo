@@ -434,7 +434,9 @@ hundo.Viz = function(config) {
     
     this.maker = {
         on: config.maker,
-        play: false
+        play: false,
+        mouseRow: undefined,
+        mouseCol: undefined
     }
 
     if (this.maker.on) {
@@ -500,6 +502,51 @@ hundo.Viz = function(config) {
     this.drawBoard();
 
     this.updateLevelSelect();
+
+    this.boardSvg
+        .on("mousemove", hundo.Viz.mousemove);
+
+}
+
+hundo.Viz.prototype.mousemove = function(x, y) {
+
+    if (!this.maker.on) {
+        return;
+    }
+
+    var [row, col] = this.cellFromXY(x, y)
+
+    if (typeof this.maker.mouseRow == "undefined" ||
+        typeof this.maker.mouseCol == "undefined" ||
+        row != this.maker.mouseRow ||
+        col != this.maker.mouseCol) {
+
+        this.maker.mouseRow = row;
+        this.maker.mouseCol = col;
+
+        this.boardSvg.selectAll()
+            .data([0])
+            .enter()
+            .append("rect")
+            .attr("x", col * this.vizConfig.cellSize)
+            .attr("y", row * this.vizConfig.cellSize)
+            .attr("height", this.vizConfig.cellSize)
+            .attr("width", this.vizConfig.cellSize)
+            .attr("style", "fill:#0F0; fill-opacity: 0.2")
+            .attr("id", "highlight");
+
+        console.log(row, col)
+
+    }
+
+}
+
+hundo.Viz.mousemove = function() {
+    var [x, y] = d3.mouse(this);
+    var id = hundo.Viz.getIdFromBoardSvg(this);
+    var viz = hundo.instances[id]
+    viz.mousemove(x, y);
+
 }
 
 hundo.Viz.prototype.drawSvgGrid = function(name) {
@@ -590,10 +637,16 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
 
 }
 
+hundo.Viz.getIdFromBoardSvg = function(boardSvg) {
+    var boardSvgId = boardSvg.getAttribute("id")
+    var id = _.split(boardSvgId, "boardSvg")[1]
+
+    return id;
+}
+
 hundo.Viz.clickBoard = function(){
 
-    var boardSvgId = this.getAttribute("id")
-    var id = _.split(boardSvgId, "boardSvg")[1]
+    var id = hundo.Viz.getIdFromBoardSvg(this);
 
     var [x, y] = d3.mouse(this);
 
@@ -1593,5 +1646,5 @@ new Hundo({
         playButton: true,
         levelSelect: true
     },
-    maker: false
+    maker: true
 });
