@@ -516,6 +516,11 @@ hundo.Viz = function(config) {
 
 }
 
+hundo.Viz.prototype.removeHighlight = function() {
+    this.boardSvg.select("#" + this.highlightId())
+        .remove();
+}
+
 hundo.Viz.prototype.mousemove = function(x, y) {
 
     if (!this.maker.on || this.maker.play) {
@@ -529,15 +534,13 @@ hundo.Viz.prototype.mousemove = function(x, y) {
         row != this.maker.mouseRow ||
         col != this.maker.mouseCol) {
 
-        this.boardSvg.select("#" + this.highlightId())
-            .remove();
+        this.removeHighlight();
 
-        // TODO: implement
-        /*var piece = ...
+        var piece = this.getPieceFromPalette(row, col);
 
-        if (!this.canAddPiece(piece)) {
+        if (!this.board.canAddPiece(piece)) {
             return;
-        }*/
+        }
 
         this.maker.mouseRow = row;
         this.maker.mouseCol = col;
@@ -567,10 +570,7 @@ hundo.Viz.mousemove = function() {
 }
 
 hundo.Viz.prototype.mouseleave = function() {
-
-
-    this.boardSvg.select("#" + this.highlightId())
-        .remove();
+    this.removeHighlight();
 }
 
 hundo.Viz.mouseleave = function() {
@@ -663,6 +663,8 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
     if (this.board.addPiece(piece)) {
         this.animateSolvedQuick();
         this.drawBoardQuick();
+        this.removeHighlight();
+
     } else {
         console.log("Could not add: " + piece);
     }
