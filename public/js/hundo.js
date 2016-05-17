@@ -531,6 +531,13 @@ hundo.Viz.prototype.mousemove = function(x, y) {
         this.boardSvg.select("#" + this.highlightId())
             .remove();
 
+        // TODO: implement
+        /*var piece = ...
+
+        if (!this.canAddPiece(piece)) {
+            return;
+        }*/
+
         this.maker.mouseRow = row;
         this.maker.mouseCol = col;
 
