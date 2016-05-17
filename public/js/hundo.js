@@ -149,9 +149,6 @@ hundo.Board.prototype.hasBall = function() {
 }
 
 hundo.Board.prototype.clearCell = function(row, col) {
-
-    console.log("clearCell")
-
     if (typeof this.ball != "undefined" &&
         this.ball.row == row && this.ball.col == col) {
         this.ball = undefined;
@@ -1272,30 +1269,17 @@ hundo.Viz.prototype.stepAnimate = function() {
 // TODO: hoist code into Viz.prototype.checkKey
 hundo.Viz.checkKey = function(e) {
 
-    console.log(hundo.vizz.board.atRest)
-    console.log(hundo.vizz.board.sovled)
-    console.log(hundo.vizz.makerMode)
-    console.log(hundo.vizz.makerPlay)
-
     if (!hundo.vizz.board.atRest) {
         return;
     }
-
-    console.log(1);
 
     if (hundo.vizz.board.solved) {
         return;
     }
 
-    console.log(2);
-
     if (hundo.vizz.makerMode && !hundo.vizz.makerPlay) {
         return;
     }
-
-
-    console.log(3);
-
 
     var e = e || window.event;
 
@@ -1340,10 +1324,8 @@ hundo.Viz.prototype.clickPlay = function() {
 
     if (this.makerPlay) {
         $("#" + this.playButtonId()).text("Edit")
-        console.log("play mode")
     } else {
         $("#" + this.playButtonId()).text("Play")
-        console.log("edit mode")
     }
 
 }
@@ -1368,12 +1350,10 @@ hundo.clickLevelBack = function(id) {
 }
 
 hundo.Viz.prototype.clickPalette = function(config) {
-    console.log(this.id, config);
     this.paletteSelection = config;
 }
 
 hundo.clickPalette = function(id, config) {
-    console.log("foo")
     var viz = hundo.instances[id]
     viz.clickPalette(config);
 }
