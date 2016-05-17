@@ -524,7 +524,7 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
     return [row, col];
 }
 
-hundo.Viz.prototype.handleClick = function(x, y) {
+hundo.Viz.prototype.boardClick = function(x, y) {
 
     if (!this.makerMode) {
         return false;
@@ -552,7 +552,7 @@ hundo.Viz.boardClick = function(){
     var [x, y] = d3.mouse(this);
 
     var viz = hundo.instances[id]
-    viz.handleClick(x, y);
+    viz.boardClick(x, y);
 }
 
 hundo.Viz.prototype.addPlayButton = function() {
