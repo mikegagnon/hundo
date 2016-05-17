@@ -139,6 +139,10 @@ hundo.Board = function(boardConfig, idGen) {
     });
 }
 
+hundo.Board.prototype.isEmptyCell = function(row, col) {
+    return this.matrix[row][col].length == 0;
+}
+
 hundo.Board.prototype.hasBall = function() {
 
     var balls = this.getPieces(function(piece) {
@@ -536,10 +540,16 @@ hundo.Viz.prototype.mousemove = function(x, y) {
 
         this.removeHighlight();
 
-        var piece = this.getPieceFromPalette(row, col);
+        if (this.paletteSelection.delete) {
+            if (this.board.isEmptyCell(row, col)) {
+                return;
+            }
+        } else {
+            var piece = this.getPieceFromPalette(row, col);
 
-        if (!this.board.canAddPiece(piece)) {
-            return;
+            if (!this.board.canAddPiece(piece)) {
+                return;
+            }
         }
 
         this.maker.mouseRow = row;
@@ -639,6 +649,8 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
         return new hundo.Block(this.idGen.next(), row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
         return new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
+    } else {
+        console.error("Unrecognized piece type")
     }
 
 }
