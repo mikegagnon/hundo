@@ -550,8 +550,8 @@ hundo.Viz.prototype.mousemove = function(x, y) {
             .attr("y", row * this.vizConfig.cellSize)
             .attr("height", this.vizConfig.cellSize)
             .attr("width", this.vizConfig.cellSize)
-            .attr("style", "fill:#3D8E37; fill-opacity: 0.5")
-            .attr("id", this.highlightId());
+            .attr("style", "fill:#3D8E37; fill-opacity: 0.5; cursor: pointer;")
+            .attr("id", this.highlightId())
 
         console.log(row, col)
 
