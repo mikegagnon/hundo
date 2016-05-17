@@ -521,6 +521,9 @@ hundo.Viz.prototype.mousemove = function(x, y) {
         row != this.maker.mouseRow ||
         col != this.maker.mouseCol) {
 
+        this.boardSvg.select("#" + this.highlightId())
+            .remove();
+
         this.maker.mouseRow = row;
         this.maker.mouseCol = col;
 
@@ -532,8 +535,8 @@ hundo.Viz.prototype.mousemove = function(x, y) {
             .attr("y", row * this.vizConfig.cellSize)
             .attr("height", this.vizConfig.cellSize)
             .attr("width", this.vizConfig.cellSize)
-            .attr("style", "fill:#0F0; fill-opacity: 0.2")
-            .attr("id", "highlight");
+            .attr("style", "fill:#3D8E37; fill-opacity: 0.5")
+            .attr("id", this.highlightId());
 
         console.log(row, col)
 
@@ -757,6 +760,10 @@ hundo.Viz.prototype.hundoId = function() {
 
 hundo.Viz.prototype.boardSvgId = function() {
     return "boardSvg" + this.id;
+}
+
+hundo.Viz.prototype.highlightId = function() {
+    return "highlight" + this.id;
 }
 
 hundo.Viz.prototype.playButtonId = function() {
