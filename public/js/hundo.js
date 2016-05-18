@@ -288,7 +288,8 @@ hundo.Board.prototype.getJson = function() {
         }
     }
 
-    return JSON.stringify(j)
+    return j;
+
 }
 
 // removes the first element in array for which func(element) is true
@@ -593,20 +594,9 @@ hundo.Viz.levelFromUrl = function() {
         return false;
     }
 
-    var jsonString = decodeURIComponent(params.level);
+    var compressedLevel = decodeURIComponent(params.level);
 
-    if (typeof jsonString == "undefined") {
-
-        return false;
-    }
-
-    var level;
-
-    try {
-        level = $.parseJSON(jsonString);
-    } catch(e) {
-        level = false
-    }
+    var level = hundo.Compress.decompressLevel(compressedLevel);
 
     return level;
 }
@@ -1564,7 +1554,7 @@ hundo.Viz.prototype.clickSave = function() {
 
     $("#" + this.levelUrlFieldId()).select();
 
-    console.log(this.board.getJson());
+    console.log(JSON.stringify(this.board.getJson()));
 }
 
 hundo.clickSave = function(id) {
@@ -1596,8 +1586,7 @@ hundo.clickPalette = function(id, config) {
 }
 
 hundo.Viz.prototype.getBoardUrl = function() {
-
-    var levelParam = this.board.getJson();
+    var levelParam = hundo.Compress.compressLevel(this.board.getJson());
     var url = window.location.href;
     url += "?level=" + encodeURIComponent(levelParam)
     return url;
@@ -1675,7 +1664,6 @@ hundo.Compress.sep = "-";
 
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level) {
-
     var levelArray = [];
 
     // The first two bytes encode numRows, numCols
@@ -1783,8 +1771,6 @@ hundo.defaultVizConfig = {
     levelSelect: true,
     levelMax: 0
 }
-
-
 
 document.onkeydown = hundo.Viz.checkKey;
 
