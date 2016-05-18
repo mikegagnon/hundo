@@ -512,6 +512,7 @@ hundo.Viz = function(config) {
     }
 
     if (this.maker.on) {
+        this.addSave();
         this.addPalette();
     }
 
@@ -867,6 +868,15 @@ hundo.Viz.prototype.addPalette = function() {
     $("#" + this.consoleId()).append(palette);
 }
 
+hundo.Viz.prototype.addSave = function() {
+    var contents = `<button id="${this.saveButtonId()}" onclick="hundo.clickSave(${this.id})" type="button"
+     class="button">Save</button>`
+
+    var saveButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(saveButton);
+}
+
 hundo.Viz.prototype.hundoId = function() {
     return "hundo" + this.id;
 }
@@ -881,6 +891,10 @@ hundo.Viz.prototype.highlightId = function() {
 
 hundo.Viz.prototype.playButtonId = function() {
     return "playButton" + this.id;
+}
+
+hundo.Viz.prototype.saveButtonId = function() {
+    return "saveButton" + this.id;
 }
 
 hundo.Viz.prototype.consoleId = function() {
@@ -1510,6 +1524,15 @@ hundo.Viz.prototype.clickPlay = function() {
 hundo.clickPlay = function(id) {
     hundo.vizz = hundo.instances[id];
     hundo.vizz.clickPlay();
+}
+
+hundo.Viz.prototype.clickSave = function() {
+    console.log("save");
+}
+
+hundo.clickSave = function(id) {
+    hundo.vizz = hundo.instances[id];
+    hundo.vizz.clickSave();
 }
 
 // TODO: bug, hundo.vizz is unsafe here because
