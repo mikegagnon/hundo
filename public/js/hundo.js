@@ -1588,6 +1588,9 @@ hundo.clickPalette = function(id, config) {
 hundo.Viz.prototype.getBoardUrl = function() {
     var levelParam = hundo.Compress.compressLevel(this.board.getJson());
     var url = window.location.href;
+
+    url = _.split(url, "?")[0];
+
     url += "?level=" + encodeURIComponent(levelParam)
     return url;
 }
