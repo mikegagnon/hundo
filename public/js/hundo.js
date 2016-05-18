@@ -1639,8 +1639,136 @@ hundo.Compress.fromBase64Digit = function(digit) {
     }
 }
 
+hundo.Compress.dirToNum = function(dir) {
+
+    if (dir == hundo.DirectionEnum.UP) {
+        return "0";
+    } else if (dir == hundo.DirectionEnum.DOWN) {
+        return "1";
+    } else if (dir == hundo.DirectionEnum.LEFT) {
+        return "2";
+    } else if (dir == hundo.DirectionEnum.RIGHT) {
+        return "3";
+    } else {
+        console.error("Bad direction: " + dir);
+        return null;
+    }
+}
+
+hundo.Compress.numToDir = function(num) {
+
+    if (num == "0") {
+        return hundo.DirectionEnum.UP;
+    } else if (num == "1") {
+        return hundo.DirectionEnum.DOWN;
+    } else if (num == "2") {
+        return hundo.DirectionEnum.LEFT;
+    } else if (num == "3") {
+        return hundo.DirectionEnum.RIGHT;
+    } else {
+        console.error("Bad num: " + num);
+        return null;
+    }
+}
+
+hundo.Compress.sep = "-";
+
 // assumes numRows, numCols < 32
-hundo.Viz.compressLevel = function(level) {
+hundo.Compress.compressLevel = function(level) {
+
+    var levelArray = [];
+
+    // The first two bytes encode numRows, numCols
+    levelArray.push(hundo.Compress.toBase64Digit(level.numRows));
+    levelArray.push(hundo.Compress.toBase64Digit(level.numCols));
+
+    // The next two bytes encode ball.row, ball.col
+    levelArray.push(hundo.Compress.toBase64Digit(level.ball.row));
+    levelArray.push(hundo.Compress.toBase64Digit(level.ball.col));
+
+    // Encode each block as (block.row, block.col) pair
+    _.each(level.blocks, function(block){
+        levelArray.push(hundo.Compress.toBase64Digit(block.row));
+        levelArray.push(hundo.Compress.toBase64Digit(block.col));
+    });
+
+    // separates blocks and goals
+    levelArray.push(hundo.Compress.sep);
+
+    // Encode the goals, like blocks
+    _.each(level.goals, function(goal){
+        levelArray.push(hundo.Compress.toBase64Digit(goal.row));
+        levelArray.push(hundo.Compress.toBase64Digit(goal.col));
+        levelArray.push(hundo.Compress.dirToNum(goal.dir))
+    });
+
+    return _.join(levelArray, "");
+}
+
+hundo.Compress.getRowCol = function(bytes) {
+
+    var row = hundo.Compress.fromBase64Digit(bytes[0]);
+    var col = hundo.Compress.fromBase64Digit(bytes[1]);
+
+    bytes.shift();
+    bytes.shift();
+
+    return [row, col];
+
+}
+
+// 64-bit bytes
+hundo.Compress.decompressLevel = function(byteString) {
+
+    var level = {
+        ball: {},
+        blocks: [],
+        goals: []
+    };
+
+    var bytes = _.split(byteString, "")
+
+    var [r, c] = hundo.Compress.getRowCol(bytes);
+    level.numRows = r;
+    level.numCols = c;
+
+    [r, c] = hundo.Compress.getRowCol(bytes);
+    level.ball.row = r;
+    level.ball.col = c;
+
+    // Get the blocks
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        block = {
+            row: r,
+            col: c
+        }
+        level.blocks.push(block);
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
+    // Get the goals
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        var dir = hundo.Compress.numToDir(bytes[0]);
+        bytes.shift();
+        goal = {
+            row: r,
+            col: c,
+            dir: dir
+        }
+        level.goals.push(goal);
+    }
+
+    return level;
 }
 
 hundo.defaultVizConfig = {
@@ -1656,206 +1784,7 @@ hundo.defaultVizConfig = {
     levelMax: 0
 }
 
-var starter = {
-    numRows: 15,
-    numCols: 21,
-    blocks: [
-        {
-            row: 3,
-            col: 9
-        },
-        {
-            row: 3,
-            col: 10
-        },
-        {
-            row: 3,
-            col: 11
-        },
-        {
-            row: 11,
-            col: 9
-        },
-        {
-            row: 11,
-            col: 10
-        },
-        {
-            row: 11,
-            col: 11
-        },
-        {
-            row: 6,
-            col: 6
-        },
-        {
-            row: 7,
-            col: 6
-        },
-        {
-            row: 8,
-            col: 6
-        },
-        {
-            row: 6,
-            col: 14
-        },
-        {
-            row: 7,
-            col: 14
-        },
-        {
-            row: 8,
-            col: 14
-        },
 
-
-    ],
-    goals: [
-        {
-            row: 2,
-            col: 7,
-            dir: hundo.DirectionEnum.DOWN
-        },
-
-    ],
-    ball: {
-        row: 7,
-        col: 10
-    }
-}
-
-var boardConfig1 = {
-    numRows: 15,
-    numCols: 20,
-    blocks : [
-        {
-            row: 2,
-            col: 0
-        },
-        {
-            row: 2,
-            col: 1
-        },
-        {
-            row: 2,
-            col: 2
-        },
-        {
-            row: 2,
-            col: 3
-        },
-        {
-            row: 2,
-            col: 8
-        },
-        {
-            row: 2,
-            col: 4
-        },
-        {
-            row: 2,
-            col: 9
-        },
-    ],
-    goals: [
-        {
-            row: 1,
-            col: 7,
-            dir: hundo.DirectionEnum.DOWN
-        },
-        {
-            row: 3,
-            col: 7,
-            dir: hundo.DirectionEnum.UP
-        },
-        {
-            row: 5,
-            col: 8,
-            dir: hundo.DirectionEnum.LEFT
-        },
-        {
-            row: 10,
-            col: 5,
-            dir: hundo.DirectionEnum.RIGHT
-        }
-
-    ],
-    ball: {
-        row: 2,
-        col: 7,
-    }
-}
-
-var boardConfig2 = {
-    numRows: 15,
-    numCols: 20,
-    blocks : [
-        {
-            row: 2,
-            col: 1
-        },
-        {
-            row: 2,
-            col: 2
-        },
-    ],
-    goals: [
-        {
-            row: 1,
-            col: 7,
-            dir: hundo.DirectionEnum.DOWN
-        },
-        {
-            row: 3,
-            col: 7,
-            dir: hundo.DirectionEnum.UP
-        }
-
-    ],
-    ball: {
-        row: 2,
-        col: 7,
-    }
-}
-
-var boardConfig3 = {
-    numRows: 15,
-    numCols: 20,
-    blocks : [
-        {
-            row: 5,
-            col: 1
-        },
-        {
-            row: 2,
-            col: 2
-        },
-    ],
-    goals: [
-        {
-            row: 1,
-            col: 7,
-            dir: hundo.DirectionEnum.DOWN
-        },
-        {
-            row: 3,
-            col: 7,
-            dir: hundo.DirectionEnum.UP
-        }
-
-    ],
-    ball: {
-        row: 2,
-        col: 7,
-    }
-}
-
-
-
-var foo = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":1},{"row":1,"col":2},{"row":1,"col":3},{"row":1,"col":14},{"row":2,"col":18},{"row":3,"col":1},{"row":3,"col":10},{"row":3,"col":11},{"row":3,"col":12},{"row":3,"col":13},{"row":3,"col":14},{"row":3,"col":18},{"row":4,"col":1},{"row":4,"col":18},{"row":5,"col":1},{"row":5,"col":18},{"row":6,"col":1},{"row":6,"col":18},{"row":7,"col":1},{"row":7,"col":18},{"row":8,"col":1},{"row":8,"col":12},{"row":9,"col":1},{"row":9,"col":12},{"row":10,"col":1},{"row":10,"col":12},{"row":10,"col":16},{"row":10,"col":17},{"row":10,"col":18},{"row":11,"col":12},{"row":12,"col":1},{"row":12,"col":2},{"row":12,"col":3},{"row":12,"col":12},{"row":14,"col":12},{"row":14,"col":13},{"row":14,"col":14}],"goals":[{"row":13,"col":6,"dir":"RIGHT"}],"ball":{"row":6,"col":9}}
-var diagonal = {"numRows":15,"numCols":21,"blocks":[{"row":2,"col":5},{"row":2,"col":6},{"row":2,"col":7},{"row":4,"col":3},{"row":4,"col":7},{"row":4,"col":8},{"row":4,"col":9},{"row":4,"col":10},{"row":4,"col":11},{"row":5,"col":3},{"row":6,"col":3},{"row":6,"col":5},{"row":6,"col":13},{"row":7,"col":5},{"row":7,"col":13},{"row":8,"col":5},{"row":8,"col":13},{"row":9,"col":5},{"row":9,"col":13},{"row":9,"col":15},{"row":10,"col":15},{"row":11,"col":7},{"row":11,"col":8},{"row":11,"col":9},{"row":11,"col":10},{"row":11,"col":11},{"row":11,"col":15},{"row":13,"col":11},{"row":13,"col":12},{"row":13,"col":13}],"goals":[{"row":3,"col":1,"dir":"RIGHT"},{"row":12,"col":17,"dir":"LEFT"}],"ball":{"row":7,"col":9}}
-levels = [starter, diagonal, foo];
 
 document.onkeydown = hundo.Viz.checkKey;
 
