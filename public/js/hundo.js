@@ -605,6 +605,11 @@ hundo.Viz.prototype.removeHighlight = function() {
         .remove();
 }
 
+// BUG TODO: it seems that mousemove and mouseleave are interferring
+// with each other because mousemove updates the highlighter
+// on every pixel change (as opposed to only updating the
+// highlighter on cell changes). mouseleave only works when
+// the mouse exits the board at high speed.
 hundo.Viz.prototype.mousemove = function(x, y) {
 
     if (!this.maker.on || this.maker.play) {
