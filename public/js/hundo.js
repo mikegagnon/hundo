@@ -469,7 +469,7 @@ hundo.Viz = function(config) {
 
     // TODO: validate vizConfig and levels
     this.vizConfig = config.viz;
-    
+
     this.maker = {
         on: config.maker,
         play: false,
@@ -477,15 +477,24 @@ hundo.Viz = function(config) {
         mouseCol: undefined
     }
 
+    var levelFromUrl = hundo.Viz.levelFromUrl();
+
+    if (levelFromUrl) {
+        this.maker.on = true;
+    }
+
     if (this.maker.on) {
 
-        // one empty level
-        this.levels = [
-            {
-                numRows: config.viz.numRows,
-                numCols: config.viz.numCols
-            }
-        ]
+        if (levelFromUrl) {
+            this.levels = [levelFromUrl];
+        } else {
+            this.levels = [
+                {
+                    numRows: config.viz.numRows,
+                    numCols: config.viz.numCols
+                }
+            ]
+        }
 
         config.viz.levelSelect = false;
 
@@ -514,6 +523,7 @@ hundo.Viz = function(config) {
     if (this.maker.on) {
         this.addSave();
         this.addPalette();
+        this.addLevelUrlField();
     }
 
     this.boardSvg = d3.select("#" + this.boardSvgId())
@@ -576,14 +586,14 @@ hundo.Viz.levelFromUrl = function() {
     var params = hundo.Viz.getParams()
 
     if (!("level" in params)) {
-        return {};
+        return false;
     }
 
     var jsonString = decodeURIComponent(params.level);
 
     if (typeof jsonString == "undefined") {
 
-        return {};
+        return false;
     }
 
     var level;
@@ -591,7 +601,7 @@ hundo.Viz.levelFromUrl = function() {
     try {
         level = $.parseJSON(jsonString);
     } catch(e) {
-        level = {}
+        level = false
     }
 
     return level;
@@ -882,6 +892,15 @@ hundo.Viz.prototype.addSave = function() {
      $("#" + this.consoleId()).append(saveButton);
 }
 
+hundo.Viz.prototype.addLevelUrlField = function() {
+    var contents = `<div>URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
+    value=""></input></div>`
+
+    var saveButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(saveButton);
+}
+
 hundo.Viz.prototype.hundoId = function() {
     return "hundo" + this.id;
 }
@@ -900,6 +919,10 @@ hundo.Viz.prototype.playButtonId = function() {
 
 hundo.Viz.prototype.saveButtonId = function() {
     return "saveButton" + this.id;
+}
+
+hundo.Viz.prototype.levelUrlFieldId = function() {
+    return "levelUrlField" + this.id
 }
 
 hundo.Viz.prototype.consoleId = function() {
@@ -1533,6 +1556,14 @@ hundo.clickPlay = function(id) {
 
 hundo.Viz.prototype.clickSave = function() {
     console.log("save");
+
+    var url = this.getBoardUrl()
+
+    $("#" + this.levelUrlFieldId()).attr("value", url);
+
+    $("#" + this.levelUrlFieldId()).select();
+
+    console.log(this.board.getJson());
 }
 
 hundo.clickSave = function(id) {
@@ -1568,10 +1599,9 @@ hundo.Viz.prototype.getBoardUrl = function() {
     var levelParam = this.board.getJson();
     var url = window.location.href;
     url += "?level=" + encodeURIComponent(levelParam)
-    console.log(url)
+    return url;
 }
 
-file:///Users/xyz/workspace/hundo/public/index.html?level=eyJudW1Sb3dzIjoxNSwibnVtQ29scyI6MjEsImJsb2NrcyI6W3sicm93IjoxLCJjb2wiOjF9LHsicm93IjoxLCJjb2wiOjJ9LHsicm93IjoxLCJjb2wiOjN9LHsicm93IjoxLCJjb2wiOjE0fSx7InJvdyI6MiwiY29sIjoxOH0seyJyb3ciOjMsImNvbCI6MX0seyJyb3ciOjMsImNvbCI6MTB9LHsicm93IjozLCJjb2wiOjExfSx7InJvdyI6MywiY29sIjoxMn0seyJyb3ciOjMsImNvbCI6MTN9LHsicm93IjozLCJjb2wiOjE0fSx7InJvdyI6MywiY29sIjoxOH0seyJyb3ciOjQsImNvbCI6MX0seyJyb3ciOjQsImNvbCI6MTh9LHsicm93Ijo1LCJjb2wiOjF9LHsicm93Ijo1LCJjb2wiOjE4fSx7InJvdyI6NiwiY29sIjoxfSx7InJvdyI6NiwiY29sIjoxOH0seyJyb3ciOjcsImNvbCI6MX0seyJyb3ciOjcsImNvbCI6MTh9LHsicm93Ijo4LCJjb2wiOjF9LHsicm93Ijo4LCJjb2wiOjEyfSx7InJvdyI6OSwiY29sIjoxfSx7InJvdyI6OSwiY29sIjoxMn0seyJyb3ciOjEwLCJjb2wiOjF9LHsicm93IjoxMCwiY29sIjoxMn0seyJyb3ciOjEwLCJjb2wiOjE2fSx7InJvdyI6MTAsImNvbCI6MTd9LHsicm93IjoxMCwiY29sIjoxOH0seyJyb3ciOjExLCJjb2wiOjEyfSx7InJvdyI6MTIsImNvbCI6MX0seyJyb3ciOjEyLCJjb2wiOjJ9LHsicm93IjoxMiwiY29sIjozfSx7InJvdyI6MTIsImNvbCI6MTJ9LHsicm93IjoxNCwiY29sIjoxMn0seyJyb3ciOjE0LCJjb2wiOjEzfSx7InJvdyI6MTQsImNvbCI6MTR9XSwiZ29hbHMiOlt7InJvdyI6MTMsImNvbCI6NiwiZGlyIjoiUklHSFQifV0sImJhbGwiOnsicm93Ijo2LCJjb2wiOjl9fQ%3D%3D
 hundo.defaultVizConfig = {
     cellSize: 26,
     stepDuration: 50,
@@ -1783,7 +1813,8 @@ var boardConfig3 = {
 
 
 var foo = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":1},{"row":1,"col":2},{"row":1,"col":3},{"row":1,"col":14},{"row":2,"col":18},{"row":3,"col":1},{"row":3,"col":10},{"row":3,"col":11},{"row":3,"col":12},{"row":3,"col":13},{"row":3,"col":14},{"row":3,"col":18},{"row":4,"col":1},{"row":4,"col":18},{"row":5,"col":1},{"row":5,"col":18},{"row":6,"col":1},{"row":6,"col":18},{"row":7,"col":1},{"row":7,"col":18},{"row":8,"col":1},{"row":8,"col":12},{"row":9,"col":1},{"row":9,"col":12},{"row":10,"col":1},{"row":10,"col":12},{"row":10,"col":16},{"row":10,"col":17},{"row":10,"col":18},{"row":11,"col":12},{"row":12,"col":1},{"row":12,"col":2},{"row":12,"col":3},{"row":12,"col":12},{"row":14,"col":12},{"row":14,"col":13},{"row":14,"col":14}],"goals":[{"row":13,"col":6,"dir":"RIGHT"}],"ball":{"row":6,"col":9}}
-levels = [foo, starter, boardConfig1, boardConfig2, boardConfig3];
+var diagonal = {"numRows":15,"numCols":21,"blocks":[{"row":2,"col":5},{"row":2,"col":6},{"row":2,"col":7},{"row":4,"col":3},{"row":4,"col":7},{"row":4,"col":8},{"row":4,"col":9},{"row":4,"col":10},{"row":4,"col":11},{"row":5,"col":3},{"row":6,"col":3},{"row":6,"col":5},{"row":6,"col":13},{"row":7,"col":5},{"row":7,"col":13},{"row":8,"col":5},{"row":8,"col":13},{"row":9,"col":5},{"row":9,"col":13},{"row":9,"col":15},{"row":10,"col":15},{"row":11,"col":7},{"row":11,"col":8},{"row":11,"col":9},{"row":11,"col":10},{"row":11,"col":11},{"row":11,"col":15},{"row":13,"col":11},{"row":13,"col":12},{"row":13,"col":13}],"goals":[{"row":3,"col":1,"dir":"RIGHT"},{"row":12,"col":17,"dir":"LEFT"}],"ball":{"row":7,"col":9}}
+levels = [starter, diagonal, foo];
 
 document.onkeydown = hundo.Viz.checkKey;
 
