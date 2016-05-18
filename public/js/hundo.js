@@ -1818,24 +1818,4 @@ levels = [starter, diagonal, foo];
 
 document.onkeydown = hundo.Viz.checkKey;
 
-new Hundo({
-    levels: levels,
-    id: 1,
-    viz: {
-        playButton: true,
-        levelSelect: true
-    },
-    maker: false
-});
-
-new Hundo({
-    levels: levels,
-    id: 2,
-    viz: {
-        playButton: true,
-        levelSelect: true
-    },
-    maker: true
-});
-
 
