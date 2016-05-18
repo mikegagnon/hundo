@@ -611,9 +611,6 @@ hundo.Viz.levelFromUrl = function() {
     return level;
 }
 
-console.log(hundo.Viz.levelFromUrl())
-
-
 hundo.Viz.prototype.removeHighlight = function() {
     this.boardSvg.select("#" + this.highlightId())
         .remove();
@@ -1604,6 +1601,46 @@ hundo.Viz.prototype.getBoardUrl = function() {
     var url = window.location.href;
     url += "?level=" + encodeURIComponent(levelParam)
     return url;
+}
+
+hundo.Compress = {}
+
+hundo.Compress.toBase64Digit = function (number) {
+    if (number < 0 || number >= 62) {
+        console.error("Cannot convert to base64: " + number);
+        return null;
+    }
+
+    if (number < 10) {
+        return "" + number
+    } else if (number < 36) {
+        return String.fromCharCode("a".charCodeAt(0) + number - 10)
+    } else {
+        return String.fromCharCode("A".charCodeAt(0) + number - 36)
+    }
+}
+
+hundo.Compress.fromBase64Digit = function(digit) {
+
+    var charCode = digit.charCodeAt(0);
+
+    if (charCode >= "0".charCodeAt(0) &&
+        charCode <= "9".charCodeAt(0)) {
+        return charCode - "0".charCodeAt(0);
+    } else if (charCode >= "a".charCodeAt(0) &&
+        charCode <= "z".charCodeAt(0)) {
+        return charCode - "a".charCodeAt(0) + 10;
+    } else if (charCode >= "A".charCodeAt(0) &&
+        charCode <= "Z".charCodeAt(0)) {
+        return charCode - "A".charCodeAt(0) + 36;
+    } else {
+        console.error("Cannot convert from base64: " + digit);
+        return null;
+    }
+}
+
+// assumes numRows, numCols < 32
+hundo.Viz.compressLevel = function(level) {
 }
 
 hundo.defaultVizConfig = {
