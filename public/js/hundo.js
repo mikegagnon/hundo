@@ -547,6 +547,58 @@ hundo.Viz = function(config) {
 
 }
 
+// TODO: assume untrusted input and write tests
+hundo.Viz.getParams = function() {
+    var url = window.location.href;
+
+    var params = _.split(url, "?")[1]
+
+    if (typeof params == "undefined") {
+        return {}
+    }
+
+    var paramList = params.split("&");
+
+    var paramObj = {}
+
+    _.each(paramList, function(param) {
+        var [key, value] = param.split("=");
+        paramObj[key] = value;
+    });
+
+    return paramObj
+
+}
+
+hundo.Viz.levelFromUrl = function() {
+
+    var params = hundo.Viz.getParams()
+
+    if (!("level" in params)) {
+        return {};
+    }
+
+    var jsonString = decodeURIComponent(params.level);
+
+    if (typeof jsonString == "undefined") {
+
+        return {};
+    }
+
+    var level;
+
+    try {
+        level = $.parseJSON(jsonString);
+    } catch(e) {
+        level = {}
+    }
+
+    return level;
+}
+
+console.log(hundo.Viz.levelFromUrl())
+
+
 hundo.Viz.prototype.removeHighlight = function() {
     this.boardSvg.select("#" + this.highlightId())
         .remove();
@@ -1483,6 +1535,15 @@ hundo.clickPalette = function(id, config) {
     viz.clickPalette(config);
 }
 
+hundo.Viz.prototype.getBoardUrl = function() {
+
+    var levelParam = this.board.getJson();
+    var url = window.location.href;
+    url += "?level=" + encodeURIComponent(levelParam)
+    console.log(url)
+}
+
+file:///Users/xyz/workspace/hundo/public/index.html?level=eyJudW1Sb3dzIjoxNSwibnVtQ29scyI6MjEsImJsb2NrcyI6W3sicm93IjoxLCJjb2wiOjF9LHsicm93IjoxLCJjb2wiOjJ9LHsicm93IjoxLCJjb2wiOjN9LHsicm93IjoxLCJjb2wiOjE0fSx7InJvdyI6MiwiY29sIjoxOH0seyJyb3ciOjMsImNvbCI6MX0seyJyb3ciOjMsImNvbCI6MTB9LHsicm93IjozLCJjb2wiOjExfSx7InJvdyI6MywiY29sIjoxMn0seyJyb3ciOjMsImNvbCI6MTN9LHsicm93IjozLCJjb2wiOjE0fSx7InJvdyI6MywiY29sIjoxOH0seyJyb3ciOjQsImNvbCI6MX0seyJyb3ciOjQsImNvbCI6MTh9LHsicm93Ijo1LCJjb2wiOjF9LHsicm93Ijo1LCJjb2wiOjE4fSx7InJvdyI6NiwiY29sIjoxfSx7InJvdyI6NiwiY29sIjoxOH0seyJyb3ciOjcsImNvbCI6MX0seyJyb3ciOjcsImNvbCI6MTh9LHsicm93Ijo4LCJjb2wiOjF9LHsicm93Ijo4LCJjb2wiOjEyfSx7InJvdyI6OSwiY29sIjoxfSx7InJvdyI6OSwiY29sIjoxMn0seyJyb3ciOjEwLCJjb2wiOjF9LHsicm93IjoxMCwiY29sIjoxMn0seyJyb3ciOjEwLCJjb2wiOjE2fSx7InJvdyI6MTAsImNvbCI6MTd9LHsicm93IjoxMCwiY29sIjoxOH0seyJyb3ciOjExLCJjb2wiOjEyfSx7InJvdyI6MTIsImNvbCI6MX0seyJyb3ciOjEyLCJjb2wiOjJ9LHsicm93IjoxMiwiY29sIjozfSx7InJvdyI6MTIsImNvbCI6MTJ9LHsicm93IjoxNCwiY29sIjoxMn0seyJyb3ciOjE0LCJjb2wiOjEzfSx7InJvdyI6MTQsImNvbCI6MTR9XSwiZ29hbHMiOlt7InJvdyI6MTMsImNvbCI6NiwiZGlyIjoiUklHSFQifV0sImJhbGwiOnsicm93Ijo2LCJjb2wiOjl9fQ%3D%3D
 hundo.defaultVizConfig = {
     cellSize: 26,
     stepDuration: 50,
