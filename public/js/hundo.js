@@ -282,7 +282,10 @@ hundo.Board.prototype.getJson = function() {
                     dir: goal.dir
                 }
             }),
-        ball: {
+    }
+
+    if (typeof this.ball != "undefined") {
+        j.ball = {
             row: this.ball.row,
             col: this.ball.col
         }
@@ -1674,8 +1677,13 @@ hundo.Compress.compressLevel = function(level) {
     levelArray.push(hundo.Compress.toBase64Digit(level.numCols));
 
     // The next two bytes encode ball.row, ball.col
-    levelArray.push(hundo.Compress.toBase64Digit(level.ball.row));
-    levelArray.push(hundo.Compress.toBase64Digit(level.ball.col));
+    if (typeof level.ball != "undefined") {
+        levelArray.push(hundo.Compress.toBase64Digit(level.ball.row));
+        levelArray.push(hundo.Compress.toBase64Digit(level.ball.col));
+    }
+
+    // signifies beginning of blocks
+    levelArray.push(hundo.Compress.sep);
 
     // Encode each block as (block.row, block.col) pair
     _.each(level.blocks, function(block){
@@ -1712,7 +1720,6 @@ hundo.Compress.getRowCol = function(bytes) {
 hundo.Compress.decompressLevel = function(byteString) {
 
     var level = {
-        ball: {},
         blocks: [],
         goals: []
     };
@@ -1723,9 +1730,24 @@ hundo.Compress.decompressLevel = function(byteString) {
     level.numRows = r;
     level.numCols = c;
 
-    [r, c] = hundo.Compress.getRowCol(bytes);
-    level.ball.row = r;
-    level.ball.col = c;
+    // Get the ball, if it's there
+    if (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        level.ball = {
+            row: r,
+            col: c
+        }
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
 
     // Get the blocks
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
