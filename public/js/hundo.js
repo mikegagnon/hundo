@@ -40,8 +40,6 @@ hundo.Block = function(id, row, col) {
 
 // returns true iff the piece were pushed in direction dir
 hundo.Block.prototype.nudge = function(dir, board) {
-
-    // TODO: return collide animation?
     return [false, []];
 }
 
@@ -75,8 +73,6 @@ hundo.Ball.prototype.nudge = function(dir, board) {
                 "move": {
                     "ball": this,
                     "dir": dir,
-                    // TODO: solved
-                    //"solved": this.solved
                 }
             });
         return [true, animations];
@@ -117,7 +113,9 @@ hundo.oppositeDir = function(dir) {
 // dir is the direction of the momentum of piece doing the nudging
 // returns true if this piece can accept the nudging piece
 hundo.Goal.prototype.nudge = function(dir, board) {
+
     return [this.dir == hundo.oppositeDir(dir), []];
+
 }
 
 /**
@@ -135,7 +133,22 @@ hundo.Ice = function(id, row, col) {
 
 // TODO: implement
 hundo.Ice.prototype.nudge = function(dir, board) {
- 
+
+
+    // If ice is in the goal, then it can't move
+    var occupyGoal = false;
+
+    _.each(board.matrix[this.row][this.col], function(piece) {
+        if (piece.type == hundo.PieceTypeEnum.GOAL) {
+            console.log("nope");
+            occupyGoal = true;
+        }
+    })
+
+    if (occupyGoal) {
+        return [false, []];
+    }
+
     var [dr, dc] = hundo.Board.drdc(dir);
 
     var row = this.row + dr;
@@ -455,6 +468,8 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 // see hundo.nudge
 hundo.Board.prototype.nudge = function(row, col, dir) {
 
+    console.log("board.nudge(" + row + ", " + col + ", " + dir + ")")
+
     var pieces = this.matrix[row][col];
 
     var result = true;
@@ -462,14 +477,17 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
 
     var THIS = this;
 
-
-
     _.each(pieces, function(piece) {
 
-        var [nudged, newAnimations] =piece.nudge(dir, THIS);
+        var [nudged, newAnimations] = piece.nudge(dir, THIS);
         animations = _.concat(animations, newAnimations);
-        result &= nudged
+        if (!nudged) {
+            result = false;
+        }
+        //result &= nudged
     });
+
+    console.log("board.nudge got nudged == " + result)
 
     return [result, animations];
 
@@ -542,8 +560,10 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] = this.nudge(this.ball.row, this.ball.col, this.ball.dir)
-
+    console.log("Step calling nudge")
+    var [nudged, animations] =
+        this.nudge(this.ball.row, this.ball.col, this.ball.dir)
+    console.log("Step called nudged and got: " + nudged)
     if (nudged) {
         if (this.checkSolved()) {
             this.solved = true;
