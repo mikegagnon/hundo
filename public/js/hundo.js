@@ -485,6 +485,9 @@ hundo.Board.prototype.clone = function() {
  * Solver solves puzzles
  ******************************************************************************/
 
+// Thank you Wikipedia!
+// https://en.wikipedia.org/wiki/Graph_traversal#Pseudocode
+
 hundo.Solver = function(board) {
 
     this.vertices = [];
