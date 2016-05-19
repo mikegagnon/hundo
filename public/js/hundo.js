@@ -12,7 +12,8 @@ var hundo = {}
 hundo.PieceTypeEnum = {
     BALL: "BALL",
     BLOCK: "BLOCK",
-    GOAL: "GOAL"
+    GOAL: "GOAL",
+    ICECUBE: "ICECUBE"
 }
 
 hundo.DirectionEnum = {
@@ -93,6 +94,24 @@ hundo.oppositeDir = function(dir) {
 // returns true if this piece can accept the nudging piece
 hundo.Goal.prototype.nudge = function(dir) {
     return this.dir == hundo.oppositeDir(dir);
+}
+
+/**
+ * Ice cube board pieces
+ ******************************************************************************/
+
+hundo.Icecube = function(id, row, col) {
+    this.id = id;
+    this.type = hundo.PieceTypeEnum.ICECUBE;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+}
+
+// TODO: implement
+hundo.Icecube.prototype.nudge = function(dir) {
+    return false;
 }
 
 /**
