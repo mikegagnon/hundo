@@ -487,6 +487,16 @@ hundo.Board.prototype.clone = function() {
 
 hundo.Solver = {}
 
+// push the ball in direction dir
+hundo.Solver.move = function(board, dir) {
+    board.setDir(dir);
+    board.step();
+
+    while (!board.done && !board.solved && !board.atRest) {
+        result = board.step();        
+    }
+}
+
 hundo.Solver.solve = function(board) {
     // TODO, lulz
 }
