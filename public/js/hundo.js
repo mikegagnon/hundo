@@ -991,6 +991,8 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
         return new hundo.Block(this.idGen.next(), row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
         return new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ICE) {
+        return new hundo.Ice(this.idGen.next(), row, col);
     } else {
         console.error("Unrecognized piece type")
     }
@@ -1121,6 +1123,12 @@ hundo.Viz.prototype.addPalette = function() {
                 dir: hundo.DirectionEnum.RIGHT
             }
         },
+        {
+            image: "ice",
+            config: {
+                type: hundo.PieceTypeEnum.ICE
+            }
+        }
 
     ]
 
