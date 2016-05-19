@@ -704,9 +704,8 @@ hundo.Solver.prototype.explore = function(board) {
 
     // if out of bounds or solved
     if (board.ball.row < 0 || board.ball.row >= board.numRows ||
-        board.ball.col < 0 || board.ball.col >= board.numCols) {
-        return [];
-    } else if (board.solved) {
+        board.ball.col < 0 || board.ball.col >= board.numCols ||
+        board.solved) {
         return [];
     }
 
@@ -718,7 +717,7 @@ hundo.Solver.prototype.explore = function(board) {
 
     var THIS = this;
 
-    var winningEdges = []
+    var winningEdges = [];
 
     _.each(boards, function(newBoard) {
 
