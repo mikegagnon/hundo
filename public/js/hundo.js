@@ -110,8 +110,9 @@ hundo.Ice = function(id, row, col) {
 }
 
 // TODO: implement
-hundo.Ice.prototype.nudge = function(dir) {
-    return false;
+hundo.Ice.prototype.nudge = function(dir, board) {
+    
+    return false; // hundo.Board.prototype.nudge
 }
 
 /**
@@ -415,8 +416,10 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
 
     var result = true;
 
+    var THIS = this;
+
     _.each(pieces, function(piece) {
-        result &= piece.nudge(dir);
+        result &= piece.nudge(dir, THIS);
     });
 
     return result;
@@ -434,6 +437,26 @@ hundo.Board.prototype.checkSolved = function() {
     return result.length == 1;
 }
 
+hundo.Board.drdc = function(direction) {
+
+    var dr = 0, dc = 0;
+
+    if (direction == hundo.DirectionEnum.UP) {
+        dr = -1;
+    } else if (direction == hundo.DirectionEnum.DOWN) {
+        dr = 1;
+    } else if (direction == hundo.DirectionEnum.LEFT) {
+        dc = -1;
+    } else if (direction == hundo.DirectionEnum.RIGHT) {
+        dc = 1;
+    } else {
+        console.error("Bad direction: " + direction);
+        return null;
+    }
+
+    return [dr, dc];
+}
+
 // returns null on fatal error
 // else, returns an animation object, which describes how the
 // the step should be animated
@@ -446,19 +469,7 @@ hundo.Board.prototype.step = function() {
         return null;
     }
     
-    var dr = 0, dc = 0;
-    if (direction == hundo.DirectionEnum.UP) {
-        dr = -1;
-    } else if (direction == hundo.DirectionEnum.DOWN) {
-        dr = 1;
-    } else if (direction == hundo.DirectionEnum.LEFT) {
-        dc = -1;
-    } else if (direction == hundo.DirectionEnum.RIGHT) {
-        dc = 1;
-    } else {
-        console.error("Ball must have a direction to step");
-        return null;
-    }
+    var [dr, dc] = hundo.Board.drdc(direction);
 
     var newRow = this.ball.row + dr;
     var newCol = this.ball.col + dc;
