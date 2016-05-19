@@ -112,7 +112,12 @@ hundo.Ice = function(id, row, col) {
 // TODO: implement
 hundo.Ice.prototype.nudge = function(dir, board) {
     
-    return false; // hundo.Board.prototype.nudge
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    var row = this.row + dr;
+    var col = this.col + dc;
+     
+    return board.nudge(row, col, dir);
 }
 
 /**
