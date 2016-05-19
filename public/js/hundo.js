@@ -650,9 +650,6 @@ hundo.Solver = function(board) {
 hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
     var matches = _.flatMap(this.boards, function(board2) {
-        //console.log("has explored boards")
-        //console.log(board1.getJson());
-        //console.log(board2.getJson());
         if (board1.equals(board2)) {
             return [true];
         } else {
@@ -743,17 +740,6 @@ hundo.Solver.prototype.explore = function(board) {
                 var w = THIS.explore(newBoard) 
 
                 winningEdges = _.concat(winningEdges, w)
-
-                console.log("Winning edges");
-                console.log(winningEdges);
-
-
-                if (newBoard.solved) {
-                    console.log("Balls")
-                    console.log(newBoard.getBalls())
-                    console.log("Goals")
-                    console.log(newBoard.getGoals())
-                }
 
                 if (w.length > 0 || newBoard.solved) {
                     winningEdges.push(edge);
