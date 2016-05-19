@@ -489,10 +489,7 @@ hundo.Solver = function(board) {
 
     this.vertices = [];
 
-    // maybe store whether or not edges are winners in here?
     this.edges = [];
-
-    // TODO: guard against absent ball
 
     if (typeof board.ball == "undefined" ||
         typeof board.ball.row == "undefined" ||
@@ -500,7 +497,7 @@ hundo.Solver = function(board) {
         return;
     }
 
-    this.explore(board);
+    this.winningEdges = this.explore(board);
 }
 
 hundo.Solver.prototype.hasExploredVertex = function(vertex1) {
@@ -564,9 +561,9 @@ hundo.Solver.prototype.explore = function(board) {
     // if out of bounds or solved
     if (board.ball.row < 0 || board.ball.row >= board.numRows ||
         board.ball.col < 0 || board.ball.col >= board.numCols) {
-        return;
+        return [];
     } else if (board.solved) {
-        return;
+        return [];
     }
 
     var boards = [];
@@ -576,6 +573,8 @@ hundo.Solver.prototype.explore = function(board) {
     boards[3] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
 
     var THIS = this;
+
+    var winningEdges = []
 
     _.each(boards, function(newBoard) {
 
@@ -594,11 +593,18 @@ hundo.Solver.prototype.explore = function(board) {
         if (!THIS.hasExploredEdge(edge)) { 
             if (!THIS.hasExploredVertex(vertex)) {
                 THIS.edges.push(edge);
-                THIS.explore(newBoard);
+                var w = THIS.explore(newBoard) 
+                
+                winningEdges = _.concat(winningEdges, w)
+                
+                if (w.length > 0 || newBoard.solved) {
+                    winningEdges.push(edge);
+                }
             }            
         }
     });
 
+    return winningEdges;
 }
 
 
@@ -1208,13 +1214,11 @@ hundo.Viz.prototype.removeSolution = function() {
 
 }
 
-hundo.Viz.prototype.drawSolution = function() {
-    var solver = new hundo.Solver(this.board);
-
+hundo.Viz.prototype.drawEdges = function(edges, style) {
     var THIS = this;
-
+    
     this.boardSvg.selectAll()
-        .data(solver.edges)
+        .data(edges)
         .enter()
         .append("line")
         .attr("class", "solution")
@@ -1234,7 +1238,18 @@ hundo.Viz.prototype.drawSolution = function() {
             return edge.row2 * THIS.vizConfig.cellSize +
                 THIS.vizConfig.cellSize / 2;
         })
-        .attr("style", "stroke:#FFF;stroke-width:1;opacity:0.4");
+        .attr("style", style);
+}
+
+hundo.Viz.prototype.drawSolution = function() {
+    var solver = new hundo.Solver(this.board);
+
+
+    this.drawEdges(solver.edges,
+        "stroke:#FFF;stroke-width:1;opacity:0.4");
+    this.drawEdges(solver.winningEdges,
+        "stroke:#B00000;stroke-width:4;opacity:1.0");
+
 }
 
 
