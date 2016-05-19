@@ -2157,6 +2157,15 @@ hundo.Compress.compressLevel = function(level) {
         levelArray.push(hundo.Compress.dirToNum(goal.dir))
     });
 
+    // separator
+    levelArray.push(hundo.Compress.sep);
+
+    // Encode the ice
+    _.each(level.ice, function(ice){
+        levelArray.push(hundo.Compress.toBase64Digit(ice.row));
+        levelArray.push(hundo.Compress.toBase64Digit(ice.col));
+    });
+
     return _.join(levelArray, "");
 }
 
@@ -2177,7 +2186,8 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     var level = {
         blocks: [],
-        goals: []
+        goals: [],
+        ice: []
     };
 
     var bytes = _.split(byteString, "")
@@ -2235,6 +2245,24 @@ hundo.Compress.decompressLevel = function(byteString) {
             dir: dir
         }
         level.goals.push(goal);
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        ice = {
+            row: r,
+            col: c
+        }
+        level.ice.push(ice);
     }
 
     return level;
