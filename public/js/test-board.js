@@ -15,19 +15,19 @@ function equalsTypeRowCol(a, b) {
         a.col == b.col;
 }
 
-/*hundo.Block.prototype.equals = function(piece) {
+hundo.Block.prototype.eq = function(piece) {
     return equalsTypeRowCol(this, piece);
 }
 
-hundo.Ball.prototype.equals = function(piece) {
+hundo.Ball.prototype.eq = function(piece) {
     return equalsTypeRowCol(this, piece) &&
         this.dir == piece.dir;
 }
 
-hundo.Goal.prototype.equals = function(piece) {
+hundo.Goal.prototype.eq = function(piece) {
     return equalsTypeRowCol(this, piece) &&
         this.dir == piece.dir;
-}*/
+}
 
 /**
  * Board configs
@@ -99,10 +99,10 @@ var board = new hundo.Board(config1, idGen);
 var NODIR = hundo.DirectionEnum.NODIR;
 assertEquals(1, board.numRows, 5);
 assertEquals(2, board.numCols, 10);
-assert(3, board.matrix[2][1][0].equals(new hundo.Block(0, 2, 1, NODIR)));
-assert(4, board.matrix[2][2][0].equals(new hundo.Block(1, 2, 2, NODIR)));
-assert(5, board.matrix[2][3][0].equals(new hundo.Ball(2, 2, 3, NODIR)));
-assert(6, board.matrix[1][7][0].equals(
+assert(3, board.matrix[2][1][0].eq(new hundo.Block(0, 2, 1, NODIR)));
+assert(4, board.matrix[2][2][0].eq(new hundo.Block(1, 2, 2, NODIR)));
+assert(5, board.matrix[2][3][0].eq(new hundo.Ball(2, 2, 3, NODIR)));
+assert(6, board.matrix[1][7][0].eq(
     new hundo.Goal(3, 1, 7, hundo.DirectionEnum.UP)));
 
 /**
@@ -114,7 +114,7 @@ var board = new hundo.Board(config1, idGen);
 
 var blocks = board.getBlocks();
 assertEquals(1, blocks.length, 2);
-assert(2, blocks[0].equals(new hundo.Block(0, 2,1)));
+assert(2, blocks[0].eq(new hundo.Block(0, 2,1)));
 
 /**
  * Test Board.getBalls
@@ -138,10 +138,10 @@ var ball = board.ball;
 
 board.movePiece(ball, 2, 4);
 
-assert(1, ball.equals(new hundo.Ball(2, 2, 4, NODIR)));
+assert(1, ball.eq(new hundo.Ball(2, 2, 4, NODIR)));
 assertEquals(2, board.matrix[2][3].length, 0);
 assert(3, board.matrix[2][4].length, 1);
-assert(4, board.matrix[2][4][0].equals(new hundo.Ball(2, 2, 4, NODIR)));
+assert(4, board.matrix[2][4][0].eq(new hundo.Ball(2, 2, 4, NODIR)));
 
 TEST = "Board.movePiece out of bounds"
 
@@ -151,19 +151,19 @@ var ball = board.ball;
 
 board.movePiece(ball, -1, 4);
 
-assert(1, ball.equals(new hundo.Ball(2, -1, 4, NODIR)));
+assert(1, ball.eq(new hundo.Ball(2, -1, 4, NODIR)));
 assertEquals(2, board.matrix[2][3].length, 0);
 assert(3, board.oob.length, 1);
-assert(4, board.oob[0].equals(new hundo.Ball(2, -1, 4, NODIR)));
+assert(4, board.oob[0].eq(new hundo.Ball(2, -1, 4, NODIR)));
 
 TEST = "Board.movePiece out of bounds to in bounds"
 
 board.movePiece(ball, 4, 4);
 
-assert(1, ball.equals(new hundo.Ball(2, 4, 4, NODIR)));
+assert(1, ball.eq(new hundo.Ball(2, 4, 4, NODIR)));
 assertEquals(2, board.oob.length, 0);
 assert(3, board.matrix[4][4].length, 1);
-assert(4, board.matrix[4][4][0].equals(new hundo.Ball(2, 4, 4, NODIR)));
+assert(4, board.matrix[4][4][0].eq(new hundo.Ball(2, 4, 4, NODIR)));
 
 
 /**
@@ -184,7 +184,7 @@ var board = new hundo.Board(config1, idGen);
 board.setDir(hundo.DirectionEnum.UP);
 board.movePiece(board.ball, -1, 3);
 board.ball.dir = hundo.DirectionEnum.NODIR;
-assert(1, board.oob[0].equals(
+assert(1, board.oob[0].eq(
     new hundo.Ball(2, -1, 3, hundo.DirectionEnum.NODIR)));
 
 board.reset();
@@ -197,11 +197,11 @@ var board = new hundo.Board(config1, idGen);
 board.setDir(hundo.DirectionEnum.UP);
 board.movePiece(board.ball, -1, 3);
 board.ball.dir = hundo.DirectionEnum.NODIR;
-assert(1, board.oob[0].equals(
+assert(1, board.oob[0].eq(
     new hundo.Ball(2, -1, 3, hundo.DirectionEnum.NODIR)));
 
 board.movePiece(board.matrix[2][2][0], -1, -1);
-assert(2, board.oob[1].equals(
+assert(2, board.oob[1].eq(
     new hundo.Block(1, -1, -1)));
 board.reset();
 
@@ -216,17 +216,17 @@ TEST = "Board.reset in bounds and out of bounds"
 var board = new hundo.Board(config1, idGen);
 
 board.movePiece(board.matrix[2][2][0], -1, -1);
-assert(1, board.oob[0].equals(
+assert(1, board.oob[0].eq(
     new hundo.Block(1, -1, -1)));
 
 board.movePiece(board.ball, 0, 0);
-assert(2, board.matrix[0][0][0].equals(
+assert(2, board.matrix[0][0][0].eq(
     new hundo.Ball(2, 0, 0, hundo.DirectionEnum.NODIR)));
 
 board.reset();
-assert(3, board.matrix[2][2][0].equals(
+assert(3, board.matrix[2][2][0].eq(
     new hundo.Block(1, 2, 2)));
-assert(4, board.matrix[2][3][0].equals(
+assert(4, board.matrix[2][3][0].eq(
     new hundo.Ball(2, 2, 3, hundo.DirectionEnum.NODIR)));
 
 
@@ -244,8 +244,8 @@ board.ball.dir = hundo.DirectionEnum.UP;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 1, 3, hundo.DirectionEnum.UP);
-assert(1, board.matrix[1][3][0].equals(expectedBall));
-assert(2, board.ball.equals(expectedBall));
+assert(1, board.matrix[1][3][0].eq(expectedBall));
+assert(2, board.ball.eq(expectedBall));
 assertEquals(3, result[0].move.dir, hundo.DirectionEnum.UP);
 
 // DOWN
@@ -255,8 +255,8 @@ board.ball.dir = hundo.DirectionEnum.DOWN;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 3, 3, hundo.DirectionEnum.DOWN);
-assert(4, board.matrix[3][3][0].equals(expectedBall));
-assert(5, board.ball.equals(expectedBall));
+assert(4, board.matrix[3][3][0].eq(expectedBall));
+assert(5, board.ball.eq(expectedBall));
 assertEquals(6, result[0].move.dir, hundo.DirectionEnum.DOWN);
 
 // LEFT collide
@@ -266,10 +266,10 @@ board.ball.dir = hundo.DirectionEnum.LEFT;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 2, 3, hundo.DirectionEnum.NODIR);
-assert(7, board.matrix[2][3][0].equals(expectedBall));
-assert(8, board.ball.equals(expectedBall));
+assert(7, board.matrix[2][3][0].eq(expectedBall));
+assert(8, board.ball.eq(expectedBall));
 assertEquals(9, result[0].collide.dir, hundo.DirectionEnum.LEFT);
-assert(10, result[0].collide.recipients[0].equals(
+assert(10, result[0].collide.recipients[0].eq(
     new hundo.Block(1, 2, 2)));
 
 // RIGHT
@@ -279,8 +279,8 @@ board.ball.dir = hundo.DirectionEnum.RIGHT;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 2, 4, hundo.DirectionEnum.RIGHT);
-assert(11, board.matrix[2][4][0].equals(expectedBall));
-assert(12, board.ball.equals(expectedBall));
+assert(11, board.matrix[2][4][0].eq(expectedBall));
+assert(12, board.ball.eq(expectedBall));
 assertEquals(13, result[0].move.dir, hundo.DirectionEnum.RIGHT);
 
 /**
