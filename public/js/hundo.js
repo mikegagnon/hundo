@@ -13,7 +13,7 @@ hundo.PieceTypeEnum = {
     BALL: "BALL",
     BLOCK: "BLOCK",
     GOAL: "GOAL",
-    ICECUBE: "ICECUBE"
+    ICE: "ICE"
 }
 
 hundo.DirectionEnum = {
@@ -100,9 +100,9 @@ hundo.Goal.prototype.nudge = function(dir) {
  * Ice cube board pieces
  ******************************************************************************/
 
-hundo.Icecube = function(id, row, col) {
+hundo.Ice = function(id, row, col) {
     this.id = id;
-    this.type = hundo.PieceTypeEnum.ICECUBE;
+    this.type = hundo.PieceTypeEnum.ICE;
     this.row = row;
     this.col = col;
     this.origRow = row;
@@ -110,7 +110,7 @@ hundo.Icecube = function(id, row, col) {
 }
 
 // TODO: implement
-hundo.Icecube.prototype.nudge = function(dir) {
+hundo.Ice.prototype.nudge = function(dir) {
     return false;
 }
 
@@ -187,12 +187,12 @@ hundo.Board = function(boardConfig, idGen) {
         THIS.addPiece(piece);
     });
 
-    // Add icecubes to the matrix
-    _.each(boardConfig.icecubes, function(goal) {
+    // Add ice to the matrix
+    _.each(boardConfig.ice, function(goal) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
-        var piece = new hundo.Icecube(idGen.next(), row, col);
+        var piece = new hundo.Ice(idGen.next(), row, col);
         THIS.addPiece(piece);
     });
 }
@@ -226,7 +226,7 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     if (piece.type == hundo.PieceTypeEnum.BLOCK ||
         piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.GOAL ||
-        piece.type == hundo.PieceTypeEnum.ICECUBE) {
+        piece.type == hundo.PieceTypeEnum.ICE) {
         return this.matrix[piece.row][piece.col].length == 0;
     } else {
         console.error("Unimplemented addPiece for " + piece);
@@ -315,9 +315,9 @@ hundo.Board.prototype.getGoals = function() {
     });
 };
 
-hundo.Board.prototype.getIcecubes = function() {
+hundo.Board.prototype.getIce = function() {
     return this.getPieces(function(piece){
-        return piece.type == hundo.PieceTypeEnum.ICECUBE;
+        return piece.type == hundo.PieceTypeEnum.ICE;
     });
 };
 
@@ -339,10 +339,10 @@ hundo.Board.prototype.getJson = function() {
                     dir: goal.dir
                 }
             }),
-        icecubes: _.map(this.getIcecubes(), function(icecube) {
+        ice: _.map(this.getIce(), function(ice) {
                 return {
-                    row: icecube.row,
-                    col: icecube.col
+                    row: ice.row,
+                    col: ice.col
                 }
         })
     }
@@ -527,7 +527,7 @@ hundo.Board.prototype.clone = function() {
 
 hundo.Solver = function(board) {
 
-    this.vertices = [];
+    this.vertice = [];
 
     this.edges = [];
 
@@ -544,7 +544,7 @@ hundo.Solver = function(board) {
 
 hundo.Solver.prototype.hasExploredVertex = function(vertex1) {
 
-    var matches = _.flatMap(this.vertices, function(vertex2) {
+    var matches = _.flatMap(this.vertice, function(vertex2) {
         if (vertex1.row == vertex2.row && vertex1.col == vertex2.col) {
             return [true];
         } else {
@@ -595,7 +595,7 @@ hundo.Solver.move = function(board, dir) {
 
 hundo.Solver.prototype.explore = function(board) {
 
-    this.vertices.push({
+    this.vertice.push({
         row: board.ball.row,
         col: board.ball.col
     })
@@ -1235,7 +1235,7 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
 
     if (piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.BLOCK ||
-        piece.type == hundo.PieceTypeEnum.ICECUBE) {
+        piece.type == hundo.PieceTypeEnum.ICE) {
         return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = this.vizConfig.cellSize / 2;
@@ -1340,7 +1340,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
 
     this.boardSvg.selectAll()
-        .data(this.board.getIcecubes())
+        .data(this.board.getIce())
         .enter()
         .append("ellipse")
         .attr("cx", this.vizConfig.cellSize / 2)
@@ -1348,7 +1348,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("rx", this.vizConfig.cellSize / 2)
         .attr("ry", this.vizConfig.cellSize / 2)
         .attr("style", "fill:#00a")
-        .attr("class", "icecube")
+        .attr("class", "ice")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
