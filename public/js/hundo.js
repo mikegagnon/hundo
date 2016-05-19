@@ -495,10 +495,18 @@ hundo.Solver.move = function(board, dir) {
     while (!board.done && !board.solved && !board.atRest) {
         result = board.step();        
     }
+
+    return board;
 }
 
 hundo.Solver.solve = function(board) {
     // TODO, lulz
+
+    var boardUp = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
+    var boardDown = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
+    var boardLeft = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
+    var boardRight = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
+
 }
 
 
