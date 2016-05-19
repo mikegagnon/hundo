@@ -1393,15 +1393,19 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
+    var iceMargin = Math.floor(this.vizConfig.cellSize / 6);
+
     this.boardSvg.selectAll()
         .data(this.board.getIce())
         .enter()
         .append("rect")
-        .attr("x", this.vizConfig.cellSize / 2)
-        .attr("cy", this.vizConfig.cellSize / 2)
-        .attr("rx", this.vizConfig.cellSize / 2)
-        .attr("ry", this.vizConfig.cellSize / 2)
-        .attr("style", "fill:#00a")
+        .attr("x", iceMargin)
+        .attr("y", iceMargin)
+        .attr("width", this.vizConfig.cellSize - iceMargin * 2)
+        .attr("height", this.vizConfig.cellSize - iceMargin * 2)
+        .attr("rx", iceMargin)
+        .attr("ry", iceMargin)
+        .attr("style", "fill:#63ADD2")
         .attr("class", "ice")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
@@ -1489,15 +1493,29 @@ hundo.Viz.prototype.reset = function() {
 
     _.each(pieces, function(piece, i){
         var piece = pieces[i];
-        THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
-            .transition()
-            .ease("linear")
-            .attr("rx", THIS.vizConfig.cellSize / 2)
-            .attr("ry", THIS.vizConfig.cellSize / 2)
-            .attr("transform", function() {
-                return THIS.transform(piece);
-            })
-            .duration(0);
+
+        if (piece.type == hundo.PieceTypeEnum.BALL) {
+            THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
+                .transition()
+                .ease("linear")
+
+                // undo the ball squish
+                .attr("rx", THIS.vizConfig.cellSize / 2)
+                .attr("ry", THIS.vizConfig.cellSize / 2)
+
+                .attr("transform", function() {
+                    return THIS.transform(piece);
+                })
+                .duration(0);
+        } else {
+            THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
+                .transition()
+                .ease("linear")
+                .attr("transform", function() {
+                    return THIS.transform(piece);
+                })
+                .duration(0);
+        }
     });
 
 }
@@ -1764,14 +1782,15 @@ hundo.Viz.prototype.animateIce = function(animation) {
 
     ice = animation.move.ice;
     iceId = "#" + hundo.Viz.pieceId(ice);
-
-    var [dx, dy] = hundo.Viz.dxdy(animation.move.dir);
     
     var THIS = this;
 
     this.boardSvg.select(iceId)
         .transition()
         .ease("linear")
+        //.attr("rx", 5)
+        //.attr("ry", 5)
+        // TODO: decomment
         .attr("transform", function() {
             return THIS.transform(ice);
         })
@@ -1788,21 +1807,42 @@ hundo.Viz.prototype.animateCollide = function(animation) {
     for (var i = 0; i < recipients.length; i++) {
         var piece = recipients[i];
         var id = "#" + hundo.Viz.pieceId(piece);
-        this.boardSvg.select(id)
-            .transition()
-            .ease("linear")
-            .attr("rx", this.vizConfig.cellSize / 2)
-            .attr("ry", this.vizConfig.cellSize / 2)
-            .attr("transform", function() {
 
-                var [dx, dy] = hundo.Viz.dxdy(dir);
+        if (piece.type == hundo.PieceTypeEnum.BALL) {
+            this.boardSvg.select(id)
+                .transition()
+                .ease("linear")
+                // undo the ball squish
+                .attr("rx", this.vizConfig.cellSize / 2)
+                .attr("ry", this.vizConfig.cellSize / 2)
 
-                dx *= THIS.vizConfig.cellSize / 3;
-                dy *= THIS.vizConfig.cellSize / 3;
+                .attr("transform", function() {
 
-                return THIS.transform(piece, {dx: dx, dy: dy});
-            })
-            .duration(this.vizConfig.stepDuration / 2);
+                    var [dx, dy] = hundo.Viz.dxdy(dir);
+
+                    dx *= THIS.vizConfig.cellSize / 3;
+                    dy *= THIS.vizConfig.cellSize / 3;
+
+                    return THIS.transform(piece, {dx: dx, dy: dy});
+                })
+                .duration(this.vizConfig.stepDuration / 2);
+        } else {
+
+            this.boardSvg.select(id)
+                .transition()
+                .ease("linear")
+                .attr("transform", function() {
+
+                    var [dx, dy] = hundo.Viz.dxdy(dir);
+
+                    dx *= THIS.vizConfig.cellSize / 3;
+                    dy *= THIS.vizConfig.cellSize / 3;
+
+                    return THIS.transform(piece, {dx: dx, dy: dy});
+                })
+                .duration(this.vizConfig.stepDuration / 2);
+
+        }
     }
 
     setTimeout(function(){
