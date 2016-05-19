@@ -485,7 +485,52 @@ hundo.Board.prototype.clone = function() {
  * Solver solves puzzles
  ******************************************************************************/
 
-hundo.Solver = {}
+hundo.Solver = function() {
+
+    this.vertices = [];
+
+    // maybe store whether or not edges are winners in here?
+    this.edges = [];
+}
+
+hundo.Solver.prototype.hasExploredVertex = function(vertex1) {
+
+    var matches = _.flatMap(this.vertices, function(vertex2) {
+        if (vertex1.row == vertex2.row && vertex1.col == vertex2.col) {
+            return [true];
+        } else {
+            return [];
+        }
+    })
+
+    if (matches.length == 0) {
+        return false;
+    } else if (matches.length == 1) {
+        return true;
+    } else {
+        console.error("multiple matches for has explored: " + matches);
+    }
+}
+
+hundo.Solver.prototype.hasExploredEdge = function(edge1) {
+
+    var matches = _.flatMap(this.edges, function(edge2) {
+        if (edge1.row1 == edge2.row1 && edge1.row2 == edge2.row2 &&
+            edge1.col1 == edge2.col1 && edge1.col2 == edge2.col2) {
+            return [true];
+        } else {
+            return [];
+        }
+    })
+
+    if (matches.length == 0) {
+        return false;
+    } else if (matches.length == 1) {
+        return true;
+    } else {
+        console.error("multiple matches for has explored: " + matches);
+    }
+}
 
 // push the ball in direction dir
 hundo.Solver.move = function(board, dir) {
@@ -499,13 +544,50 @@ hundo.Solver.move = function(board, dir) {
     return board;
 }
 
-hundo.Solver.solve = function(board) {
-    // TODO, lulz
+hundo.Solver.prototype.explore = function(board) {
 
-    var boardUp = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
-    var boardDown = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
-    var boardLeft = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
-    var boardRight = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
+    this.vertices.push({
+        row: board.ball.row,
+        col: board.ball.col
+    })
+
+    // if out of bounds or solved
+    if (board.ball.row < 0 || board.ball.row >= board.numRows ||
+        board.ball.col < 0 || board.ball.col >= board.numCols) {
+        return;
+    } else if (board.solved) {
+        return;
+    }
+
+    var boards = [];
+    boards[0] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
+    boards[1] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
+    boards[2] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
+    boards[3] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
+
+    var THIS = this;
+
+    _.each(boards, function(newBoard) {
+
+        var edge = {
+            row1: board.ball.row,
+            col1: board.ball.col,
+            row2: newBoard.ball.row,
+            col2: newBoard.ball.col
+        }
+
+        var vertex = {
+            row: newBoard.ball.row,
+            col: newBoard.ball.col
+        }
+
+        if (!THIS.hasExploredEdge(edge)) { 
+            if (!THIS.hasExploredVertex(vertex)) {
+                THIS.edges.push(edge);
+                THIS.explore(newBoard);
+            }            
+        }
+    });
 
 }
 
