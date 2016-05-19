@@ -493,6 +493,13 @@ hundo.Solver = function(board) {
     this.edges = [];
 
     // TODO: guard against absent ball
+
+    if (typeof board.ball == "undefined" ||
+        typeof board.ball.row == "undefined" ||
+        typeof board.ball.col == "undefined") {
+        return;
+    }
+
     this.explore(board);
 }
 
@@ -633,7 +640,8 @@ hundo.Viz = function(config) {
         on: config.maker,
         play: false,
         mouseRow: undefined,
-        mouseCol: undefined
+        mouseCol: undefined,
+        showSolution: false
     }
 
     var levelFromUrl = hundo.Viz.levelFromUrl();
@@ -681,6 +689,7 @@ hundo.Viz = function(config) {
 
     if (this.maker.on) {
         this.addSave();
+        this.addShowSolution();
         this.addPalette();
         this.addLevelUrlField();
     }
@@ -906,7 +915,6 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
     if (this.board.addPiece(piece)) {
         this.animateSolvedQuick();
         this.drawBoardQuick();
-        this.drawSolution();
         this.removeHighlight();
 
     } else {
@@ -1038,6 +1046,15 @@ hundo.Viz.prototype.addSave = function() {
      $("#" + this.consoleId()).append(saveButton);
 }
 
+hundo.Viz.prototype.addShowSolution = function() {
+    var contents = `<button id="${this.solutionButtonId()}" onclick="hundo.clickShowSolution(${this.id})" type="button"
+     class="button">Show solution</button>`
+
+    var solutionButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(solutionButton);
+}
+
 hundo.Viz.prototype.addLevelUrlField = function() {
     var contents = `<div>URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
     value=""></input></div>`
@@ -1065,6 +1082,10 @@ hundo.Viz.prototype.playButtonId = function() {
 
 hundo.Viz.prototype.saveButtonId = function() {
     return "saveButton" + this.id;
+}
+
+hundo.Viz.prototype.solutionButtonId = function() {
+    return "solutionButton" + this.id;
 }
 
 hundo.Viz.prototype.levelUrlFieldId = function() {
@@ -1181,6 +1202,11 @@ hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
 
+hundo.Viz.prototype.removeSolution = function() {
+
+    this.boardSvg.selectAll(".solution").remove();
+
+}
 
 hundo.Viz.prototype.drawSolution = function() {
     var solver = new hundo.Solver(this.board);
@@ -1191,7 +1217,7 @@ hundo.Viz.prototype.drawSolution = function() {
         .data(solver.edges)
         .enter()
         .append("line")
-        .attr("class", "grid")
+        .attr("class", "solution")
         .attr("x1", function(edge) {
             return edge.col1 * THIS.vizConfig.cellSize +
                 THIS.vizConfig.cellSize / 2;
@@ -1208,7 +1234,7 @@ hundo.Viz.prototype.drawSolution = function() {
             return edge.row2 * THIS.vizConfig.cellSize +
                 THIS.vizConfig.cellSize / 2;
         })
-        .attr("style", "stroke:#FFF;stroke-width:1;opacity:0.8");
+        .attr("style", "stroke:#FFF;stroke-width:1;opacity:0.4");
 }
 
 
@@ -1254,6 +1280,10 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
+
+    if (this.maker.showSolution) {
+        this.drawSolution();
+    }
 }
 
 hundo.Viz.prototype.drawBoardQuick = function() {
@@ -1388,6 +1418,8 @@ hundo.Viz.prototype.animateSolvedQuick = function() {
         var id = "#" + hundo.Viz.pieceId(piece);
         $(id).remove();
     })
+
+    this.removeSolution();
 }
 
 hundo.Viz.prototype.animateSolved = function() {
@@ -1422,6 +1454,8 @@ hundo.Viz.prototype.animateSolved = function() {
             .duration(THIS.vizConfig.flyInDuration)
             .remove();
     });
+
+    this.removeSolution();
 }
 
 hundo.Viz.prototype.prevLevel = function() {
@@ -1719,9 +1753,9 @@ hundo.Viz.prototype.clickPlay = function() {
     this.maker.play = !this.maker.play;
 
     if (this.maker.play) {
-        $("#" + this.playButtonId()).text("Edit")
+        $("#" + this.playButtonId()).text("Edit");
     } else {
-        $("#" + this.playButtonId()).text("Play")
+        $("#" + this.playButtonId()).text("Play");
     }
 
 }
@@ -1746,6 +1780,25 @@ hundo.Viz.prototype.clickSave = function() {
 hundo.clickSave = function(id) {
     hundo.vizz = hundo.instances[id];
     hundo.vizz.clickSave();
+}
+
+hundo.Viz.prototype.clickShowSolution = function() {
+    this.maker.showSolution = !this.maker.showSolution;
+    
+    if (this.maker.showSolution) {
+        $("#" + this.solutionButtonId()).text("Hide solution");
+    } else {
+        $("#" + this.solutionButtonId()).text("Show solution");
+    }
+
+    this.animateSolvedQuick();
+    this.drawBoardQuick();
+
+}
+
+hundo.clickShowSolution = function(id) {
+    hundo.vizz = hundo.instances[id];
+    hundo.vizz.clickShowSolution();
 }
 
 // TODO: bug, hundo.vizz is unsafe here because
