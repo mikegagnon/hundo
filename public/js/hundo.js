@@ -1759,8 +1759,24 @@ hundo.Viz.prototype.animateBall = function(animation) {
 
 }
 
+// TODO: move common code (in animateBall) into seperate function
 hundo.Viz.prototype.animateIce = function(animation) {
-    // TODO
+
+    ice = animation.move.ice;
+    iceId = "#" + hundo.Viz.pieceId(ice);
+
+    var [dx, dy] = hundo.Viz.dxdy(animation.move.dir);
+    
+    var THIS = this;
+
+    this.boardSvg.select(iceId)
+        .transition()
+        .ease("linear")
+        .attr("transform", function() {
+            return THIS.transform(ice);
+        })
+        .duration(this.vizConfig.stepDuration);
+
 }
 
 hundo.Viz.prototype.animateCollide = function(animation) {
