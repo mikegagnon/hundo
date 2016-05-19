@@ -40,7 +40,9 @@ hundo.Block = function(id, row, col) {
 
 // returns true iff the piece were pushed in direction dir
 hundo.Block.prototype.nudge = function(dir, board) {
-    return false;
+
+    // TODO: return collide animation?
+    return [false, []];
 }
 
 /**
@@ -64,11 +66,22 @@ hundo.Ball.prototype.nudge = function(dir, board) {
     var row = this.row + dr;
     var col = this.col + dc;
 
-    if (board.nudge(row, col, dir)) {
+    var [nudged, animations] = board.nudge(row, col, dir)
+
+    if (nudged) {
         board.movePiece(this, row, col);
-        return true;
+        animations.push(
+            {
+                "move": {
+                    "ball": this,
+                    "dir": dir,
+                    // TODO: solved
+                    //"solved": this.solved
+                }
+            });
+        return [true, animations];
     } else {
-        return false;
+        return [false, animations];
     }
 }
 
@@ -104,7 +117,7 @@ hundo.oppositeDir = function(dir) {
 // dir is the direction of the momentum of piece doing the nudging
 // returns true if this piece can accept the nudging piece
 hundo.Goal.prototype.nudge = function(dir, board) {
-    return this.dir == hundo.oppositeDir(dir);
+    return [this.dir == hundo.oppositeDir(dir), []];
 }
 
 /**
@@ -127,12 +140,21 @@ hundo.Ice.prototype.nudge = function(dir, board) {
 
     var row = this.row + dr;
     var col = this.col + dc;
-     
-    if (board.nudge(row, col, dir)) {
+
+    var [nudged, animations] = board.nudge(row, col, dir)
+
+    if (nudged) {
         board.movePiece(this, row, col);
-        return true;
+        animations.push(
+            {
+                "move": {
+                    "ice": this,
+                    "dir": dir
+                }
+            });
+        return [true, animations];
     } else {
-        return false;
+        return [false, animations];
     }
 }
 
@@ -436,14 +458,20 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
     var pieces = this.matrix[row][col];
 
     var result = true;
+    var animations = []
 
     var THIS = this;
 
+
+
     _.each(pieces, function(piece) {
-        result &= piece.nudge(dir, THIS);
+
+        var [nudged, newAnimations] =piece.nudge(dir, THIS);
+        animations = _.concat(animations, newAnimations);
+        result &= nudged
     });
 
-    return result;
+    return [result, animations];
 
 }
 
@@ -505,40 +533,35 @@ hundo.Board.prototype.step = function() {
 
         this.movePiece(this.ball, newRow, newCol);
 
-        return {
+        return [{
             "move": {
                 "ball": this.ball,
                 "dir": direction,
                 "solved": false
             },
-        };
+        }];
     }
 
-    if (this.nudge(this.ball.row, this.ball.col, this.ball.dir)) {
+    var [nudged, animations] = this.nudge(this.ball.row, this.ball.col, this.ball.dir)
+
+    if (nudged) {
         if (this.checkSolved()) {
             this.solved = true;
             this.atRest = true;
             this.ball.dir = hundo.DirectionEnum.NODIR;
         }
-
-        return {
-            "move": {
-                "ball": this.ball,
-                "dir": direction,
-                "solved": this.solved
-            }
-        }
+        return animations;
     } else {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
         var recipients = this.matrix[newRow][newCol].slice(0);
         recipients.push(this.ball);
-        return {
+        return [{
             "collide": {
                 "dir": direction,
                 "recipients": recipients
             }
-        };
+        }];
     } 
 }
 
@@ -1676,12 +1699,117 @@ hundo.Viz.prototype.updateLevelSelect = function() {
     }
 }
 
-// TODO: idGen member of Viz
+hundo.Viz.prototype.animateBall = function(animation) {
+
+    ball = animation.move.ball;
+    ballId = "#" + hundo.Viz.pieceId(ball);
+
+    var dx;
+    var dy;
+    if (ball.dir != hundo.DirectionEnum.NODIR) {
+        [dx, dy] = hundo.Viz.dxdy(ball.dir);
+    } else {
+        dx = 0;
+        dy = 0;
+    }
+
+    var THIS = this;
+
+
+    this.boardSvg.select(ballId)
+        .transition()
+        .ease("linear")
+        .attr("rx", function() {
+            if (dy != 0) {
+                return THIS.vizConfig.cellSize / 4;
+            } else {
+                return THIS.vizConfig.cellSize / 2;
+            }
+        })
+        .attr("ry", function() {
+            if (dx != 0) {
+                return THIS.vizConfig.cellSize / 4;
+            } else {
+                return THIS.vizConfig.cellSize / 2;
+            }
+        })
+        .attr("transform", function() {
+            return THIS.transform(ball);
+        })
+        .duration(this.vizConfig.stepDuration);
+
+    // leave a trail behind the ball
+    this.boardSvg.selectAll()
+        .data([{row: ball.row, col: ball.col}])
+        .enter()
+        .append("circle")
+        .attr("cx", ball.col * this.vizConfig.cellSize +
+                this.vizConfig.cellSize / 2
+        )
+        .attr("cy", ball.row * this.vizConfig.cellSize +
+                this.vizConfig.cellSize / 2
+        )
+        .attr("r", this.vizConfig.cellSize / 2 -
+                this.vizConfig.cellSize / 8)
+        .attr("style", "fill:#bbb")
+        .transition()
+        .duration(this.vizConfig.stepDuration * 4)
+        .attr("r", "0")
+        .remove();
+
+}
+
+hundo.Viz.prototype.animateIce = function(animation) {
+    // TODO
+}
+
+hundo.Viz.prototype.animateCollide = function(animation) {
+
+    var THIS = this;
+
+    var recipients = animation.collide.recipients;
+    var dir = animation.collide.dir;
+    for (var i = 0; i < recipients.length; i++) {
+        var piece = recipients[i];
+        var id = "#" + hundo.Viz.pieceId(piece);
+        this.boardSvg.select(id)
+            .transition()
+            .ease("linear")
+            .attr("rx", this.vizConfig.cellSize / 2)
+            .attr("ry", this.vizConfig.cellSize / 2)
+            .attr("transform", function() {
+
+                var [dx, dy] = hundo.Viz.dxdy(dir);
+
+                dx *= THIS.vizConfig.cellSize / 3;
+                dy *= THIS.vizConfig.cellSize / 3;
+
+                return THIS.transform(piece, {dx: dx, dy: dy});
+            })
+            .duration(this.vizConfig.stepDuration / 2);
+    }
+
+    setTimeout(function(){
+        for (var i = 0; i < recipients.length; i++) {
+            var piece = recipients[i];
+            var id = "#" + hundo.Viz.pieceId(piece);
+            THIS.boardSvg.select(id)
+                .transition()
+                .ease("linear")
+                .attr("transform", function() {
+                    return THIS.transform(piece);
+                })
+                .duration(THIS.vizConfig.stepDuration / 2);
+            }
+    }, this.vizConfig.stepDuration / 2);
+
+}
+
 hundo.Viz.prototype.stepAnimate = function() {
 
     var THIS = this;
 
-    var animate = this.board.step();
+    var animations = this.board.step();
 
     if (this.board.atRest) {
         clearInterval(this.animateInterval);
@@ -1693,98 +1821,17 @@ hundo.Viz.prototype.stepAnimate = function() {
             THIS.animateInterval);
     }
 
-    if ("move" in animate) {
-        ball = animate.move.ball;
-        ballId = "#" + hundo.Viz.pieceId(ball);
+    var THIS = this;
 
-        var dx;
-        var dy;
-        if (ball.dir != hundo.DirectionEnum.NODIR) {
-            [dx, dy] = hundo.Viz.dxdy(ball.dir);
-        } else {
-            dx = 0;
-            dy = 0;
+    _.each(animations, function(animation) {
+        if ("move" in animation && "ball" in animation.move) {
+            THIS.animateBall(animation);
+        } else if ("move" in animation && "ice" in animation.move) {
+            THIS.animateIce(animation);
+        } else if ("collide" in animation) {
+            THIS.animateCollide(animation);
         }
-
-        this.boardSvg.select(ballId)
-            .transition()
-            .ease("linear")
-            .attr("rx", function() {
-                if (dy != 0) {
-                    return THIS.vizConfig.cellSize / 4;
-                } else {
-                    return THIS.vizConfig.cellSize / 2;
-                }
-            })
-            .attr("ry", function() {
-                if (dx != 0) {
-                    return THIS.vizConfig.cellSize / 4;
-                } else {
-                    return THIS.vizConfig.cellSize / 2;
-                }
-            })
-            .attr("transform", function() {
-                return THIS.transform(ball);
-            })
-            .duration(this.vizConfig.stepDuration);
-
-        // leave a trail behind the ball
-        this.boardSvg.selectAll()
-            .data([{row: ball.row, col: ball.col}])
-            .enter()
-            .append("circle")
-            .attr("cx", ball.col * this.vizConfig.cellSize +
-                    this.vizConfig.cellSize / 2
-            )
-            .attr("cy", ball.row * this.vizConfig.cellSize +
-                    this.vizConfig.cellSize / 2
-            )
-            .attr("r", this.vizConfig.cellSize / 2 -
-                    this.vizConfig.cellSize / 8)
-            .attr("style", "fill:#bbb")
-            .transition()
-            .duration(this.vizConfig.stepDuration * 4)
-            .attr("r", "0")
-            .remove();
-
-    } else if ("collide" in animate) {
-        var recipients = animate.collide.recipients;
-        var dir = animate.collide.dir;
-        for (var i = 0; i < recipients.length; i++) {
-            var piece = recipients[i];
-            var id = "#" + hundo.Viz.pieceId(piece);
-            this.boardSvg.select(id)
-                .transition()
-                .ease("linear")
-                .attr("rx", this.vizConfig.cellSize / 2)
-                .attr("ry", this.vizConfig.cellSize / 2)
-                .attr("transform", function() {
-
-                    var [dx, dy] = hundo.Viz.dxdy(dir);
-
-                    dx *= THIS.vizConfig.cellSize / 3;
-                    dy *= THIS.vizConfig.cellSize / 3;
-
-                    return THIS.transform(piece, {dx: dx, dy: dy});
-                })
-                .duration(this.vizConfig.stepDuration / 2);
-        }
-
-        setTimeout(function(){
-            for (var i = 0; i < recipients.length; i++) {
-                var piece = recipients[i];
-                var id = "#" + hundo.Viz.pieceId(piece);
-                THIS.boardSvg.select(id)
-                    .transition()
-                    .ease("linear")
-                    .attr("transform", function() {
-                        return THIS.transform(piece);
-                    })
-                    .duration(THIS.vizConfig.stepDuration / 2);
-                }
-        }, this.vizConfig.stepDuration / 2);
-    }
-
+    })
 
     if (this.board.solved) {
         if (this.maker.on) {

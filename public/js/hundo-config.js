@@ -74,6 +74,10 @@ var starter = {
         {
             row: 5,
             col: 10
+        },
+        {
+            row: 10,
+            col: 12
         }
     ],
     ball: {
