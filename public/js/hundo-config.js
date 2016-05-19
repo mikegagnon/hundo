@@ -68,7 +68,7 @@ var starter = {
     ],
     icecubes: [
         {
-            row: 4,
+            row: 6,
             col: 10
         }
     ],
