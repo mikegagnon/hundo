@@ -485,12 +485,15 @@ hundo.Board.prototype.clone = function() {
  * Solver solves puzzles
  ******************************************************************************/
 
-hundo.Solver = function() {
+hundo.Solver = function(board) {
 
     this.vertices = [];
 
     // maybe store whether or not edges are winners in here?
     this.edges = [];
+
+    // TODO: guard against absent ball
+    this.explore(board);
 }
 
 hundo.Solver.prototype.hasExploredVertex = function(vertex1) {
@@ -903,6 +906,7 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
     if (this.board.addPiece(piece)) {
         this.animateSolvedQuick();
         this.drawBoardQuick();
+        this.drawSolution();
         this.removeHighlight();
 
     } else {
@@ -1176,6 +1180,37 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
 hundo.getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
 }
+
+
+hundo.Viz.prototype.drawSolution = function() {
+    var solver = new hundo.Solver(this.board);
+
+    var THIS = this;
+
+    this.boardSvg.selectAll()
+        .data(solver.edges)
+        .enter()
+        .append("line")
+        .attr("class", "grid")
+        .attr("x1", function(edge) {
+            return edge.col1 * THIS.vizConfig.cellSize +
+                THIS.vizConfig.cellSize / 2;
+        })
+        .attr("y1", function(edge) {
+            return edge.row1 * THIS.vizConfig.cellSize +
+                THIS.vizConfig.cellSize / 2;
+        })
+        .attr("x2", function(edge) {
+            return edge.col2 * THIS.vizConfig.cellSize +
+                THIS.vizConfig.cellSize / 2;
+        })
+        .attr("y2", function(edge) {
+            return edge.row2 * THIS.vizConfig.cellSize +
+                THIS.vizConfig.cellSize / 2;
+        })
+        .attr("style", "stroke:#FFF;stroke-width:1;opacity:0.8");
+}
+
 
 hundo.Viz.prototype.drawPieces = function(transformation) {
 
