@@ -468,6 +468,11 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 // see hundo.nudge
 hundo.Board.prototype.nudge = function(row, col, dir) {
 
+    if (row < 0 || row >= this.numRows || col < 0 || col >= this.numCols) {
+        return [true, []];
+    }
+
+
     var pieces = this.matrix[row][col];
 
     var result = true;
