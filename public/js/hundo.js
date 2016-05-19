@@ -186,6 +186,15 @@ hundo.Board = function(boardConfig, idGen) {
         var piece = new hundo.Goal(idGen.next(), row, col, dir);
         THIS.addPiece(piece);
     });
+
+    // Add icecubes to the matrix
+    _.each(boardConfig.icecubes, function(goal) {
+        var row = goal.row;
+        var col = goal.col;
+        var dir = goal.dir;
+        var piece = new hundo.Icecube(idGen.next(), row, col);
+        THIS.addPiece(piece);
+    });
 }
 
 hundo.Board.prototype.isEmptyCell = function(row, col) {
@@ -216,12 +225,9 @@ hundo.Board.prototype.canAddPiece = function(piece) {
 
     if (piece.type == hundo.PieceTypeEnum.BLOCK ||
         piece.type == hundo.PieceTypeEnum.BALL ||
-        piece.type == hundo.PieceTypeEnum.GOAL) {
-        if (this.matrix[piece.row][piece.col].length == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        piece.type == hundo.PieceTypeEnum.GOAL ||
+        piece.type == hundo.PieceTypeEnum.ICECUBE) {
+        return this.matrix[piece.row][piece.col].length == 0;
     } else {
         console.error("Unimplemented addPiece for " + piece);
         return false;
@@ -309,6 +315,12 @@ hundo.Board.prototype.getGoals = function() {
     });
 };
 
+hundo.Board.prototype.getIcecubes = function() {
+    return this.getPieces(function(piece){
+        return piece.type == hundo.PieceTypeEnum.ICECUBE;
+    });
+};
+
 hundo.Board.prototype.getJson = function() {
 
     var j = {
@@ -327,6 +339,12 @@ hundo.Board.prototype.getJson = function() {
                     dir: goal.dir
                 }
             }),
+        icecubes: _.map(this.getIcecubes(), function(icecube) {
+                return {
+                    row: icecube.row,
+                    col: icecube.col
+                }
+        })
     }
 
     if (typeof this.ball != "undefined") {
@@ -1216,7 +1234,8 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
     }
 
     if (piece.type == hundo.PieceTypeEnum.BALL ||
-        piece.type == hundo.PieceTypeEnum.BLOCK) {
+        piece.type == hundo.PieceTypeEnum.BLOCK ||
+        piece.type == hundo.PieceTypeEnum.ICECUBE) {
         return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         var z = this.vizConfig.cellSize / 2;
@@ -1318,6 +1337,22 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("xlink:href", "#goalTemplate")
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getIcecubes())
+        .enter()
+        .append("ellipse")
+        .attr("cx", this.vizConfig.cellSize / 2)
+        .attr("cy", this.vizConfig.cellSize / 2)
+        .attr("rx", this.vizConfig.cellSize / 2)
+        .attr("ry", this.vizConfig.cellSize / 2)
+        .attr("style", "fill:#00a")
+        .attr("class", "icecube")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+
         });
 
     if (this.maker.showSolution) {

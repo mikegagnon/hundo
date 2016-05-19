@@ -66,6 +66,12 @@ var starter = {
         },
 
     ],
+    icecubes: [
+        {
+            row: 4,
+            col: 10
+        }
+    ],
     ball: {
         row: 7,
         col: 10
