@@ -438,7 +438,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
         piece.col < 0 || piece.col >= this.numCols) {
 
         i = hundo.arrayRemove(this.oob, function(p) {
-            return p.id = piece.id;
+            return p.id == piece.id;
         })
     } else {
         var pieces = this.matrix[piece.row][piece.col];
@@ -650,8 +650,9 @@ hundo.Solver = function(board) {
 hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
     var matches = _.flatMap(this.boards, function(board2) {
-        console.log(board1.getJson());
-        console.log(board2.getJson());
+        //console.log("has explored boards")
+        //console.log(board1.getJson());
+        //console.log(board2.getJson());
         if (board1.equals(board2)) {
             return [true];
         } else {
@@ -740,9 +741,13 @@ hundo.Solver.prototype.explore = function(board) {
             if (!THIS.hasExploredVertex(newBoard)) {
                 THIS.edges.push(edge);
                 var w = THIS.explore(newBoard) 
-                
+
                 winningEdges = _.concat(winningEdges, w)
-                
+
+                console.log("Winning edges");
+                console.log(winningEdges);
+
+
                 if (newBoard.solved) {
                     console.log("Balls")
                     console.log(newBoard.getBalls())
