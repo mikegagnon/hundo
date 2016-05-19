@@ -194,10 +194,10 @@ hundo.Board = function(boardConfig, idGen) {
     });
 
     // Add ice to the matrix
-    _.each(boardConfig.ice, function(goal) {
-        var row = goal.row;
-        var col = goal.col;
-        var dir = goal.dir;
+    _.each(boardConfig.ice, function(ice) {
+        var row = ice.row;
+        var col = ice.col;
+        var dir = ice.dir;
         var piece = new hundo.Ice(idGen.next(), row, col);
         THIS.addPiece(piece);
     });
