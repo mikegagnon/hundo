@@ -1,5 +1,6 @@
 /**
- * This is free and unencumbered software released into the public domain.
+ * Unless otherwise noted, the contents of this file are free and unencumbered
+ * software released into the public domain.
  * See UNLICENSE.txt
  */
 
@@ -140,7 +141,6 @@ hundo.Ice.prototype.nudge = function(dir, board) {
 
     _.each(board.matrix[this.row][this.col], function(piece) {
         if (piece.type == hundo.PieceTypeEnum.GOAL) {
-            console.log("nope");
             occupyGoal = true;
         }
     })
@@ -468,8 +468,6 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 // see hundo.nudge
 hundo.Board.prototype.nudge = function(row, col, dir) {
 
-    console.log("board.nudge(" + row + ", " + col + ", " + dir + ")")
-
     var pieces = this.matrix[row][col];
 
     var result = true;
@@ -484,10 +482,7 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
         if (!nudged) {
             result = false;
         }
-        //result &= nudged
     });
-
-    console.log("board.nudge got nudged == " + result)
 
     return [result, animations];
 
@@ -560,10 +555,8 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    console.log("Step calling nudge")
     var [nudged, animations] =
         this.nudge(this.ball.row, this.ball.col, this.ball.dir)
-    console.log("Step called nudged and got: " + nudged)
     if (nudged) {
         if (this.checkSolved()) {
             this.solved = true;
@@ -593,6 +586,38 @@ hundo.Board.prototype.clone = function() {
 }
 
 /**
+ * Code not released into the public domain
+ ******************************************************************************/
+
+// This function was written by annakata on stackoverflow.com
+// http://stackoverflow.com/questions/1068834/object-comparison-in-javascript
+// The code is licensed under the Creative Commons, Attribution-ShareAlike 3.0
+// Unported (CC BY-SA 3.0)
+
+Object.prototype.equals = function(x)
+{
+    for(p in this)
+    {
+        switch(typeof(this[p]))
+        {
+            case 'object':
+                if (!this[p].equals(x[p])) { return false }; break;
+            case 'function':
+                if (typeof(x[p])=='undefined' || (p != 'equals' && this[p].toString() != x[p].toString())) { return false; }; break;
+            default:
+                if (this[p] != x[p]) { return false; }
+        }
+    }
+
+    for(p in x)
+    {
+        if(typeof(this[p])=='undefined') {return false;}
+    }
+
+    return true;
+}
+
+/**
  * Solver solves puzzles
  ******************************************************************************/
 
@@ -601,11 +626,12 @@ hundo.Board.prototype.clone = function() {
 
 hundo.Solver = function(board) {
 
-    this.vertice = [];
-
     this.edges = [];
 
     this.winningEdges = [];
+
+    // vertices
+    this.boards = [];
 
     if (typeof board.ball == "undefined" ||
         typeof board.ball.row == "undefined" ||
@@ -616,10 +642,12 @@ hundo.Solver = function(board) {
     this.winningEdges = this.explore(board);
 }
 
-hundo.Solver.prototype.hasExploredVertex = function(vertex1) {
+hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
-    var matches = _.flatMap(this.vertice, function(vertex2) {
-        if (vertex1.row == vertex2.row && vertex1.col == vertex2.col) {
+    var matches = _.flatMap(this.boards, function(board2) {
+        console.log(board1.getJson());
+        console.log(board2.getJson());
+        if (board1.equals(board2)) {
             return [true];
         } else {
             return [];
@@ -669,10 +697,7 @@ hundo.Solver.move = function(board, dir) {
 
 hundo.Solver.prototype.explore = function(board) {
 
-    this.vertice.push({
-        row: board.ball.row,
-        col: board.ball.col
-    })
+    this.boards.push(board)
 
     // if out of bounds or solved
     if (board.ball.row < 0 || board.ball.row >= board.numRows ||
@@ -707,12 +732,19 @@ hundo.Solver.prototype.explore = function(board) {
         }
 
         if (!THIS.hasExploredEdge(edge)) { 
-            if (!THIS.hasExploredVertex(vertex)) {
+            if (!THIS.hasExploredVertex(newBoard)) {
                 THIS.edges.push(edge);
                 var w = THIS.explore(newBoard) 
                 
                 winningEdges = _.concat(winningEdges, w)
                 
+                if (newBoard.solved) {
+                    console.log("Balls")
+                    console.log(newBoard.getBalls())
+                    console.log("Goals")
+                    console.log(newBoard.getGoals())
+                }
+
                 if (w.length > 0 || newBoard.solved) {
                     winningEdges.push(edge);
                 }

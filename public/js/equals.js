@@ -1,5 +1,5 @@
 
-// This code was written by annakata on stackoverflow.com
+// This function was written by annakata on stackoverflow.com
 // http://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 // The code is licensed under the Creative Commons, Attribution-ShareAlike 3.0
 // Unported (CC BY-SA 3.0)

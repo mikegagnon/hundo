@@ -15,7 +15,7 @@ function equalsTypeRowCol(a, b) {
         a.col == b.col;
 }
 
-hundo.Block.prototype.equals = function(piece) {
+/*hundo.Block.prototype.equals = function(piece) {
     return equalsTypeRowCol(this, piece);
 }
 
@@ -27,7 +27,7 @@ hundo.Ball.prototype.equals = function(piece) {
 hundo.Goal.prototype.equals = function(piece) {
     return equalsTypeRowCol(this, piece) &&
         this.dir == piece.dir;
-}
+}*/
 
 /**
  * Board configs
