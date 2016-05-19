@@ -494,6 +494,8 @@ hundo.Solver = function(board) {
 
     this.edges = [];
 
+    this.winningEdges = [];
+
     if (typeof board.ball == "undefined" ||
         typeof board.ball.row == "undefined" ||
         typeof board.ball.col == "undefined") {
