@@ -70,6 +70,10 @@ var starter = {
         {
             row: 6,
             col: 10
+        },
+        {
+            row: 5,
+            col: 10
         }
     ],
     ball: {

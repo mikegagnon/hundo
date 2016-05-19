@@ -39,7 +39,7 @@ hundo.Block = function(id, row, col) {
 }
 
 // returns true iff the piece were pushed in direction dir
-hundo.Block.prototype.nudge = function(dir) {
+hundo.Block.prototype.nudge = function(dir, board) {
     return false;
 }
 
@@ -57,8 +57,19 @@ hundo.Ball = function(id, row, col, dir) {
     this.dir = dir;
 }
 
-hundo.Ball.prototype.nudge = function(dir) {
-    return false;
+hundo.Ball.prototype.nudge = function(dir, board) {
+
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    var row = this.row + dr;
+    var col = this.col + dc;
+
+    if (board.nudge(row, col, dir)) {
+        board.movePiece(this, row, col);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -92,7 +103,7 @@ hundo.oppositeDir = function(dir) {
 
 // dir is the direction of the momentum of piece doing the nudging
 // returns true if this piece can accept the nudging piece
-hundo.Goal.prototype.nudge = function(dir) {
+hundo.Goal.prototype.nudge = function(dir, board) {
     return this.dir == hundo.oppositeDir(dir);
 }
 
@@ -111,13 +122,18 @@ hundo.Ice = function(id, row, col) {
 
 // TODO: implement
 hundo.Ice.prototype.nudge = function(dir, board) {
-    
+ 
     var [dr, dc] = hundo.Board.drdc(dir);
 
     var row = this.row + dr;
     var col = this.col + dc;
      
-    return board.nudge(row, col, dir);
+    if (board.nudge(row, col, dir)) {
+        board.movePiece(this, row, col);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -498,8 +514,7 @@ hundo.Board.prototype.step = function() {
         };
     }
 
-    if (this.nudge(newRow, newCol, this.ball.dir)) {
-        this.movePiece(this.ball, newRow, newCol);
+    if (this.nudge(this.ball.row, this.ball.col, this.ball.dir)) {
         if (this.checkSolved()) {
             this.solved = true;
             this.atRest = true;
