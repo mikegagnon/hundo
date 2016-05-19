@@ -246,7 +246,7 @@ var result = board.step();
 var expectedBall = new hundo.Ball(2, 1, 3, hundo.DirectionEnum.UP);
 assert(1, board.matrix[1][3][0].equals(expectedBall));
 assert(2, board.ball.equals(expectedBall));
-assertEquals(3, result.move.dir, hundo.DirectionEnum.UP);
+assertEquals(3, result[0].move.dir, hundo.DirectionEnum.UP);
 
 // DOWN
 var board = new hundo.Board(config1, idGen);
@@ -257,7 +257,7 @@ var result = board.step();
 var expectedBall = new hundo.Ball(2, 3, 3, hundo.DirectionEnum.DOWN);
 assert(4, board.matrix[3][3][0].equals(expectedBall));
 assert(5, board.ball.equals(expectedBall));
-assertEquals(6, result.move.dir, hundo.DirectionEnum.DOWN);
+assertEquals(6, result[0].move.dir, hundo.DirectionEnum.DOWN);
 
 // LEFT collide
 var board = new hundo.Board(config1, idGen);
@@ -268,8 +268,8 @@ var result = board.step();
 var expectedBall = new hundo.Ball(2, 2, 3, hundo.DirectionEnum.NODIR);
 assert(7, board.matrix[2][3][0].equals(expectedBall));
 assert(8, board.ball.equals(expectedBall));
-assertEquals(9, result.collide.dir, hundo.DirectionEnum.LEFT);
-assert(10, result.collide.recipients[0].equals(
+assertEquals(9, result[0].collide.dir, hundo.DirectionEnum.LEFT);
+assert(10, result[0].collide.recipients[0].equals(
     new hundo.Block(1, 2, 2)));
 
 // RIGHT
@@ -281,7 +281,7 @@ var result = board.step();
 var expectedBall = new hundo.Ball(2, 2, 4, hundo.DirectionEnum.RIGHT);
 assert(11, board.matrix[2][4][0].equals(expectedBall));
 assert(12, board.ball.equals(expectedBall));
-assertEquals(13, result.move.dir, hundo.DirectionEnum.RIGHT);
+assertEquals(13, result[0].move.dir, hundo.DirectionEnum.RIGHT);
 
 /**
  * Board.step 
@@ -309,22 +309,22 @@ TEST = "Board.nudge"
 var board = new hundo.Board(config1, idGen);
 
 // nudging empty space
-assertEquals(1, true, board.nudge(0,0, hundo.DirectionEnum.UP));
-assertEquals(2, true, board.nudge(0,0, hundo.DirectionEnum.DOWN));
-assertEquals(3, true, board.nudge(0,0, hundo.DirectionEnum.LEFT));
-assertEquals(4, true, board.nudge(0,0, hundo.DirectionEnum.RIGHT));
+assertEquals(1, true, board.nudge(0,0, hundo.DirectionEnum.UP)[0]);
+assertEquals(2, true, board.nudge(0,0, hundo.DirectionEnum.DOWN)[0]);
+assertEquals(3, true, board.nudge(0,0, hundo.DirectionEnum.LEFT)[0]);
+assertEquals(4, true, board.nudge(0,0, hundo.DirectionEnum.RIGHT)[0]);
 
 // nudging a block
-assertEquals(5, false, board.nudge(2,1, hundo.DirectionEnum.UP));
-assertEquals(6, false, board.nudge(2,1, hundo.DirectionEnum.DOWN));
-assertEquals(7, false, board.nudge(2,1, hundo.DirectionEnum.LEFT));
-assertEquals(8, false, board.nudge(2,1, hundo.DirectionEnum.RIGHT));
+assertEquals(5, false, board.nudge(2,1, hundo.DirectionEnum.UP)[0]);
+assertEquals(6, false, board.nudge(2,1, hundo.DirectionEnum.DOWN)[0]);
+assertEquals(7, false, board.nudge(2,1, hundo.DirectionEnum.LEFT)[0]);
+assertEquals(8, false, board.nudge(2,1, hundo.DirectionEnum.RIGHT)[0]);
 
 // nudging a goal
-assertEquals(9, false, board.nudge(1,7, hundo.DirectionEnum.UP));
-assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN));
-assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT));
-assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT));
+assertEquals(9, false, board.nudge(1,7, hundo.DirectionEnum.UP)[0]);
+assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN)[0]);
+assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT)[0]);
+assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT)[0]);
 
 /**
  * Board.checkSolved
