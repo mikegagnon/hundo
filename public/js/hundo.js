@@ -5,6 +5,10 @@
 
 var hundo = {}
 
+/**
+ * Enums
+ ******************************************************************************/
+
 hundo.PieceTypeEnum = {
     BALL: "BALL",
     BLOCK: "BLOCK",
@@ -19,7 +23,11 @@ hundo.DirectionEnum = {
     NODIR: "NODIR"
 }
 
-// every piece has unique id
+/**
+ * Block board pieces
+ ******************************************************************************/
+
+// id is a uuid relative to board pieces
 hundo.Block = function(id, row, col) {
     this.id = id;
     this.type = hundo.PieceTypeEnum.BLOCK;
@@ -29,9 +37,14 @@ hundo.Block = function(id, row, col) {
     this.origCol = col;
 }
 
+// returns true iff the piece were pushed in direction dir
 hundo.Block.prototype.nudge = function(dir) {
     return false;
 }
+
+/**
+ * Ball board piece
+ ******************************************************************************/
 
 hundo.Ball = function(id, row, col, dir) {
     this.id = id;
@@ -46,6 +59,10 @@ hundo.Ball = function(id, row, col, dir) {
 hundo.Ball.prototype.nudge = function(dir) {
     return false;
 }
+
+/**
+ * Goal board pieces
+ ******************************************************************************/
 
 hundo.Goal = function(id, row, col, dir) {
     this.id = id;
@@ -78,15 +95,24 @@ hundo.Goal.prototype.nudge = function(dir) {
     return this.dir == hundo.oppositeDir(dir);
 }
 
+/**
+ * Generates uuids for board pieces
+ ******************************************************************************/
+
 hundo.IdGenerator = function() {
     this.nextId = 0;
 }
 
+// I'll be impressed if this ever overflows
 hundo.IdGenerator.prototype.next = function() {
     return this.nextId++;
 }
 
 hundo.idGenerator = new hundo.IdGenerator();
+
+/**
+ * Board encapsulates the model of the game (MVC style)
+ ******************************************************************************/
 
 // TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig, idGen) {
@@ -94,7 +120,7 @@ hundo.Board = function(boardConfig, idGen) {
     // is the ball at rest?
     this.atRest = true;
 
-    // is the board finished? namely, the ball has gone out
+    // is the board finished? namely, if the ball has gone out
     // of bounds or reached a goal
     this.done = false;
 
@@ -452,6 +478,10 @@ hundo.instances = {}
 
 hundo.vizz = null;
 
+/**
+ * The Hundo class is what clients use to create a Hundo game
+ ******************************************************************************/
+
 Hundo = function(config) {
 
     // clone hundo.defaultVizConfig so it doesn't get clobbered by extend
@@ -463,15 +493,19 @@ Hundo = function(config) {
 
     config.viz = $.extend(defaultVizConfig, config.viz);
 
-    this.viz = new hundo.Viz(config);
+    viz = new hundo.Viz(config);
 
-    hundo.instances[config.id] = this.viz;
+    hundo.instances[config.id] = viz;
 
     if (_.size(hundo.instances) == 1) {
-        hundo.vizz = this.viz;
+        hundo.vizz = viz;
     }
 
 }
+
+/**
+ * Viz encapsulates the view and the controller
+ ******************************************************************************/
 
 hundo.Viz = function(config) {
 
@@ -1597,6 +1631,10 @@ hundo.Viz.prototype.getBoardUrl = function() {
     url += "?level=" + encodeURIComponent(levelParam)
     return url;
 }
+
+/**
+ * Compress functions enable levels to be encoded in URLs
+ ******************************************************************************/
 
 hundo.Compress = {}
 
