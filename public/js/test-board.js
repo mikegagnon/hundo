@@ -339,3 +339,13 @@ board.movePiece(board.ball, 1, 7);
 
 assert(2, board.checkSolved());
 
+/**
+ * Board.clone
+ **************************************************/
+
+TEST = "Board.clone"
+
+var board1 = new hundo.Board(config1, idGen);
+var board2 = board1.clone();
+
+assert(1, board1.getJson().equals(board2.getJson()));

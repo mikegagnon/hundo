@@ -474,9 +474,23 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
-hundo.instances = {}
+// Deep copy the board
+hundo.Board.prototype.clone = function() {
+    var config = this.getJson();
+    return new hundo.Board(config, hundo.idGenerator);
 
-hundo.vizz = null;
+}
+
+/**
+ * Solver solves puzzles
+ ******************************************************************************/
+
+hundo.Solver = {}
+
+hundo.Solver.solve = function(board) {
+    // TODO, lulz
+}
+
 
 /**
  * The Hundo class is what clients use to create a Hundo game
@@ -1821,6 +1835,10 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     return level;
 }
+
+hundo.instances = {}
+
+hundo.vizz = null;
 
 hundo.defaultVizConfig = {
     cellSize: 26,
