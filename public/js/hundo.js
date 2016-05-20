@@ -817,7 +817,8 @@ hundo.Viz = function(config) {
         play: false,
         mouseRow: undefined,
         mouseCol: undefined,
-        showSolution: false
+        showSolution: false,
+        showGraph: false,
     }
 
     var levelFromUrl = hundo.Viz.levelFromUrl();
@@ -1423,9 +1424,11 @@ hundo.Viz.prototype.drawEdges = function(edges, style) {
 hundo.Viz.prototype.drawSolution = function() {
     var solver = new hundo.Solver(this.board);
 
+    if (this.maker.showGraph) {
+        this.drawEdges(solver.edges,
+            "stroke:#FFF;stroke-width:1;opacity:0.4");
+    }
 
-    this.drawEdges(solver.edges,
-        "stroke:#FFF;stroke-width:1;opacity:0.4");
     this.drawEdges(solver.winningEdges,
         "stroke:#B00000;stroke-width:4;opacity:1.0");
 
@@ -2074,7 +2077,8 @@ hundo.clickSave = function(id) {
 
 hundo.Viz.prototype.clickShowSolution = function() {
     this.maker.showSolution = !this.maker.showSolution;
-    
+    this.maker.showGraph = this.maker.showSolution;
+
     if (this.maker.showSolution) {
         $("#" + this.solutionButtonId()).text("Hide solution");
     } else {
@@ -2126,6 +2130,7 @@ hundo.Viz.prototype.getBoardUrl = function() {
 
 hundo.cheat = function() {
     hundo.vizz.maker.showSolution = !hundo.vizz.maker.showSolution;
+    hundo.vizz.maker.showGraph = false;
 
     if (hundo.vizz.maker.showSolution) {
         hundo.vizz.drawSolution();
