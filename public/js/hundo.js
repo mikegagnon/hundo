@@ -15,7 +15,8 @@ hundo.PieceTypeEnum = {
     BLOCK: "BLOCK",
     GOAL: "GOAL",
     ICE: "ICE",
-    ARROW: "ARROW"
+    ARROW: "ARROW",
+    GBLOCK: "GBLOCK"
 }
 
 hundo.DirectionEnum = {
@@ -198,6 +199,25 @@ hundo.Arrow.prototype.nudge = function(dir, board) {
 }
 
 /**
+ * Gblock board pieces
+ ******************************************************************************/
+
+hundo.Gblock = function(id, row, col, groupNum) {
+    this.id = id;
+    this.type = hundo.PieceTypeEnum.GBLOCK;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+    this.groupNum = groupNum;
+}
+
+// TODO: implement
+hundo.Gblock.prototype.nudge = function(dir, board, commit) {
+    return [false, []];
+}
+
+/**
  * Generates uuids for board pieces
  ******************************************************************************/
 
@@ -286,6 +306,15 @@ hundo.Board = function(boardConfig, idGen) {
         var piece = new hundo.Arrow(idGen.next(), row, col, dir);
         THIS.addPiece(piece);
     });
+
+    // Add gblocks to the matrix
+    _.each(boardConfig.glbocks, function(arrow) {
+        var row = arrow.row;
+        var col = arrow.col;
+        var groupNum = arrow.groupNum;
+        var piece = new hundo.Gblock(idGen.next(), row, col, groupNum);
+        THIS.addPiece(piece);
+    });
 }
 
 hundo.Board.prototype.isEmptyCell = function(row, col) {
@@ -326,6 +355,7 @@ hundo.Board.prototype.canAddPiece = function(piece) {
         return this.matrix[piece.row][piece.col].length == 0;
     }
 
+    // TOD: allow ICE to be added to arrow
     else if (piece.type == hundo.PieceTypeEnum.ICE) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
@@ -335,14 +365,23 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE));
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK)));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.ARROW) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL))));   
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK)));
+    }
+
+    else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
+        return this.matrix[piece.row][piece.col].length == 0 ||
+            (this.matrix[piece.row][piece.col].length == 1 &&
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW)));
     }
 
     else {
@@ -444,6 +483,12 @@ hundo.Board.prototype.getArrows = function() {
     });
 };
 
+hundo.Board.prototype.getGblocks = function() {
+    return this.getPieces(function(piece){
+        return piece.type == hundo.PieceTypeEnum.GBLOCK;
+    });
+};
+
 hundo.Board.prototype.getJson = function() {
 
     var j = {
@@ -474,7 +519,14 @@ hundo.Board.prototype.getJson = function() {
                     col: arrow.col,
                     dir: arrow.dir
                 }
-            })
+            }),
+        gblocks: _.map(this.getGblocks(), function(gblock) {
+                return {
+                    row: gblock.row,
+                    col: gblock.col,
+                    groupNum: glbock.groupNum
+                }
+            }),
     }
 
     if (typeof this.ball != "undefined") {
@@ -1134,6 +1186,8 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
         return new hundo.Ice(this.idGen.next(), row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ARROW) {
         return new hundo.Arrow(this.idGen.next(), row, col, this.paletteSelection.dir);
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GBLOCK) {
+        return new hundo.Arrow(this.idGen.next(), row, col, this.paletteSelection.groupNum);
     } else {
         console.error("Unrecognized piece type")
     }
@@ -1296,6 +1350,13 @@ hundo.Viz.prototype.addPalette = function() {
             config: {
                 type: hundo.PieceTypeEnum.ARROW,
                 dir: hundo.DirectionEnum.RIGHT
+            }
+        },
+        {
+            image: "gblock-0",
+            config: {
+                type: hundo.PieceTypeEnum.GBLOCK,
+                groupNum: 0
             }
         },
 
@@ -1466,7 +1527,8 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
 
     if (piece.type == hundo.PieceTypeEnum.BALL ||
         piece.type == hundo.PieceTypeEnum.BLOCK ||
-        piece.type == hundo.PieceTypeEnum.ICE) {
+        piece.type == hundo.PieceTypeEnum.ICE ||
+        piece.type == hundo.PieceTypeEnum.GBLOCK) {
         return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL ||
         piece.type == hundo.PieceTypeEnum.ARROW) {
@@ -1601,6 +1663,19 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("class", "arrow")
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", "#arrowTemplate")
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getGblocks())
+        .enter()
+        .append("svg:use")
+        .attr("class", "gblock")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", function (piece) {
+            return "#gblockTemplate-" + piece.groupNum;
+        })
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
@@ -1987,6 +2062,23 @@ hundo.Viz.prototype.animateIce = function(animation) {
 
 }
 
+hundo.Viz.prototype.animateGblock = function(animation) {
+
+    gblock = animation.move.glbock;
+    gblockId = "#" + hundo.Viz.pieceId(glbock);
+    
+    var THIS = this;
+
+    this.boardSvg.select(glbockId)
+        .transition()
+        .ease("linear")
+        .attr("transform", function() {
+            return THIS.transform(gblock);
+        })
+        .duration(this.vizConfig.stepDuration);
+
+}
+
 hundo.Viz.prototype.animateCollide = function(animation) {
 
     var THIS = this;
@@ -2073,6 +2165,8 @@ hundo.Viz.prototype.stepAnimate = function() {
             THIS.animateBall(animation);
         } else if ("move" in animation && "ice" in animation.move) {
             THIS.animateIce(animation);
+        } else if ("move" in animation && "gblock" in animation.move) {
+            THIS.animateGblock(animation);
         } else if ("collide" in animation) {
             THIS.animateCollide(animation);
         }
@@ -2370,6 +2464,16 @@ hundo.Compress.compressLevel = function(level) {
         levelArray.push(hundo.Compress.dirToNum(arrow.dir))
     });
 
+    // separator
+    levelArray.push(hundo.Compress.sep);
+
+    // Encode the gblocks
+    _.each(level.gblocks, function(gblock){
+        levelArray.push(hundo.Compress.toBase64Digit(gblock.row));
+        levelArray.push(hundo.Compress.toBase64Digit(gblock.col));
+        levelArray.push(hundo.Compress.toBase64Digit(gblock.groupNum));
+    });
+
     return _.join(levelArray, "");
 }
 
@@ -2393,7 +2497,8 @@ hundo.Compress.decompressLevel = function(byteString) {
         blocks: [],
         goals: [],
         ice: [],
-        arrows: []
+        arrows: [],
+        gblocks: []
     };
 
     var bytes = _.split(byteString, "")
@@ -2491,6 +2596,28 @@ hundo.Compress.decompressLevel = function(byteString) {
             dir: dir
         }
         level.arrows.push(arrow);
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
+    // Get the gblocks
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        var groupNum = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        gblock = {
+            row: r,
+            col: c,
+            groupNum: groupNum
+        }
+        level.gblocks.push(gblock);
     }
 
     return level;
