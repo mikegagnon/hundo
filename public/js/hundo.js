@@ -308,10 +308,10 @@ hundo.Board = function(boardConfig, idGen) {
     });
 
     // Add gblocks to the matrix
-    _.each(boardConfig.glbocks, function(arrow) {
-        var row = arrow.row;
-        var col = arrow.col;
-        var groupNum = arrow.groupNum;
+    _.each(boardConfig.gblocks, function(gblock) {
+        var row = gblock.row;
+        var col = gblock.col;
+        var groupNum = gblock.groupNum;
         var piece = new hundo.Gblock(idGen.next(), row, col, groupNum);
         THIS.addPiece(piece);
     });
@@ -346,6 +346,9 @@ hundo.Board.prototype.getPiece = function(row, col, type) {
 }
 
 hundo.Board.prototype.canAddPiece = function(piece) {
+
+    console.log(piece);
+
     if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
         return false;
     }
@@ -385,9 +388,11 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     }
 
     else {
-        console.error("Unimplemented addPiece for " + piece);
+        console.error("Unimplemented addPiece");
+        console.error(piece);
         return false;
     }
+
 }
 
 hundo.Board.prototype.addPiece = function(piece) {
@@ -1124,6 +1129,7 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
         <div>
             <svg id="${this.boardSvgId(name)}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
+                    
                     <g id="blockTemplate" height="20" width="20" >
                       <rect x="0" y="0" width="20" height="20" fill="#888" />
                       <path d="M0 0 L26 0 L20 6 L6 6 Z"
@@ -1135,15 +1141,31 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                       <path d="M26 26 L20 20 L6 20 L0 26 Z"
                         stroke="none" fill="#666"/>
                     </g>
+
                     <g id="goalTemplate" height="20" width="20">
                         <polygon points="0,26 0,13 13,26" style="fill:red" />
                         <polygon points="13,26 26,13 26,26" style="fill:red" />
                         <rect x="0" y="23" width="26" height="3" fill="red" />
                     </g>
+
                     <g id="arrowTemplate" height="20" width="20">
                         <polygon points="0,13 13,0 26,13 20,13 20,26 6,26 6,13" style="fill:yellow; stroke-width: 1; stroke: black;" />
                     </g>
 
+                    <g id="gblockTemplate-0" height="26" width="26">
+                                            <!-- <use class="block" xlink:href="#blockTemplate"> -->
+
+                    <rect x="0" y="0" width="20" height="20" fill="#888" />
+                      <path d="M0 0 L26 0 L20 6 L6 6 Z"
+                        stroke="none" fill="#aaa"/>
+                      <path d="M0 0 L6 6 L6 20 L0 26 Z"
+                        stroke="none" fill="#aaa"/>
+                      <path d="M26 0 L20 6 L20 20 L26 26 Z"
+                        stroke="none" fill="#666"/>
+                      <path d="M26 26 L20 20 L6 20 L0 26 Z"
+                        stroke="none" fill="#666"/>
+                    <rect x="0" y="0" width="26" height="26" style="fill:red" fill-opacity="0.3" />
+                    </g>
                 </defs>
 
                 <rect id="background" x="0" y="0" style="fill:black" />
@@ -1674,6 +1696,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("class", "gblock")
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", function (piece) {
+            console.log("foo")
             return "#gblockTemplate-" + piece.groupNum;
         })
         .attr("transform", function(piece) {

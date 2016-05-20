@@ -68,7 +68,14 @@ var starter = {
     ball: {
         row: 7,
         col: 10
-    }
+    },
+    gblocks: [
+        {
+            row: 8,
+            col: 8,
+            groupNum: 0
+        }
+    ]
 }
 
 var boardConfig1 = {
