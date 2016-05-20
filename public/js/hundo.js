@@ -59,17 +59,19 @@ hundo.Ball = function(id, row, col, dir) {
     this.dir = dir;
 }
 
-hundo.Ball.prototype.nudge = function(dir, board) {
+hundo.Ball.prototype.nudge = function(dir, board, commit) {
 
     var [dr, dc] = hundo.Board.drdc(dir);
 
     var row = this.row + dr;
     var col = this.col + dc;
 
-    var [nudged, animations] = board.nudge(row, col, dir)
+    var [nudged, animations] = board.nudge(row, col, dir, commit)
 
     if (nudged) {
-        board.movePiece(this, row, col);
+        if (commit) {
+            board.movePiece(this, row, col);
+        }
         animations.push(
             {
                 "move": {
@@ -133,8 +135,7 @@ hundo.Ice = function(id, row, col) {
     this.origCol = col;
 }
 
-hundo.Ice.prototype.nudge = function(dir, board) {
-
+hundo.Ice.prototype.nudge = function(dir, board, commit) {
 
     // If ice is in the goal, then it can't move
     var occupyGoal = false;
@@ -154,10 +155,12 @@ hundo.Ice.prototype.nudge = function(dir, board) {
     var row = this.row + dr;
     var col = this.col + dc;
 
-    var [nudged, animations] = board.nudge(row, col, dir)
+    var [nudged, animations] = board.nudge(row, col, dir, commit)
 
     if (nudged) {
-        board.movePiece(this, row, col);
+        if (commit) {
+            board.movePiece(this, row, col);
+        }
         animations.push(
             {
                 "move": {
@@ -187,7 +190,6 @@ hundo.Arrow = function(id, row, col, dir) {
 
 // TODO: implement
 hundo.Arrow.prototype.nudge = function(dir, board) {
-    console.log("Arrow nudged in direction " + dir);
     var result = this.dir == dir || (
         board.matrix[this.row][this.col].length == 2 &&
         board.getPiece(this.row, this.col, hundo.PieceTypeEnum.BALL) &&
@@ -537,7 +539,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 }
 
 // see hundo.nudge
-hundo.Board.prototype.nudge = function(row, col, dir) {
+hundo.Board.prototype.nudge = function(row, col, dir, commit) {
 
     if (row < 0 || row >= this.numRows || col < 0 || col >= this.numCols) {
         return [true, []];
@@ -552,7 +554,8 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
 
     _.each(pieces, function(piece) {
 
-        var [nudged, newAnimations] = piece.nudge(dir, THIS);
+        var [nudged, newAnimations] = piece.nudge(dir, THIS, commit);
+
         animations = _.concat(animations, newAnimations);
         if (!nudged) {
             result = false;
@@ -631,8 +634,14 @@ hundo.Board.prototype.step = function() {
     }
 
     var [nudged, animations] =
-        this.nudge(this.ball.row, this.ball.col, this.ball.dir)
+        this.nudge(this.ball.row, this.ball.col, this.ball.dir, false);
+
     if (nudged) {
+
+        // now commit the nudge
+        [nudged, animations] =
+            this.nudge(this.ball.row, this.ball.col, this.ball.dir, true);
+
         if (this.checkSolved()) {
             this.solved = true;
             this.atRest = true;
