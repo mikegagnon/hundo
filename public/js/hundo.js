@@ -275,17 +275,36 @@ hundo.Board.prototype.clearCell = function(row, col) {
     this.matrix[row][col] = [];
 }
 
+hundo.Board.prototype.getPiece = function(row, col, type) {
+
+    return _.find(this.matrix[row][col], function(piece){
+        return piece.type == type;
+    });
+}
+
 hundo.Board.prototype.canAddPiece = function(piece) {
     if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
         return false;
     }
 
-    if (piece.type == hundo.PieceTypeEnum.BLOCK ||
-        piece.type == hundo.PieceTypeEnum.BALL ||
-        piece.type == hundo.PieceTypeEnum.GOAL ||
-        piece.type == hundo.PieceTypeEnum.ICE) {
+    else if (piece.type == hundo.PieceTypeEnum.BLOCK ||
+        piece.type == hundo.PieceTypeEnum.BALL) {
         return this.matrix[piece.row][piece.col].length == 0;
-    } else {
+    }
+
+    else if (piece.type == hundo.PieceTypeEnum.ICE) {
+        return this.matrix[piece.row][piece.col].length == 0 ||
+            (this.matrix[piece.row][piece.col].length == 1 &&
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL));
+    }
+
+    else if (piece.type == hundo.PieceTypeEnum.GOAL) {
+        return this.matrix[piece.row][piece.col].length == 0 ||
+            (this.matrix[piece.row][piece.col].length == 1 &&
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE));
+    }
+
+    else {
         console.error("Unimplemented addPiece for " + piece);
         return false;
     }
@@ -689,10 +708,11 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 // push the ball in direction dir
 hundo.Solver.move = function(board, dir) {
     board.setDir(dir);
+
     board.step();
 
     while (!board.done && !board.solved && !board.atRest) {
-        result = board.step();        
+        board.step();
     }
 
     return board;
@@ -700,7 +720,7 @@ hundo.Solver.move = function(board, dir) {
 
 hundo.Solver.prototype.explore = function(board) {
 
-    this.boards.push(board)
+    this.boards.push(board);
 
     // if out of bounds or solved
     if (board.ball.row < 0 || board.ball.row >= board.numRows ||
@@ -710,7 +730,10 @@ hundo.Solver.prototype.explore = function(board) {
     }
 
     var boards = [];
-    boards[0] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
+
+    var clone = board.clone();
+
+    boards[0] = hundo.Solver.move(clone, hundo.DirectionEnum.UP);
     boards[1] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
     boards[2] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
     boards[3] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
@@ -719,7 +742,7 @@ hundo.Solver.prototype.explore = function(board) {
 
     var winningEdges = [];
 
-    _.each(boards, function(newBoard) {
+    _.each(boards, function(newBoard, i) {
 
         var edge = {
             row1: board.ball.row,
@@ -736,6 +759,7 @@ hundo.Solver.prototype.explore = function(board) {
         if (!THIS.hasExploredEdge(edge)) { 
             if (!THIS.hasExploredVertex(newBoard)) {
                 THIS.edges.push(edge);
+
                 var w = THIS.explore(newBoard) 
 
                 winningEdges = _.concat(winningEdges, w)
