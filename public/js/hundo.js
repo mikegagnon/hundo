@@ -652,7 +652,8 @@ hundo.Board.prototype.step = function() {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
         var recipients = this.matrix[newRow][newCol].slice(0);
-        recipients.push(this.ball);
+        recipients = _.concat(recipients,
+            this.matrix[this.ball.row][this.ball.col]);
         return [{
             "collide": {
                 "dir": direction,
