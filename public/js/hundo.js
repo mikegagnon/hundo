@@ -214,8 +214,41 @@ hundo.Gblock = function(id, row, col, groupNum) {
 
 // TODO: implement
 hundo.Gblock.prototype.nudge = function(dir, board, commit) {
-    return [false, []];
-}
+   // If ice is in the goal, then it can't move
+    var occupyGoal = false;
+
+    _.each(board.matrix[this.row][this.col], function(piece) {
+        if (piece.type == hundo.PieceTypeEnum.GOAL) {
+            occupyGoal = true;
+        }
+    })
+
+    if (occupyGoal) {
+        return [false, []];
+    }
+
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    var row = this.row + dr;
+    var col = this.col + dc;
+
+    var [nudged, animations] = board.nudge(row, col, dir, commit)
+
+    if (nudged) {
+        if (commit) {
+            board.movePiece(this, row, col);
+        }
+        animations.push(
+            {
+                "move": {
+                    "gblock": this,
+                    "dir": dir
+                }
+            });
+        return [true, animations];
+    } else {
+        return [false, animations];
+    }}
 
 /**
  * Generates uuids for board pieces
@@ -529,7 +562,7 @@ hundo.Board.prototype.getJson = function() {
                 return {
                     row: gblock.row,
                     col: gblock.col,
-                    groupNum: glbock.groupNum
+                    groupNum: gblock.groupNum
                 }
             }),
     }
@@ -1153,18 +1186,16 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
 
                     <g id="gblockTemplate-0" height="26" width="26">
-                                            <!-- <use class="block" xlink:href="#blockTemplate"> -->
-
-                    <rect x="0" y="0" width="20" height="20" fill="#888" />
-                      <path d="M0 0 L26 0 L20 6 L6 6 Z"
-                        stroke="none" fill="#aaa"/>
-                      <path d="M0 0 L6 6 L6 20 L0 26 Z"
-                        stroke="none" fill="#aaa"/>
-                      <path d="M26 0 L20 6 L20 20 L26 26 Z"
-                        stroke="none" fill="#666"/>
-                      <path d="M26 26 L20 20 L6 20 L0 26 Z"
-                        stroke="none" fill="#666"/>
-                    <rect x="0" y="0" width="26" height="26" style="fill:red" fill-opacity="0.3" />
+                        <rect x="0" y="0" width="20" height="20" fill="#888" />
+                          <path d="M0 0 L26 0 L20 6 L6 6 Z"
+                            stroke="none" fill="#aaa"/>
+                          <path d="M0 0 L6 6 L6 20 L0 26 Z"
+                            stroke="none" fill="#aaa"/>
+                          <path d="M26 0 L20 6 L20 20 L26 26 Z"
+                            stroke="none" fill="#666"/>
+                          <path d="M26 26 L20 20 L6 20 L0 26 Z"
+                            stroke="none" fill="#666"/>
+                        <rect x="0" y="0" width="26" height="26" style="fill:red" fill-opacity="0.3" />
                     </g>
                 </defs>
 
@@ -2087,12 +2118,12 @@ hundo.Viz.prototype.animateIce = function(animation) {
 
 hundo.Viz.prototype.animateGblock = function(animation) {
 
-    gblock = animation.move.glbock;
-    gblockId = "#" + hundo.Viz.pieceId(glbock);
+    gblock = animation.move.gblock;
+    gblockId = "#" + hundo.Viz.pieceId(gblock);
     
     var THIS = this;
 
-    this.boardSvg.select(glbockId)
+    this.boardSvg.select(gblockId)
         .transition()
         .ease("linear")
         .attr("transform", function() {

@@ -71,7 +71,7 @@ var starter = {
     },
     gblocks: [
         {
-            row: 8,
+            row: 7,
             col: 8,
             groupNum: 0
         }
