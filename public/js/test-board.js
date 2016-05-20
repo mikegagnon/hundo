@@ -348,4 +348,4 @@ TEST = "Board.clone"
 var board1 = new hundo.Board(config1, idGen);
 var board2 = board1.clone();
 
-assert(1, board1.getJson().equals(board2.getJson()));
+assert(1, Object.compare(board1.getJson(), board2.getJson()));

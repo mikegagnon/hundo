@@ -613,33 +613,34 @@ hundo.Board.prototype.clone = function() {
  * Code not released into the public domain
  ******************************************************************************/
 
-// This function was written by annakata on stackoverflow.com
-// http://stackoverflow.com/questions/1068834/object-comparison-in-javascript
-// The code is licensed under the Creative Commons, Attribution-ShareAlike 3.0
-// Unported (CC BY-SA 3.0)
-
-Object.prototype.equals = function(x)
-{
-    for(p in this)
-    {
-        switch(typeof(this[p]))
-        {
+// Thank you nicbell! https://gist.github.com/nicbell/6081098
+Object.compare = function (obj1, obj2) {
+    //Loop through properties in object 1
+    for (var p in obj1) {
+        //Check property exists on both objects
+        if (obj1.hasOwnProperty(p) !== obj2.hasOwnProperty(p)) return false;
+ 
+        switch (typeof (obj1[p])) {
+            //Deep compare objects
             case 'object':
-                if (!this[p].equals(x[p])) { return false }; break;
+                if (!Object.compare(obj1[p], obj2[p])) return false;
+                break;
+            //Compare function code
             case 'function':
-                if (typeof(x[p])=='undefined' || (p != 'equals' && this[p].toString() != x[p].toString())) { return false; }; break;
+                if (typeof (obj2[p]) == 'undefined' || (p != 'compare' && obj1[p].toString() != obj2[p].toString())) return false;
+                break;
+            //Compare values
             default:
-                if (this[p] != x[p]) { return false; }
+                if (obj1[p] != obj2[p]) return false;
         }
     }
-
-    for(p in x)
-    {
-        if(typeof(this[p])=='undefined') {return false;}
+ 
+    //Check object 2 for any extra properties
+    for (var p in obj2) {
+        if (typeof (obj1[p]) == 'undefined') return false;
     }
-
     return true;
-}
+};
 
 /**
  * Solver solves puzzles
@@ -669,7 +670,9 @@ hundo.Solver = function(board) {
 hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
     var matches = _.flatMap(this.boards, function(board2) {
-        if (board1.equals(board2)) {
+
+
+        if (Object.compare(board1, board2)) {
             return [true];
         } else {
             return [];

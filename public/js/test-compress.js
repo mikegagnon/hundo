@@ -236,7 +236,7 @@ function testCompress(level) {
     var newLevel = hundo.Compress.decompressLevel(
         hundo.Compress.compressLevel(level))
 
-    return level.equals(newLevel);
+    return Object.compare(level, newLevel);
 }
 
 _.each(testLevels, function(level, i){
