@@ -187,7 +187,12 @@ hundo.Arrow = function(id, row, col, dir) {
 
 // TODO: implement
 hundo.Arrow.prototype.nudge = function(dir, board) {
-    return [this.dir == dir, []];
+    console.log("Arrow nudged in direction " + dir);
+    var result = this.dir == dir || (
+        board.matrix[this.row][this.col].length == 2 &&
+        board.getPiece(this.row, this.col, hundo.PieceTypeEnum.BALL) &&
+        this.dir == hundo.oppositeDir(dir))
+    return [result, []];
 }
 
 /**
@@ -537,7 +542,6 @@ hundo.Board.prototype.nudge = function(row, col, dir) {
     if (row < 0 || row >= this.numRows || col < 0 || col >= this.numCols) {
         return [true, []];
     }
-
 
     var pieces = this.matrix[row][col];
 

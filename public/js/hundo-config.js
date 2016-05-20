@@ -69,6 +69,12 @@ var starter = {
         row: 7,
         col: 10
     },
+    ice: [
+        {
+            row: 7,
+            col:9
+        }
+    ],
     arrows: [
         {
             row: 6,
@@ -82,7 +88,7 @@ var starter = {
         },
         {
             row: 7,
-            col: 9,
+            col: 8,
             dir: hundo.DirectionEnum.LEFT
         },
         {
