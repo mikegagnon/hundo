@@ -1272,12 +1272,33 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "arrow",
+            image: "arrow-up",
             config: {
-                type: hundo.PieceTypeEnum.ARROW
+                type: hundo.PieceTypeEnum.ARROW,
+                dir: hundo.DirectionEnum.UP
             }
-
-        }
+        },
+        {
+            image: "arrow-down",
+            config: {
+                type: hundo.PieceTypeEnum.ARROW,
+                dir: hundo.DirectionEnum.DOWN
+            }
+        },
+        {
+            image: "arrow-left",
+            config: {
+                type: hundo.PieceTypeEnum.ARROW,
+                dir: hundo.DirectionEnum.LEFT
+            }
+        },
+        {
+            image: "arrow-right",
+            config: {
+                type: hundo.PieceTypeEnum.ARROW,
+                dir: hundo.DirectionEnum.RIGHT
+            }
+        },
 
     ]
 
