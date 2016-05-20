@@ -58,6 +58,3 @@ assertEquals(7, board.ball.row, 2);
 assertEquals(8, board.ball.col, 5);
 
 solver = new hundo.Solver(board);
-
-
-
