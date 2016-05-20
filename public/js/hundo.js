@@ -1071,13 +1071,12 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
                     <g id="goalTemplate" height="20" width="20">
                         <polygon points="0,26 0,13 13,26" style="fill:red" />
-                        <polygon points="13,26 26, 13 26,26" style="fill:red" />
+                        <polygon points="13,26 26,13 26,26" style="fill:red" />
                         <rect x="0" y="23" width="26" height="3" fill="red" />
                     </g>
                     <g id="arrowTemplate" height="20" width="20">
-                        <polygon points="0,26 0,13 13,26" style="fill:yellow" />
-                        <polygon points="13,26 26, 13 26,26" style="fill:yellow" />
-                        <rect x="0" y="23" width="26" height="3" fill="yellow" />
+                        <rect x="6" y="13" width="14" height="13" fill="yellow" />
+                        <polygon points="0,13 13,0 26,13" style="fill:yellow" />
                     </g>
 
                 </defs>

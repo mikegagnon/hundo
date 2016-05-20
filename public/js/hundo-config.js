@@ -68,7 +68,30 @@ var starter = {
     ball: {
         row: 7,
         col: 10
-    }
+    },
+    arrows: [
+        {
+            row: 6,
+            col: 10,
+            dir: hundo.DirectionEnum.UP
+        },
+        {
+            row: 7,
+            col: 11,
+            dir: hundo.DirectionEnum.RIGHT
+        },
+        {
+            row: 7,
+            col: 9,
+            dir: hundo.DirectionEnum.LEFT
+        },
+        {
+            row: 8,
+            col: 10,
+            dir: hundo.DirectionEnum.DOWN
+        },
+
+    ]
 }
 
 var boardConfig1 = {
