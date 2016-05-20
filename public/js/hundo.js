@@ -2124,6 +2124,17 @@ hundo.Viz.prototype.getBoardUrl = function() {
     return url;
 }
 
+hundo.cheat = function() {
+    hundo.vizz.maker.showSolution = !hundo.vizz.maker.showSolution;
+
+    if (hundo.vizz.maker.showSolution) {
+        hundo.vizz.drawSolution();
+    } else {
+        hundo.vizz.removeSolution();
+    }
+
+}
+
 /**
  * Compress functions enable levels to be encoded in URLs
  ******************************************************************************/
