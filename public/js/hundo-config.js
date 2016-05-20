@@ -55,7 +55,10 @@ var starter = {
             row: 8,
             col: 14
         },
-
+        {
+            row: 7,
+            col: 7
+        }
 
     ],
     goals: [
@@ -72,8 +75,15 @@ var starter = {
     gblocks: [
         {
             row: 7,
-            col: 8,
+            col: 9,
             groupNum: 0
+        }
+    ],
+    arrows: [
+        {
+            row: 7,
+            col: 8,
+            dir: hundo.DirectionEnum.LEFT
         }
     ]
 }

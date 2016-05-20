@@ -1710,17 +1710,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
 
     this.boardSvg.selectAll()
-        .data(this.board.getArrows())
-        .enter()
-        .append("svg:use")
-        .attr("class", "arrow")
-        .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#arrowTemplate")
-        .attr("transform", function(piece) {
-            return THIS.transform(piece, transformation);
-        });
-
-    this.boardSvg.selectAll()
         .data(this.board.getGblocks())
         .enter()
         .append("svg:use")
@@ -1730,6 +1719,17 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             console.log("foo")
             return "#gblockTemplate-" + piece.groupNum;
         })
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getArrows())
+        .enter()
+        .append("svg:use")
+        .attr("class", "arrow")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", "#arrowTemplate")
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
