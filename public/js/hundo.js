@@ -380,8 +380,6 @@ hundo.Board.prototype.getPiece = function(row, col, type) {
 
 hundo.Board.prototype.canAddPiece = function(piece) {
 
-    console.log(piece);
-
     if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
         return false;
     }
@@ -1716,7 +1714,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("class", "gblock")
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", function (piece) {
-            console.log("foo")
             return "#gblockTemplate-" + piece.groupNum;
         })
         .attr("transform", function(piece) {
