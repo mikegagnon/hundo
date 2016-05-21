@@ -880,6 +880,9 @@ Object.compare = function (obj1, obj2) {
  * Solver solves puzzles
  ******************************************************************************/
 
+// BUG: No winning edges for file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fl3a-142b407692939ad8e5-4b2--683-3204104204305205a16916a16b17a1a82b72b82b92c82
+// even though it is solvable (LDLDRDRURLURDR)
+
 // Thank you Wikipedia!
 // https://en.wikipedia.org/wiki/Graph_traversal#Pseudocode
 
