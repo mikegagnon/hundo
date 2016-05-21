@@ -189,8 +189,26 @@ hundo.Arrow = function(id, row, col, dir) {
     this.dir = dir;
 }
 
+hundo.Arrow.getPusher = function(row, col, dir) {
+
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    dr *= -1;
+    dc *= -1;
+
+    return [row + dr, col + dc];
+}
+
 // TODO: implement
 hundo.Arrow.prototype.nudge = function(dir, board) {
+
+    var [pusherRow, pusherCol] = hundo.Arrow.getPusher(this.row, this.col, dir);
+
+    // gblocks not allowed in arrows
+    if (board.getPiece(pusherRow, pusherCol, hundo.PieceTypeEnum.GBLOCK)) {
+        return [false, []];
+    }
+
     var result = this.dir == dir || (
         board.matrix[this.row][this.col].length == 2 &&
         board.getPiece(this.row, this.col, hundo.PieceTypeEnum.BALL) &&
@@ -436,23 +454,18 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK)));
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE)));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.ARROW) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
             (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK)));
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
-        return this.matrix[piece.row][piece.col].length == 0 ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW)));
+        return this.matrix[piece.row][piece.col].length == 0;
     }
 
     else {
@@ -2446,6 +2459,8 @@ hundo.cheat = function() {
 /**
  * Compress functions enable levels to be encoded in URLs
  ******************************************************************************/
+
+// BUG: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fla9----100690a62ae3d91-200890a70ab0
 
 hundo.Compress = {}
 
