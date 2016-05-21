@@ -474,6 +474,9 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     }
 
     else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
+        console.log(piece)
+        console.log(piece.row)
+        console.log(this.matrix[piece.row])
         return this.matrix[piece.row][piece.col].length == 0;
     }
 
@@ -1232,21 +1235,25 @@ hundo.Viz.mouseleave = function() {
 }
 
 hundo.Viz.prototype.drawSvgGrid = function(name) {
-  var svgContents = `
+
+    var blockTemplate = `
+        <rect x="0" y="0" width="20" height="20" fill="#888" />
+        <path d="M0 0 L26 0 L20 6 L6 6 Z"
+            stroke="none" fill="#aaa"/>
+        <path d="M0 0 L6 6 L6 20 L0 26 Z"
+            stroke="none" fill="#aaa"/>
+        <path d="M26 0 L20 6 L20 20 L26 26 Z"
+            stroke="none" fill="#666"/>
+        <path d="M26 26 L20 20 L6 20 L0 26 Z"
+            stroke="none" fill="#666"/>`
+
+    var svgContents = `
         <div>
             <svg id="${this.boardSvgId(name)}" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     
                     <g id="blockTemplate" height="20" width="20" >
-                      <rect x="0" y="0" width="20" height="20" fill="#888" />
-                      <path d="M0 0 L26 0 L20 6 L6 6 Z"
-                        stroke="none" fill="#aaa"/>
-                      <path d="M0 0 L6 6 L6 20 L0 26 Z"
-                        stroke="none" fill="#aaa"/>
-                      <path d="M26 0 L20 6 L20 20 L26 26 Z"
-                        stroke="none" fill="#666"/>
-                      <path d="M26 26 L20 20 L6 20 L0 26 Z"
-                        stroke="none" fill="#666"/>
+                        ${blockTemplate}
                     </g>
 
                     <g id="goalTemplate" height="20" width="20">
@@ -1260,16 +1267,18 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
 
                     <g id="gblockTemplate-0" height="26" width="26">
-                        <rect x="0" y="0" width="20" height="20" fill="#888" />
-                          <path d="M0 0 L26 0 L20 6 L6 6 Z"
-                            stroke="none" fill="#aaa"/>
-                          <path d="M0 0 L6 6 L6 20 L0 26 Z"
-                            stroke="none" fill="#aaa"/>
-                          <path d="M26 0 L20 6 L20 20 L26 26 Z"
-                            stroke="none" fill="#666"/>
-                          <path d="M26 26 L20 20 L6 20 L0 26 Z"
-                            stroke="none" fill="#666"/>
+                        ${blockTemplate}
                         <rect x="0" y="0" width="26" height="26" style="fill:red" fill-opacity="0.3" />
+                    </g>
+                    <g id="gblockTemplate-1" height="26" width="26">
+                        <rect x="0" y="0" width="20" height="20" fill="#888" />
+                          ${blockTemplate}
+                        <rect x="0" y="0" width="26" height="26" style="fill:yellow" fill-opacity="0.3" />
+                    </g>
+                    <g id="gblockTemplate-2" height="26" width="26">
+                        <rect x="0" y="0" width="20" height="20" fill="#888" />
+                          ${blockTemplate}
+                        <rect x="0" y="0" width="26" height="26" style="fill:blue" fill-opacity="0.3" />
                     </g>
                 </defs>
 
@@ -1484,6 +1493,20 @@ hundo.Viz.prototype.addPalette = function() {
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
                 groupNum: 0
+            }
+        },
+        {
+            image: "gblock-1",
+            config: {
+                type: hundo.PieceTypeEnum.GBLOCK,
+                groupNum: 1
+            }
+        },
+        {
+            image: "gblock-2",
+            config: {
+                type: hundo.PieceTypeEnum.GBLOCK,
+                groupNum: 2
             }
         },
 
