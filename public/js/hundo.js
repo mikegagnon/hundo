@@ -1288,7 +1288,7 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ARROW) {
         return new hundo.Arrow(this.idGen.next(), row, col, this.paletteSelection.dir);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GBLOCK) {
-        return new hundo.Arrow(this.idGen.next(), row, col, this.paletteSelection.groupNum);
+        return new hundo.Gblock(this.idGen.next(), row, col, this.paletteSelection.groupNum);
     } else {
         console.error("Unrecognized piece type")
     }
