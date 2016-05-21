@@ -55,10 +55,6 @@ var starter = {
             row: 8,
             col: 14
         },
-        {
-            row: 7,
-            col: 13
-        }
     ],
     goals: [
         {
