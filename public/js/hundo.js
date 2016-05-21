@@ -281,9 +281,14 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
 
         var nudged, animations;
 
-        var pushingIntoGblock =
-            board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK);
+        var pushingIntoGblock;
 
+        // TODO: factor out this if expression into a function
+        if (row >= 0 && row < board.numRows &&
+            col >= 0 && col < board.numCols) {
+            pushingIntoGblock =
+                board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK);
+        }
         if (row < 0 || row >= board.numRows ||
             col < 0 || col >= board.numCols) {
             nudged = false;
