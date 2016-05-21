@@ -231,8 +231,6 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
         // part of a neighbor check
         if (!fromGblock) {
 
-            console.log("not from Gblock");
-
             var neighbors = _.clone(board.gblocks[this.groupNum]);
 
             var THIS = this;
@@ -243,27 +241,28 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
                     return gblock.id == THIS.id;
                 });
 
-            console.log(neighbors);
             // nudgeResults == the list of nudge results for each neighbor
             var nudgeResults = _.map(neighbors, function(neighbor) {
                     return neighbor.nudge(dir, board, commit, true);
                 });
 
-            console.log(nudgeResults);
-
             // If there are any false values in nudgeResults, then this nudge
             // fails
-            var i = _.findIndex(nudgeResults, function(result){ console.log(result[0]); return !result[0]; });
+            var i = _.findIndex(nudgeResults, function(result) {
+                return !result[0];
+            });
+
+            // Get the animations of the neighbors
+            var newAnimations = _.flatMap(nudgeResults, function(result) {
+                return result[1];
+            });
+
+            animations = _.concat(animations, newAnimations);
 
             if (i >= 0) {
-
-                console.log("cancel")
                 return [false, animations];
             }
-        } else {
-            console.log("from Gblock");
         }
-
 
         if (commit) {
             board.movePiece(this, row, col);

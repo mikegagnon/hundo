@@ -58,10 +58,6 @@ var starter = {
         {
             row: 7,
             col: 7
-        },
-        {
-            row: 6,
-            col: 8
         }
 
     ],
