@@ -2493,8 +2493,6 @@ hundo.cheat = function() {
  * Compress functions enable levels to be encoded in URLs
  ******************************************************************************/
 
-// BUG: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fla9----100690a62ae3d91-200890a70ab0
-
 hundo.Compress = {}
 
 hundo.Compress.toBase64Digit = function (number) {
