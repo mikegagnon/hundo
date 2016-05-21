@@ -100,6 +100,16 @@ hundo.Goal = function(id, row, col, dir) {
     this.dir = dir;
 }
 
+hundo.Goal.getPusher = function(row, col, dir) {
+
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    dr *= -1;
+    dc *= -1;
+
+    return [row + dr, col + dc];
+}
+
 hundo.oppositeDir = function(dir) {
 
     if (dir == hundo.DirectionEnum.UP) {
@@ -118,6 +128,13 @@ hundo.oppositeDir = function(dir) {
 // dir is the direction of the momentum of piece doing the nudging
 // returns true if this piece can accept the nudging piece
 hundo.Goal.prototype.nudge = function(dir, board) {
+
+    var [pusherRow, pusherCol] = hundo.Goal.getPusher(this.row, this.col, dir);
+
+    // gblocks not allowed in arrows
+    if (board.getPiece(pusherRow, pusherCol, hundo.PieceTypeEnum.GBLOCK)) {
+        return [false, []];
+    }
 
     return [this.dir == hundo.oppositeDir(dir), []];
 
@@ -189,15 +206,7 @@ hundo.Arrow = function(id, row, col, dir) {
     this.dir = dir;
 }
 
-hundo.Arrow.getPusher = function(row, col, dir) {
-
-    var [dr, dc] = hundo.Board.drdc(dir);
-
-    dr *= -1;
-    dc *= -1;
-
-    return [row + dr, col + dc];
-}
+hundo.Arrow.getPusher = hundo.Goal.getPusher;
 
 // TODO: implement
 hundo.Arrow.prototype.nudge = function(dir, board) {
