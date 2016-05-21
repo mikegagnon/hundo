@@ -778,9 +778,19 @@ hundo.Board.prototype.step = function() {
     } else {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
-        var recipients = this.matrix[newRow][newCol].slice(0);
+        
+        var recipients = [];
+
+        var gblock = this.getPiece(newRow, newCol, hundo.PieceTypeEnum.GBLOCK);
+        if (gblock) {
+            recipients = _.concat(recipients, this.gblocks[gblock.groupNum]);
+        }
+        
+        recipients = _.concat(recipients,
+            this.matrix[newRow][newCol].slice(0));
         recipients = _.concat(recipients,
             this.matrix[this.ball.row][this.ball.col]);
+
         return [{
             "collide": {
                 "dir": direction,
