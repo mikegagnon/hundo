@@ -67,28 +67,6 @@ var starter = {
         row: 7,
         col: 10
     },
-    gblocks: [
-        {
-            row: 6,
-            col: 9,
-            groupNum: 0
-        },
-        {
-            row: 7,
-            col: 9,
-            groupNum: 0
-        },
-        {
-            row: 8,
-            col: 9,
-            groupNum: 0
-        },
-        {
-            row: 6,
-            col: 8,
-            groupNum: 0
-        },
-    ],
 }
 
 var boardConfig1 = {
