@@ -213,20 +213,9 @@ hundo.Gblock = function(id, row, col, groupNum) {
 }
 
 // TODO: implement
-hundo.Gblock.prototype.nudge = function(dir, board, commit) {
-   // If ice is in the goal, then it can't move
-    var occupyGoal = false;
-
-    _.each(board.matrix[this.row][this.col], function(piece) {
-        if (piece.type == hundo.PieceTypeEnum.GOAL) {
-            occupyGoal = true;
-        }
-    })
-
-    if (occupyGoal) {
-        return [false, []];
-    }
-
+// TODO: arrows and goals do not accept gblocks
+hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
+ 
     var [dr, dc] = hundo.Board.drdc(dir);
 
     var row = this.row + dr;
@@ -235,6 +224,47 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit) {
     var [nudged, animations] = board.nudge(row, col, dir, commit)
 
     if (nudged) {
+
+        console.log("nudged");
+
+        // nudge this block's neighbors, but only if this nudge isn't already
+        // part of a neighbor check
+        if (!fromGblock) {
+
+            console.log("not from Gblock");
+
+            var neighbors = _.clone(board.gblocks[this.groupNum]);
+
+            var THIS = this;
+
+            // now, neighbors is the list of all gblocks, in this group,
+            // but excluding this gblock
+            _.remove(neighbors, function(gblock) {
+                    return gblock.id == THIS.id;
+                });
+
+            console.log(neighbors);
+            // nudgeResults == the list of nudge results for each neighbor
+            var nudgeResults = _.map(neighbors, function(neighbor) {
+                    return neighbor.nudge(dir, board, commit, true);
+                });
+
+            console.log(nudgeResults);
+
+            // If there are any false values in nudgeResults, then this nudge
+            // fails
+            var i = _.findIndex(nudgeResults, function(result){ console.log(result[0]); return !result[0]; });
+
+            if (i >= 0) {
+
+                console.log("cancel")
+                return [false, animations];
+            }
+        } else {
+            console.log("from Gblock");
+        }
+
+
         if (commit) {
             board.movePiece(this, row, col);
         }
@@ -286,6 +316,9 @@ hundo.Board = function(boardConfig, idGen) {
     
     // The set of pieces that have moved out of bounds
     this.oob = [];
+
+    // this.gblocks[gblock.groupNum] == the set of gblocks in that group
+    this.gblocks = {}
 
     // this.matrix[row][call] == array of piece objects
     this.matrix = new Array();
@@ -433,6 +466,13 @@ hundo.Board.prototype.addPiece = function(piece) {
 
         if (piece.type == hundo.PieceTypeEnum.BALL) {
             this.ball = piece;
+        } else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
+
+            if (!(piece.groupNum in this.gblocks)){
+                this.gblocks[piece.groupNum] = [];
+            }   
+
+            this.gblocks[piece.groupNum].push(piece);
         }
 
         return true;
