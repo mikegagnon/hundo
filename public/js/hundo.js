@@ -474,9 +474,6 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     }
 
     else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
-        console.log(piece)
-        console.log(piece.row)
-        console.log(this.matrix[piece.row])
         return this.matrix[piece.row][piece.col].length == 0;
     }
 
