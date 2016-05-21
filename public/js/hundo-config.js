@@ -55,15 +55,6 @@ var starter = {
             row: 8,
             col: 14
         },
-        {
-            row: 7,
-            col: 7
-        },
-        {
-            row: 6,
-            col: 8
-        }
-
     ],
     goals: [
         {
@@ -78,18 +69,23 @@ var starter = {
     },
     gblocks: [
         {
-            row: 7,
+            row: 6,
             col: 9,
             groupNum: 0
         },
         {
-            row: 6,
+            row: 7,
             col: 9,
             groupNum: 0
         },
         {
             row: 8,
             col: 9,
+            groupNum: 0
+        },
+        {
+            row: 6,
+            col: 8,
             groupNum: 0
         }
 

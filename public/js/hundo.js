@@ -216,68 +216,69 @@ hundo.Gblock = function(id, row, col, groupNum) {
 // TODO: arrows and goals do not accept gblocks
 hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
  
-    var [dr, dc] = hundo.Board.drdc(dir);
 
-    var row = this.row + dr;
-    var col = this.col + dc;
+    // nudge this block's neighbors, but only if this nudge isn't already
+    // part of a neighbor check
+    if (!fromGblock) {
 
-    var [nudged, animations] = board.nudge(row, col, dir, commit)
+        var neighbors = board.gblocks[this.groupNum];
 
-    if (nudged) {
+        var THIS = this;
 
-        console.log("nudged");
-
-        // nudge this block's neighbors, but only if this nudge isn't already
-        // part of a neighbor check
-        if (!fromGblock) {
-
-            var neighbors = _.clone(board.gblocks[this.groupNum]);
-
-            var THIS = this;
-
-            // now, neighbors is the list of all gblocks, in this group,
-            // but excluding this gblock
-            _.remove(neighbors, function(gblock) {
-                    return gblock.id == THIS.id;
-                });
-
-            // nudgeResults == the list of nudge results for each neighbor
-            var nudgeResults = _.map(neighbors, function(neighbor) {
-                    return neighbor.nudge(dir, board, commit, true);
-                });
-
-            // If there are any false values in nudgeResults, then this nudge
-            // fails
-            var i = _.findIndex(nudgeResults, function(result) {
-                return !result[0];
+        // nudgeResults == the list of nudge results for each neighbor
+        var nudgeResults = _.map(neighbors, function(neighbor) {
+                return neighbor.nudge(dir, board, commit, true);
             });
 
-            // Get the animations of the neighbors
-            var newAnimations = _.flatMap(nudgeResults, function(result) {
-                return result[1];
-            });
+        // If there are any false values in nudgeResults, then this nudge
+        // fails
+        var i = _.findIndex(nudgeResults, function(result) {
+            return !result[0];
+        });
 
-            animations = _.concat(animations, newAnimations);
+        // Get the animations of the neighbors
+        var animations = _.flatMap(nudgeResults, function(result) {
+            return result[1];
+        });
 
-            if (i >= 0) {
-                return [false, animations];
-            }
+        if (i >= 0) {
+            return [false, animations];
+        } else {
+            return [true, animations];
         }
-
-        if (commit) {
-            board.movePiece(this, row, col);
-        }
-        animations.push(
-            {
-                "move": {
-                    "gblock": this,
-                    "dir": dir
-                }
-            });
-        return [true, animations];
     } else {
-        return [false, animations];
-    }}
+        var [dr, dc] = hundo.Board.drdc(dir);
+
+        var row = this.row + dr;
+        var col = this.col + dc;
+
+        var nudged, animations;
+
+        if (board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK)) {
+            nudged = true;
+            animations = [];
+        } else {
+            var [nudged, animations] = board.nudge(row, col, dir, commit)
+        }
+
+        if (nudged) {
+            if (commit) {
+                board.movePiece(this, row, col);
+            }
+            animations.push(
+                {
+                    "move": {
+                        "gblock": this,
+                        "dir": dir
+                    }
+                });
+            return [true, animations];
+        } else {
+            return [false, animations];
+        }
+    }
+
+}
 
 /**
  * Generates uuids for board pieces
