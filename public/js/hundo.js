@@ -880,10 +880,7 @@ Object.compare = function (obj1, obj2) {
  * Solver solves puzzles
  ******************************************************************************/
 
-// BUG: No winning edges for file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fl3a-142b407692939ad8e5-4b2--683-3204104204305205a16916a16b17a1a82b72b82b92c82
-// even though it is solvable (LDLDRDRURLURDR)
-
-// FAILS here: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fl97-142b407692939ad8e5-4b2--683-5a16916a16b17107827a1800810820872882892910982
+// BUG: Solver fails here: level-editor.html?level=fl86-455a848a99-6b2-7988--
 // But then if you go right, the solver works
 
 // Thank you Wikipedia!
@@ -974,9 +971,7 @@ hundo.Solver.prototype.explore = function(board) {
 
     var boards = [];
 
-    var clone = board.clone();
-
-    boards[0] = hundo.Solver.move(clone, hundo.DirectionEnum.UP);
+    boards[0] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
     boards[1] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
     boards[2] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
     boards[3] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
