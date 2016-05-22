@@ -781,7 +781,7 @@ hundo.Board.prototype.getJson = function() {
                     groupNum: gblock.groupNum
                 }
             }),
-        sand: _.map(this.getGblocks(), function(sand) {
+        sand: _.map(this.getSand(), function(sand) {
                 return {
                     row: sand.row,
                     col: sand.col,
