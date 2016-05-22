@@ -1960,7 +1960,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("y", 0)
         .attr("width", this.vizConfig.cellSize)
         .attr("height", this.vizConfig.cellSize)
-        .attr("style", "fill:yellow; fill-opacity: 0.5")
+        .attr("style", "fill:yellow; fill-opacity: 0.5; stroke: #bbb; stroke-width: 1")
         .attr("class", "sand")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
