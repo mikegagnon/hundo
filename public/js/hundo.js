@@ -492,7 +492,7 @@ hundo.Board = function(boardConfig, idGen) {
         THIS.addPiece(piece);
     });
 
-    // Add gblocks to the matrix
+    // Add sand to the matrix
     _.each(boardConfig.sand, function(sand) {
         var row = sand.row;
         var col = sand.col;
