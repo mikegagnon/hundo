@@ -369,8 +369,14 @@ hundo.Sand = function(id, row, col) {
 }
 
 // returns true iff the piece were pushed in direction dir
-hundo.Sand.prototype.nudge = function(dir, board) {
-    return [false, []];
+hundo.Sand.prototype.nudge = function(dir, board, commit) {
+
+    var ballOnTop = board.getPiece(this.row, this.col, hundo.PieceTypeEnum.BALL);
+
+    if (commit && !ballOnTop) {
+        board.stopBall();
+    }
+    return [true, []];
 }
 
 hundo.Sand.prototype.eq = function(piece) {
@@ -664,6 +670,11 @@ hundo.Board.prototype.reset = function() {
 hundo.Board.prototype.setDir = function(direction) {
     this.ball.dir = direction;
     this.atRest = false;
+}
+
+hundo.Board.prototype.stopBall = function() {
+    this.ball.dir = hundo.DirectionEnum.NODIR;
+    this.atRest = true;
 }
 
 // func(piece) should return true iff the piece is of the type being gotten
@@ -1941,21 +1952,20 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
 
     var sandRadius = this.vizConfig.cellSize / 3;
-    var sandCenter = this.vizConfig.cellSize / 2;
-
     this.boardSvg.selectAll()
         .data(this.board.getSand())
         .enter()
-        .append("ellipse")
-        .attr("cx", sandCenter)
-        .attr("cy", sandCenter)
-        .attr("rx", sandRadius)
-        .attr("ry", sandRadius)
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.cellSize)
         .attr("style", "fill:brown; fill-opacity: 0.75")
         .attr("class", "sand")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
+
         });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />

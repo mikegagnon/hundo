@@ -35,10 +35,10 @@ var starter = {
             row: 6,
             col: 6
         },
-        {
+        /*{
             row: 7,
             col: 6
-        },
+        },*/
         {
             row: 8,
             col: 6
@@ -65,12 +65,22 @@ var starter = {
     ],
     ball: {
         row: 7,
-        col: 10
+        col: 11
     },
     sand: [
         {
             row: 7,
             col: 8
+        }
+    ],
+    ice: [
+        {
+            row: 7,
+            col: 9
+        },
+        {
+            row: 7,
+            col: 10
         }
     ]
 }
