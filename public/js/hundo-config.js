@@ -73,14 +73,16 @@ var starter = {
             col: 8
         }
     ],
-    ice: [
+    gblocks: [
         {
             row: 7,
-            col: 9
+            col: 10,
+            groupNum: 0
         },
         {
-            row: 7,
-            col: 10
+            row: 6,
+            col: 10,
+            groupNum: 0
         }
     ]
 }
