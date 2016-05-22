@@ -956,6 +956,31 @@ hundo.Solver.move = function(board, dir) {
     return board;
 }
 
+hundo.Solver.prototype.getCellEdges = function() {
+    return _.map(this.edges, function(edge) {
+        var [b1, b2] = edge;
+        return {
+            row1: b1.ball.row,
+            col1: b1.ball.col,
+            row2: b2.ball.row,
+            col2: b2.ball.col
+        }
+    });
+}
+
+hundo.Solver.prototype.getCellWinningEdges = function() {
+    return _.map(this.winningEdges, function(edge) {
+        var [b1, b2] = edge;
+        return {
+            row1: b1.ball.row,
+            col1: b1.ball.col,
+            row2: b2.ball.row,
+            col2: b2.ball.col
+        }
+    });
+
+}
+
 hundo.Solver.prototype.explore = function(board) {
 
     this.boards.push(board);
@@ -1712,6 +1737,7 @@ hundo.Viz.prototype.removeSolution = function() {
 }
 
 hundo.Viz.prototype.drawEdges = function(edges, style) {
+
     var THIS = this;
     
     this.boardSvg.selectAll()
@@ -1742,11 +1768,11 @@ hundo.Viz.prototype.drawSolution = function() {
     var solver = new hundo.Solver(this.board);
 
     if (this.maker.showGraph) {
-        this.drawEdges(solver.edges,
+        this.drawEdges(solver.getCellEdges(),
             "stroke:#FFF;stroke-width:1;opacity:0.4");
     }
 
-    this.drawEdges(solver.winningEdges,
+    this.drawEdges(solver.getCellWinningEdges(),
         "stroke:#B00000;stroke-width:4;opacity:1.0");
 
 }
