@@ -461,10 +461,15 @@ hundo.Board = function(boardConfig, idGen) {
 
     // Add ice to the matrix
     _.each(boardConfig.ice, function(ice) {
-        var row = ice.row;
-        var col = ice.col;
-        var piece = new hundo.Ice(idGen.next(), row, col);
-        THIS.addPiece(piece);
+
+        if (THIS.inBounds(ice.row, ice.col)) {
+            var row = ice.row;
+            var col = ice.col;
+            var piece = new hundo.Ice(idGen.next(), row, col);
+            THIS.addPiece(piece);
+        } else {
+            THIS.oob.push(ice);
+        }
     });
 
     // Add arrows to the matrix
@@ -492,6 +497,13 @@ hundo.Board = function(boardConfig, idGen) {
         var piece = new hundo.Sand(idGen.next(), row, col);
         THIS.addPiece(piece);
     });
+}
+
+hundo.Board.prototype.inBounds = function(row, col) {
+    if (row >= 0 && row < this.numRows &&
+        col >= 0 && col < this.numCols) {
+        return true;
+    }
 }
 
 
@@ -586,7 +598,7 @@ hundo.Board.prototype.canAddPiece = function(piece) {
         return this.matrix[piece.row][piece.col].length == 0;
     }
 
-    // TOD: allow ICE to be added to arrow
+    // TODO: allow ICE to be added to arrow
     else if (piece.type == hundo.PieceTypeEnum.ICE) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
@@ -864,7 +876,9 @@ hundo.Board.prototype.nudge = function(row, col, dir, commit) {
 
     var THIS = this;
 
-    _.each(pieces, function(piece) {
+    for (var i = 0; i < pieces.length; i++) {
+
+        var piece = pieces[i];
 
         var [nudged, newAnimations] = piece.nudge(dir, THIS, commit);
 
@@ -872,7 +886,7 @@ hundo.Board.prototype.nudge = function(row, col, dir, commit) {
         if (!nudged) {
             result = false;
         }
-    });
+    }
 
     return [result, animations];
 
@@ -986,6 +1000,7 @@ hundo.Board.prototype.step = function() {
 }
 
 // Deep copy the board
+// TODO: rm getJson
 hundo.Board.prototype.clone = function() {
     var config = this.getJson();
     return new hundo.Board(config, hundo.idGenerator);
