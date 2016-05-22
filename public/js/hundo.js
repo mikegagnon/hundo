@@ -1158,6 +1158,12 @@ hundo.Solver.prototype.getCellWinningEdges = function() {
 
 hundo.Solver.prototype.explore = function(board) {
 
+    console.log(this.edges.length);
+
+    if (this.edges.length >= 100) {
+        return [];
+    }
+
     this.boards.push(board);
 
     // if out of bounds or solved
