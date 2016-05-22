@@ -967,8 +967,7 @@ Object.compare = function (obj1, obj2) {
  * Solver solves puzzles
  ******************************************************************************/
 
-// BUG: Solver fails here: level-editor.html?level=fl86-455a848a99-6b2-7988--
-// But then if you go right, the solver works
+// BUG: Solver fails here: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fld1-0g0h0i0j0k111k202k303i3k4041424k5k6k7g7k8k9kakb0bkc0cfckd0dke0e1e2e3e4e5e6e7e8e9eaebecedeeefegeheiejek-aa1-22-1i2-b10b20b30b41b51b61b72b82b92ba3bb3bc3c20c51c82cb3
 
 // Thank you Wikipedia!
 // https://en.wikipedia.org/wiki/Graph_traversal#Pseudocode
