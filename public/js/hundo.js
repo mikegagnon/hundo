@@ -610,11 +610,11 @@ hundo.Board.prototype.canAddPiece = function(piece) {
         return this.matrix[piece.row][piece.col].length == 0;
     }
 
-    // TODO: allow ICE to be added to arrow
     else if (piece.type == hundo.PieceTypeEnum.ICE) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL));
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW)));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.GOAL) {
