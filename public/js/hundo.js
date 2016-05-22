@@ -1277,7 +1277,12 @@ hundo.Viz = function(config) {
 
     this.id = config.id;
     this.level = 0;
-    this.levelMax = config.viz.levelMax;
+
+    if (config.viz.allLevels) {
+        this.levelMax = this.levels.length;
+    } else {
+        this.levelMax = config.viz.levelMax;
+    }
 
     this.drawSvgGrid();
 
@@ -3053,7 +3058,8 @@ hundo.defaultVizConfig = {
     numCols: 21,
     playButton: false,
     levelSelect: true,
-    levelMax: 0
+    levelMax: 0,
+    allLevels: true
 }
 
 document.onkeydown = hundo.Viz.checkKey;
