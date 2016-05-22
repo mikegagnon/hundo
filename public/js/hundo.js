@@ -270,7 +270,7 @@ hundo.Gblock = function(id, row, col, groupNum) {
     this.groupNum = groupNum;
 }
 
-hundo.Goal.prototype.eq = function(piece) {
+hundo.Gblock.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece) &&
         this.groupNum == piece.groupNum;
 }
@@ -484,11 +484,11 @@ hundo.setEq = function(set1, set2) {
 
 hundo.Board.prototype.eq = function(board) {
 
-    if (this.ball && !board.ball) {
+    if (this.numRows != board.numRows || this.numCols != board.numCols) {
         return false;
     }
 
-    if (!this.ball && board.ball) {
+    if (this.ball && !board.ball || !this.ball && board.ball) {
         return false;
     }
 
@@ -499,6 +499,15 @@ hundo.Board.prototype.eq = function(board) {
         }
     }
 
+    for (var r = 0; r < this.numRows; r++) {
+        for (var c = 0; c < this.numCols; c++) {
+            if (!hundo.setEq(this.matrix[r][c], board.matrix[r][c])) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 hundo.Board.prototype.isEmptyCell = function(row, col) {

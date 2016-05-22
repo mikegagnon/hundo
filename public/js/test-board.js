@@ -353,27 +353,81 @@ var set2 = [new hundo.Block(1, 2, 3),
             new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
 assert(1, hundo.setEq(set1, set2));
 
-var set1 = [new hundo.Block(1, 2, 3),
-            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
-var set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
-            new hundo.Block(1, 2, 3)];
+set1 = [new hundo.Block(1, 2, 3),
+        new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
+        new hundo.Block(1, 2, 3)];
 assert(2, hundo.setEq(set1, set2));
 
-var set1 = [new hundo.Block(1, 2, 3),
-            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
-var set2 = [new hundo.Block(1, 2, 3),
-            new hundo.Ball(1, 2, 4, hundo.DirectionEnum.UP)];
+set1 = [new hundo.Block(1, 2, 3),
+        new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+set2 = [new hundo.Block(1, 2, 3),
+        new hundo.Ball(1, 2, 4, hundo.DirectionEnum.UP)];
 assert(3, !hundo.setEq(set1, set2));
 
-var set1 = [new hundo.Block(1, 2, 3),
-            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
-var set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
-            new hundo.Block(1, 2, 4)];
+set1 = [new hundo.Block(1, 2, 3),
+        new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
+        new hundo.Block(1, 2, 4)];
 assert(4, !hundo.setEq(set1, set2));
 
 
+set1 = [];
+set2 = [];
+assert(5, hundo.setEq(set1, set2));
+
+/**
+ * Test board.eq
+ **************************************************/
+
+TEST = "board.eq"
 
 
+var boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+// boardConfig1 except no ball
+var boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}]};
+var board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+var board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(1, !board1.eq(board2));
 
+// boardConfig2 except no ball
+boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}]};
+boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(2, !board1.eq(board2));
 
+// boardConfig 2, except ball in different location
+boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":0,"col":0}};
+boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(3, !board1.eq(board2));
 
+// boardConfig 2, except block in different location
+boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":0},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(4, !board1.eq(board2));
+
+// boardConfig 2, except numRows is different
+boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+boardConfig2 = {"numRows":16,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(5, !board1.eq(board2));
+
+// boardConfig 2, except numCols is different
+boardConfig1 = {"numRows":15,"numCols":22,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(6, !board1.eq(board2));
+
+// boardConfig1 == boardConfig2
+boardConfig1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
+board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
+board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
+assert(7, board1.eq(board2));
