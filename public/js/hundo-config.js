@@ -35,10 +35,10 @@ var starter = {
             row: 6,
             col: 6
         },
-        /*{
+        {
             row: 7,
             col: 6
-        },*/
+        },
         {
             row: 8,
             col: 6
@@ -65,26 +65,8 @@ var starter = {
     ],
     ball: {
         row: 7,
-        col: 11
+        col: 10
     },
-    sand: [
-        {
-            row: 7,
-            col: 8
-        }
-    ],
-    gblocks: [
-        {
-            row: 7,
-            col: 10,
-            groupNum: 0
-        },
-        {
-            row: 6,
-            col: 10,
-            groupNum: 0
-        }
-    ]
 }
 
 var boardConfig1 = {
@@ -226,7 +208,8 @@ var arrowIceMachine = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":12},{"
 var gblockIntro = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":9},{"row":0,"col":10},{"row":0,"col":11},{"row":6,"col":1},{"row":6,"col":20},{"row":7,"col":1},{"row":7,"col":20},{"row":8,"col":1},{"row":8,"col":20},{"row":14,"col":9},{"row":14,"col":10},{"row":14,"col":11}],"goals":[{"row":0,"col":16,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":11,"col":20,"dir":"LEFT"},{"row":14,"col":4,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[{"row":3,"col":10,"groupNum":0},{"row":4,"col":9,"groupNum":0},{"row":4,"col":10,"groupNum":0},{"row":4,"col":11,"groupNum":0},{"row":5,"col":10,"groupNum":0},{"row":6,"col":7,"groupNum":3},{"row":6,"col":13,"groupNum":2},{"row":7,"col":6,"groupNum":3},{"row":7,"col":7,"groupNum":3},{"row":7,"col":8,"groupNum":3},{"row":7,"col":12,"groupNum":2},{"row":7,"col":13,"groupNum":2},{"row":7,"col":14,"groupNum":2},{"row":8,"col":7,"groupNum":3},{"row":8,"col":13,"groupNum":2},{"row":9,"col":10,"groupNum":1},{"row":10,"col":9,"groupNum":1},{"row":10,"col":10,"groupNum":1},{"row":10,"col":11,"groupNum":1},{"row":11,"col":10,"groupNum":1}],"ball":{"row":7,"col":10}};
 var gblockMachine = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"col":11},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":16},{"row":5,"col":16},{"row":7,"col":6},{"row":9,"col":2},{"row":9,"col":3},{"row":9,"col":10},{"row":12,"col":19},{"row":13,"col":8},{"row":13,"col":15},{"row":14,"col":5}],"goals":[{"row":4,"col":11,"dir":"LEFT"}],"ice":[],"arrows":[{"row":6,"col":8,"dir":"RIGHT"}],"gblocks":[{"row":3,"col":2,"groupNum":0},{"row":4,"col":1,"groupNum":0},{"row":4,"col":2,"groupNum":0},{"row":4,"col":3,"groupNum":0},{"row":5,"col":2,"groupNum":0},{"row":5,"col":10,"groupNum":1},{"row":6,"col":9,"groupNum":1},{"row":6,"col":10,"groupNum":1},{"row":6,"col":11,"groupNum":1},{"row":7,"col":10,"groupNum":1},{"row":10,"col":8,"groupNum":2},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":12,"col":8,"groupNum":2}],"ball":{"row":3,"col":10}};
 var tbars = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":16},{"row":0,"col":17},{"row":0,"col":18},{"row":0,"col":19},{"row":0,"col":20},{"row":1,"col":1},{"row":1,"col":20},{"row":2,"col":0},{"row":2,"col":20},{"row":3,"col":0},{"row":3,"col":18},{"row":3,"col":20},{"row":4,"col":0},{"row":4,"col":1},{"row":4,"col":2},{"row":4,"col":20},{"row":5,"col":20},{"row":6,"col":20},{"row":7,"col":16},{"row":7,"col":20},{"row":8,"col":5},{"row":8,"col":20},{"row":9,"col":13},{"row":9,"col":20},{"row":10,"col":20},{"row":11,"col":0},{"row":11,"col":20},{"row":12,"col":0},{"row":12,"col":15},{"row":12,"col":20},{"row":13,"col":0},{"row":13,"col":20},{"row":14,"col":0},{"row":14,"col":1},{"row":14,"col":2},{"row":14,"col":3},{"row":14,"col":4},{"row":14,"col":5},{"row":14,"col":6},{"row":14,"col":7},{"row":14,"col":8},{"row":14,"col":9},{"row":14,"col":10},{"row":14,"col":11},{"row":14,"col":12},{"row":14,"col":13},{"row":14,"col":14},{"row":14,"col":15},{"row":14,"col":16},{"row":14,"col":17},{"row":14,"col":18},{"row":14,"col":19},{"row":14,"col":20}],"goals":[{"row":10,"col":10,"dir":"DOWN"}],"ice":[{"row":2,"col":2}],"arrows":[{"row":1,"col":18,"dir":"LEFT"},{"row":12,"col":19,"dir":"UP"}],"gblocks":[{"row":11,"col":1,"groupNum":0},{"row":11,"col":2,"groupNum":0},{"row":11,"col":3,"groupNum":0},{"row":11,"col":4,"groupNum":1},{"row":11,"col":5,"groupNum":1},{"row":11,"col":6,"groupNum":1},{"row":11,"col":7,"groupNum":2},{"row":11,"col":8,"groupNum":2},{"row":11,"col":9,"groupNum":2},{"row":11,"col":10,"groupNum":3},{"row":11,"col":11,"groupNum":3},{"row":11,"col":12,"groupNum":3},{"row":12,"col":2,"groupNum":0},{"row":12,"col":5,"groupNum":1},{"row":12,"col":8,"groupNum":2},{"row":12,"col":11,"groupNum":3}],"ball":{"row":13,"col":1}};
-levels = [starter, diagonal, iceIntro, pairTheIce, arrowIntro, arrowIceMachine, gblockIntro, gblockMachine, tbars];
+var sandIntro = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":7,"col":11,"dir":"RIGHT"}],"ice":[{"row":2,"col":12}],"arrows":[],"gblocks":[{"row":11,"col":13,"groupNum":0},{"row":12,"col":11,"groupNum":0},{"row":12,"col":12,"groupNum":0},{"row":12,"col":13,"groupNum":0},{"row":13,"col":13,"groupNum":0}],"sand":[{"row":2,"col":4},{"row":2,"col":5},{"row":2,"col":6},{"row":2,"col":18},{"row":3,"col":18},{"row":4,"col":18},{"row":5,"col":9},{"row":5,"col":10},{"row":5,"col":15},{"row":6,"col":15},{"row":7,"col":15},{"row":10,"col":7},{"row":11,"col":7},{"row":12,"col":7},{"row":12,"col":18}],"ball":{"row":2,"col":2}};
+levels = [starter, diagonal, iceIntro, pairTheIce, arrowIntro, arrowIceMachine, gblockIntro, gblockMachine, tbars, sandIntro];
 
 new Hundo({
     levels: levels,
