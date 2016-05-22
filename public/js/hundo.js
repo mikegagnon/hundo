@@ -276,6 +276,8 @@ hundo.Gblock.prototype.eq = function(piece) {
         this.groupNum == piece.groupNum;
 }
 
+
+// BUG: every gblock piece must nudge
 hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
  
 
