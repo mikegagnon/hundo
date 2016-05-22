@@ -66,7 +66,7 @@ var starter = {
     ball: {
         row: 7,
         col: 10
-    },
+    }
 }
 
 var boardConfig1 = {

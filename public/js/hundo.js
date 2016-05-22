@@ -1280,6 +1280,11 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                           ${blockTemplate}
                         <rect x="0" y="0" width="26" height="26" style="fill:blue" fill-opacity="0.3" />
                     </g>
+                    <g id="gblockTemplate-3" height="26" width="26">
+                        <rect x="0" y="0" width="20" height="20" fill="#888" />
+                          ${blockTemplate}
+                        <rect x="0" y="0" width="26" height="26" style="fill:green" fill-opacity="0.3" />
+                    </g>
                 </defs>
 
                 <rect id="background" x="0" y="0" style="fill:black" />
@@ -1507,6 +1512,13 @@ hundo.Viz.prototype.addPalette = function() {
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
                 groupNum: 2
+            }
+        },
+        {
+            image: "gblock-3",
+            config: {
+                type: hundo.PieceTypeEnum.GBLOCK,
+                groupNum: 3
             }
         },
 
