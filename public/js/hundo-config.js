@@ -66,7 +66,13 @@ var starter = {
     ball: {
         row: 7,
         col: 10
-    }
+    },
+    sand: [
+        {
+            row: 7,
+            col: 8
+        }
+    ]
 }
 
 var boardConfig1 = {

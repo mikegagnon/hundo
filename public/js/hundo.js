@@ -1940,15 +1940,18 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
+    var sandRadius = this.vizConfig.cellSize / 3;
+    var sandCenter = this.vizConfig.cellSize / 2;
+
     this.boardSvg.selectAll()
         .data(this.board.getSand())
         .enter()
         .append("ellipse")
-        .attr("cx", this.vizConfig.cellSize / 4)
-        .attr("cy", this.vizConfig.cellSize / 4)
-        .attr("rx", this.vizConfig.cellSize / 4)
-        .attr("ry", this.vizConfig.cellSize / 4)
-        .attr("style", "fill:brown; fill-opacity: 0.5")
+        .attr("cx", sandCenter)
+        .attr("cy", sandCenter)
+        .attr("rx", sandRadius)
+        .attr("ry", sandRadius)
+        .attr("style", "fill:brown; fill-opacity: 0.75")
         .attr("class", "sand")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
