@@ -154,7 +154,7 @@ hundo.Goal.prototype.nudge = function(dir, board) {
 
     var [pusherRow, pusherCol] = hundo.Goal.getPusher(this.row, this.col, dir);
 
-    // gblocks not allowed in arrows
+    // gblocks not allowed in goals
     if (board.getPiece(pusherRow, pusherCol, hundo.PieceTypeEnum.GBLOCK)) {
         return [false, []];
     }
