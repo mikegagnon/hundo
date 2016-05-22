@@ -994,7 +994,7 @@ hundo.Solver = function(board) {
 hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
     var matches = _.flatMap(this.boards, function(board2) {
-        if (Object.compare(board1, board2)) {
+        if (board1.eq(board2)) {
             return [true];
         } else {
             return [];
