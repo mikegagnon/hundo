@@ -326,10 +326,20 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
             pushingIntoGblock =
                 board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK);
         }
+
         if (row < 0 || row >= board.numRows ||
             col < 0 || col >= board.numCols) {
             nudged = false;
             animations = [];
+
+        // HACK
+        } else if (board.getPiece(row, col, hundo.PieceTypeEnum.SAND)) {
+            if (commit) {
+                board.stopBall();
+            }
+            nudged = true;
+            animations = [];
+
         } else if (pushingIntoGblock &&
                 pushingIntoGblock.groupNum == this.groupNum) {
             nudged = true;
