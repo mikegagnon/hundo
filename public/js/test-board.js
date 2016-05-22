@@ -3,32 +3,6 @@
  * See UNLICENSE.txt
  */
 
-
-
-/**
- * Equals methods for piece objects
- **************************************************/
-
-function equalsTypeRowCol(a, b) {
-    return a.type == b.type &&
-        a.row == b.row &&
-        a.col == b.col;
-}
-
-hundo.Block.prototype.eq = function(piece) {
-    return equalsTypeRowCol(this, piece);
-}
-
-hundo.Ball.prototype.eq = function(piece) {
-    return equalsTypeRowCol(this, piece) &&
-        this.dir == piece.dir;
-}
-
-hundo.Goal.prototype.eq = function(piece) {
-    return equalsTypeRowCol(this, piece) &&
-        this.dir == piece.dir;
-}
-
 /**
  * Board configs
  **************************************************/
@@ -349,3 +323,57 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = board1.clone();
 
 assert(1, Object.compare(board1.getJson(), board2.getJson()));
+
+/**
+ * Test piece.equality
+ **************************************************/
+
+ TEST = "Block equality"
+
+ assert(1, (new hundo.Block(1, 2, 3)).eq(new hundo.Block(0, 2, 3)));
+ assert(1, !(new hundo.Block(1, 2, 3)).eq(new hundo.Block(1, 2, 4)));
+
+ TEST = "Ball equality"
+
+ assert(1, (new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)).eq(
+    new hundo.Ball(0, 2, 3, hundo.DirectionEnum.UP)));
+ assert(1, !(new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)).eq(
+    new hundo.Ball(1, 2, 3, hundo.DirectionEnum.DOWN)));
+
+
+/**
+ * Test hundo.setEq
+ **************************************************/
+
+TEST = "Set equality"
+
+var set1 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+var set2 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+assert(1, hundo.setEq(set1, set2));
+
+var set1 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+var set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
+            new hundo.Block(1, 2, 3)];
+assert(2, hundo.setEq(set1, set2));
+
+var set1 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+var set2 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 4, hundo.DirectionEnum.UP)];
+assert(3, !hundo.setEq(set1, set2));
+
+var set1 = [new hundo.Block(1, 2, 3),
+            new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP)];
+var set2 = [new hundo.Ball(1, 2, 3, hundo.DirectionEnum.UP),
+            new hundo.Block(1, 2, 4)];
+assert(4, !hundo.setEq(set1, set2));
+
+
+
+
+
+
+

@@ -26,6 +26,14 @@ hundo.DirectionEnum = {
     RIGHT: "RIGHT",
     NODIR: "NODIR"
 }
+/**
+ * Function common to all pieces
+ ******************************************************************************/
+hundo.equalsTypeRowCol = function(a, b) {
+    return a.type == b.type &&
+        a.row == b.row &&
+        a.col == b.col;
+}
 
 /**
  * Block board pieces
@@ -46,6 +54,10 @@ hundo.Block.prototype.nudge = function(dir, board) {
     return [false, []];
 }
 
+hundo.Block.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece);
+}
+
 /**
  * Ball board piece
  ******************************************************************************/
@@ -58,6 +70,11 @@ hundo.Ball = function(id, row, col, dir) {
     this.origRow = row;
     this.origCol = col;
     this.dir = dir;
+}
+
+hundo.Ball.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
 }
 
 hundo.Ball.prototype.nudge = function(dir, board, commit) {
@@ -98,6 +115,11 @@ hundo.Goal = function(id, row, col, dir) {
     this.origRow = row;
     this.origCol = col;
     this.dir = dir;
+}
+
+hundo.Goal.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
 }
 
 hundo.Goal.getPusher = function(row, col, dir) {
@@ -153,6 +175,10 @@ hundo.Ice = function(id, row, col) {
     this.origCol = col;
 }
 
+hundo.Ice.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece);
+}
+
 hundo.Ice.prototype.nudge = function(dir, board, commit) {
 
     // If ice is in the goal, then it can't move
@@ -206,6 +232,11 @@ hundo.Arrow = function(id, row, col, dir) {
     this.dir = dir;
 }
 
+hundo.Arrow.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
+}
+
 hundo.Arrow.getPusher = hundo.Goal.getPusher;
 
 // TODO: implement
@@ -239,8 +270,11 @@ hundo.Gblock = function(id, row, col, groupNum) {
     this.groupNum = groupNum;
 }
 
-// TODO: implement
-// TODO: arrows and goals do not accept gblocks
+hundo.Goal.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.groupNum == piece.groupNum;
+}
+
 hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
  
 
@@ -421,6 +455,50 @@ hundo.Board = function(boardConfig, idGen) {
         var piece = new hundo.Gblock(idGen.next(), row, col, groupNum);
         THIS.addPiece(piece);
     });
+}
+
+
+// TODO: is there a better way to do this?
+hundo.setEq = function(set1, set2) {
+    if (set1.length != set2.length) {
+        return false;
+    }
+
+    var matches = true;
+    _.each(set1, function(x) {
+        var singleMatch = false;
+        _.each(set2, function(y) {
+            if (x.eq(y)) {
+                singleMatch = true;
+            }
+        })
+
+        if (!singleMatch) {
+            matches = false;
+        }
+    });
+
+    return matches;
+
+}
+
+hundo.Board.prototype.eq = function(board) {
+
+    if (this.ball && !board.ball) {
+        return false;
+    }
+
+    if (!this.ball && board.ball) {
+        return false;
+    }
+
+    if (this.ball && board.ball) {
+        if (this.ball.row != board.ball.row ||
+            this.ball.col != board.ball.col) {
+            return false;
+        }
+    }
+
 }
 
 hundo.Board.prototype.isEmptyCell = function(row, col) {
