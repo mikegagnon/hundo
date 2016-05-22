@@ -907,8 +907,6 @@ hundo.Solver = function(board) {
 hundo.Solver.prototype.hasExploredVertex = function(board1) {
 
     var matches = _.flatMap(this.boards, function(board2) {
-
-
         if (Object.compare(board1, board2)) {
             return [true];
         } else {
@@ -987,11 +985,6 @@ hundo.Solver.prototype.explore = function(board) {
             col1: board.ball.col,
             row2: newBoard.ball.row,
             col2: newBoard.ball.col
-        }
-
-        var vertex = {
-            row: newBoard.ball.row,
-            col: newBoard.ball.col
         }
 
         if (!THIS.hasExploredEdge(edge)) { 
