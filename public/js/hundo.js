@@ -599,10 +599,15 @@ hundo.Board.prototype.getPiece = function(row, col, type) {
     });
 }
 
+// TODO: refactor with a function piece.compatible()
 hundo.Board.prototype.canAddPiece = function(piece) {
 
-    if (piece.type == hundo.PieceTypeEnum.BALL && this.hasBall()) {
-        return false;
+    if (piece.type == hundo.PieceTypeEnum.BALL) {
+        return !this.hasBall() &&
+            (this.matrix[piece.row][piece.col].length == 0  ||
+            (this.matrix[piece.row][piece.col].length == 1 &&
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW) ||
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.SAND))));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.BLOCK ||
@@ -638,8 +643,9 @@ hundo.Board.prototype.canAddPiece = function(piece) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
             (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK))));
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK) ||
+             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
     }
 
     else {
