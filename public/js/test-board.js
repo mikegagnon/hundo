@@ -538,6 +538,7 @@ assert(4, board1.eq(board2));
 /**
  * Ice bumping into block and going into goal
  **************************************************/
+// TODO: going out of bounds
 
 TEST = "Ice bumping into block and going into goal";
 
@@ -690,3 +691,80 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(4, board1.eq(board2));
 
+/**
+ * Gblocks
+ **************************************************/
+
+TEST = "Gblocks";
+
+// Four single-cell gblocks (each a different groupNum) bumping into blocks
+// level-editor.html?level=fl7a-3a767eba----5a07817c39a2-
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":10},{"row":7,"col":6},{"row":7,"col":14},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":5,"col":10,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":12,"groupNum":3},{"row":9,"col":10,"groupNum":2}],"sand":[],"ball":{"row":7,"col":10}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":10},{"row":7,"col":6},{"row":7,"col":14},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":4,"col":10,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":12,"groupNum":3},{"row":9,"col":10,"groupNum":2}],"sand":[],"ball":{"row":5,"col":10}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(1, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":10},{"row":7,"col":6},{"row":7,"col":14},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":5,"col":10,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":12,"groupNum":3},{"row":9,"col":10,"groupNum":2}],"sand":[],"ball":{"row":7,"col":10}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":10},{"row":7,"col":6},{"row":7,"col":14},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":5,"col":10,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":13,"groupNum":3},{"row":9,"col":10,"groupNum":2}],"sand":[],"ball":{"row":7,"col":12}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(2, board1.eq(board2));
+
+// One gblock-quad-square bumping into block
+// level-editor.html?level=fla9-39----680690780790-
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":6,"col":8,"groupNum":0},{"row":6,"col":9,"groupNum":0},{"row":7,"col":8,"groupNum":0},{"row":7,"col":9,"groupNum":0}],"sand":[],"ball":{"row":10,"col":9}};;
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":4,"col":8,"groupNum":0},{"row":4,"col":9,"groupNum":0},{"row":5,"col":8,"groupNum":0},{"row":5,"col":9,"groupNum":0}],"sand":[],"ball":{"row":6,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(3, board1.eq(board2));
+
+// Heading OOB
+// level-editor.html?level=fl8a-----3a24a25a2-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":3,"col":10,"groupNum":2},{"row":4,"col":10,"groupNum":2},{"row":5,"col":10,"groupNum":2}],"sand":[],"ball":{"row":8,"col":10}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":0,"col":10,"groupNum":2},{"row":1,"col":10,"groupNum":2},{"row":2,"col":10,"groupNum":2}],"sand":[],"ball":{"row":3,"col":10}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(4, board1.eq(board2));
+
+// Four oddly shaped glbock-groups bumping into each other
+// level-editor.html?level=fle8-----382560570580670871971981a81c73c83c93-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":3,"col":8,"groupNum":2},{"row":5,"col":6,"groupNum":0},{"row":5,"col":7,"groupNum":0},{"row":5,"col":8,"groupNum":0},{"row":6,"col":7,"groupNum":0},{"row":8,"col":7,"groupNum":1},{"row":9,"col":7,"groupNum":1},{"row":9,"col":8,"groupNum":1},{"row":10,"col":8,"groupNum":1},{"row":12,"col":7,"groupNum":3},{"row":12,"col":8,"groupNum":3},{"row":12,"col":9,"groupNum":3}],"sand":[],"ball":{"row":14,"col":8}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":0,"col":8,"groupNum":2},{"row":1,"col":6,"groupNum":0},{"row":1,"col":7,"groupNum":0},{"row":1,"col":8,"groupNum":0},{"row":2,"col":7,"groupNum":0},{"row":3,"col":7,"groupNum":1},{"row":4,"col":7,"groupNum":1},{"row":4,"col":8,"groupNum":1},{"row":5,"col":8,"groupNum":1},{"row":6,"col":7,"groupNum":3},{"row":6,"col":8,"groupNum":3},{"row":6,"col":9,"groupNum":3}],"sand":[],"ball":{"row":7,"col":8}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(5, board1.eq(board2));
+
+// One gblock-cell rejected by goal
+// level-editor.html?level=fl59--091---290-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":9,"dir":"DOWN"}],"ice":[],"arrows":[],"gblocks":[{"row":2,"col":9,"groupNum":0}],"sand":[],"ball":{"row":5,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":9,"dir":"DOWN"}],"ice":[],"arrows":[],"gblocks":[{"row":1,"col":9,"groupNum":0}],"sand":[],"ball":{"row":2,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(6, board1.eq(board2));
+
+// TODO: TEST FAIL: level-editor.html?level=fl52--5k2-5455565b5e5h5j--4804g35805c15d15g35i36806g36h36i3-
+
+// Gblocks and ice
+// level-editor.html?level=fl52--5k2-5455565b5e5h5j--4804g35805a05c15d15g36806906a06g3-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":5,"col":20,"dir":"LEFT"}],"ice":[{"row":5,"col":4},{"row":5,"col":5},{"row":5,"col":6},{"row":5,"col":11},{"row":5,"col":14},{"row":5,"col":17},{"row":5,"col":19}],"arrows":[],"gblocks":[{"row":4,"col":8,"groupNum":0},{"row":4,"col":16,"groupNum":3},{"row":5,"col":8,"groupNum":0},{"row":5,"col":10,"groupNum":0},{"row":5,"col":12,"groupNum":1},{"row":5,"col":13,"groupNum":1},{"row":5,"col":16,"groupNum":3},{"row":6,"col":8,"groupNum":0},{"row":6,"col":9,"groupNum":0},{"row":6,"col":10,"groupNum":0},{"row":6,"col":16,"groupNum":3}],"sand":[],"ball":{"row":5,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":5,"col":20,"dir":"LEFT"}],"ice":[{"row":5,"col":8},{"row":5,"col":9},{"row":5,"col":10},{"row":5,"col":14},{"row":5,"col":17},{"row":5,"col":19},{"row":5,"col":20}],"arrows":[],"gblocks":[{"row":4,"col":11,"groupNum":0},{"row":4,"col":18,"groupNum":3},{"row":5,"col":11,"groupNum":0},{"row":5,"col":13,"groupNum":0},{"row":5,"col":15,"groupNum":1},{"row":5,"col":16,"groupNum":1},{"row":5,"col":18,"groupNum":3},{"row":6,"col":11,"groupNum":0},{"row":6,"col":12,"groupNum":0},{"row":6,"col":13,"groupNum":0},{"row":6,"col":18,"groupNum":3}],"sand":[],"ball":{"row":5,"col":7}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(6, board1.eq(board2));
+
+// Gblock rejected by arrow
+// level-editor.html?level=flaa----5a0-8a0-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[{"row":5,"col":10,"dir":"UP"}],"gblocks":[{"row":8,"col":10,"groupNum":0}],"sand":[],"ball":{"row":10,"col":10}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[{"row":5,"col":10,"dir":"UP"}],"gblocks":[{"row":6,"col":10,"groupNum":0}],"sand":[],"ball":{"row":7,"col":10}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(6, board1.eq(board2));
