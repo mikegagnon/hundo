@@ -639,3 +639,45 @@ board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
 
 
+/**
+ * Ice and arrows
+ **************************************************/
+
+TEST = "Ice and arrows";
+
+// one ice
+// level-editor.html?level=flb9-39--99-690--
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":9,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":11,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":4,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":5,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(1, board1.eq(board2));
+
+// two ice, with ball clogged in arrow
+// level-editor.html?level=flb9-39--7999-690--
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":7,"col":9},{"row":9,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":11,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":4,"col":9},{"row":5,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":6,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(2, board1.eq(board2));
+
+// three ice, with ice clogged in arrow
+// level-editor.html?level=flb9-39--798999-690--
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":7,"col":9},{"row":8,"col":9},{"row":9,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":11,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":4,"col":9},{"row":5,"col":9},{"row":6,"col":9}],"arrows":[{"row":6,"col":9,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":7,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(3, board1.eq(board2));
+
+// three ice bumping into side of arrow
+// level-editor.html?level=flb9-39--798999-693--
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":7,"col":9},{"row":8,"col":9},{"row":9,"col":9}],"arrows":[{"row":6,"col":9,"dir":"RIGHT"}],"gblocks":[],"sand":[],"ball":{"row":11,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9}],"goals":[],"ice":[{"row":7,"col":9},{"row":8,"col":9},{"row":9,"col":9}],"arrows":[{"row":6,"col":9,"dir":"RIGHT"}],"gblocks":[],"sand":[],"ball":{"row":10,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(4, board1.eq(board2));
+
