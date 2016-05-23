@@ -430,16 +430,16 @@ hundo.Board = function(boardConfig) {
     // this.gblocks[gblock.groupNum] == the set of gblocks in that group
     this.gblocks = {}
 
-    // this.matrix[row][call] == array of piece objects
-    this.matrix = new Array();
-    for (var i = 0; i < this.numRows; i++) {
-      this.matrix[i] = new Array();
-      for (var j = 0; j < this.numCols; j++) {
-        this.matrix[i][j] = new Array();
-      }
-    }
-
     var THIS = this;
+
+    // this.matrix[row][col] == array of piece objects
+    this.matrix = new Array();
+    _.each(_.range(0, this.numRows), function(r){
+        THIS.matrix[r] = new Array();
+        _.each(_.range(0, THIS.numCols), function(c){
+            THIS.matrix[r][c] = new Array();
+        });
+    });
 
     // TODO: check return values for addPiece
 
