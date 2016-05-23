@@ -27,19 +27,12 @@ hundo.DirectionEnum = {
     RIGHT: "RIGHT",
     NODIR: "NODIR"
 }
-/**
- * Function common to all pieces
- ******************************************************************************/
-hundo.equalsTypeRowCol = function(a, b) {
-    return a.type == b.type &&
-        a.row == b.row &&
-        a.col == b.col;
-}
 
 /**
- * Generates uuids for board pieces
+ * Functionality common to all pieces
  ******************************************************************************/
 
+// Generates uuids for board pieces
 hundo.IdGenerator = function() {
     this.nextId = 0;
 }
@@ -50,6 +43,27 @@ hundo.IdGenerator.prototype.next = function() {
 }
 
 hundo.idGenerator = new hundo.IdGenerator();
+
+hundo.equalsTypeRowCol = function(a, b) {
+    return a.type == b.type &&
+        a.row == b.row &&
+        a.col == b.col;
+}
+
+hundo.oppositeDir = function(dir) {
+
+    if (dir == hundo.DirectionEnum.UP) {
+        return hundo.DirectionEnum.DOWN;
+    } else if (dir == hundo.DirectionEnum.DOWN) {
+        return hundo.DirectionEnum.UP;
+    } else if (dir == hundo.DirectionEnum.LEFT) {
+        return hundo.DirectionEnum.RIGHT;
+    } else if (dir == hundo.DirectionEnum.RIGHT) {
+        return hundo.DirectionEnum.LEFT;
+    } else {
+        console.error("Bad direction: " + dir)
+    }
+}
 
 /**
  * Block board pieces
@@ -146,21 +160,6 @@ hundo.Goal.getPusher = function(row, col, dir) {
     dc *= -1;
 
     return [row + dr, col + dc];
-}
-
-hundo.oppositeDir = function(dir) {
-
-    if (dir == hundo.DirectionEnum.UP) {
-        return hundo.DirectionEnum.DOWN;
-    } else if (dir == hundo.DirectionEnum.DOWN) {
-        return hundo.DirectionEnum.UP;
-    } else if (dir == hundo.DirectionEnum.LEFT) {
-        return hundo.DirectionEnum.RIGHT;
-    } else if (dir == hundo.DirectionEnum.RIGHT) {
-        return hundo.DirectionEnum.LEFT;
-    } else {
-        console.error("Bad direction: " + dir)
-    }
 }
 
 // dir is the direction of the momentum of piece doing the nudging
