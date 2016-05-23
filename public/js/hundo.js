@@ -554,15 +554,19 @@ hundo.Board.prototype.eq = function(board) {
         }
     }
 
-    for (var r = 0; r < this.numRows; r++) {
-        for (var c = 0; c < this.numCols; c++) {
-            if (!hundo.setEq(this.matrix[r][c], board.matrix[r][c])) {
-                return false;
-            }
-        }
-    }
+    var THIS = this;
 
-    return true;
+    var eq = true;
+
+    _.each(_.range(0, this.numRows), function(r) {
+        _.each(_.range(0, THIS.numCols), function(c) {
+            if (!hundo.setEq(THIS.matrix[r][c], board.matrix[r][c])) {
+                eq = false;
+            }
+        });
+    });
+
+    return eq;
 }
 
 hundo.Board.prototype.isEmptyCell = function(row, col) {
