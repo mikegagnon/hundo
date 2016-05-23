@@ -579,7 +579,12 @@ hundo.Board.prototype.hasBall = function() {
         return piece.type == hundo.PieceTypeEnum.BALL;
     });
 
-    return balls.length >= 1;
+    if (balls.length > 1) {
+        console.error("Multiple balls");
+        return null;
+    }
+
+    return balls.length == 1;
 }
 
 hundo.Board.prototype.clearCell = function(row, col) {
