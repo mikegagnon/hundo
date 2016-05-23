@@ -37,12 +37,27 @@ hundo.equalsTypeRowCol = function(a, b) {
 }
 
 /**
+ * Generates uuids for board pieces
+ ******************************************************************************/
+
+hundo.IdGenerator = function() {
+    this.nextId = 0;
+}
+
+// I'll be impressed if this ever overflows
+hundo.IdGenerator.prototype.next = function() {
+    return this.nextId++;
+}
+
+hundo.idGenerator = new hundo.IdGenerator();
+
+/**
  * Block board pieces
  ******************************************************************************/
 
 // id is a uuid relative to board pieces
-hundo.Block = function(id, row, col) {
-    this.id = id;
+hundo.Block = function(row, col) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.BLOCK;
     this.row = row;
     this.col = col;
@@ -63,8 +78,8 @@ hundo.Block.prototype.eq = function(piece) {
  * Ball board piece
  ******************************************************************************/
 
-hundo.Ball = function(id, row, col, dir) {
-    this.id = id;
+hundo.Ball = function(row, col, dir) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.BALL;
     this.row = row;
     this.col = col;
@@ -108,8 +123,8 @@ hundo.Ball.prototype.nudge = function(dir, board, commit) {
  * Goal board pieces
  ******************************************************************************/
 
-hundo.Goal = function(id, row, col, dir) {
-    this.id = id;
+hundo.Goal = function(row, col, dir) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GOAL;
     this.row = row;
     this.col = col;
@@ -167,8 +182,8 @@ hundo.Goal.prototype.nudge = function(dir, board) {
  * Ice cube board pieces
  ******************************************************************************/
 
-hundo.Ice = function(id, row, col) {
-    this.id = id;
+hundo.Ice = function(row, col) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.ICE;
     this.row = row;
     this.col = col;
@@ -223,8 +238,8 @@ hundo.Ice.prototype.nudge = function(dir, board, commit) {
  * Arrow board pieces
  ******************************************************************************/
 
-hundo.Arrow = function(id, row, col, dir) {
-    this.id = id;
+hundo.Arrow = function(row, col, dir) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.ARROW;
     this.row = row;
     this.col = col;
@@ -261,8 +276,8 @@ hundo.Arrow.prototype.nudge = function(dir, board) {
  * Gblock board pieces
  ******************************************************************************/
 
-hundo.Gblock = function(id, row, col, groupNum) {
-    this.id = id;
+hundo.Gblock = function(row, col, groupNum) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
     this.row = row;
     this.col = col;
@@ -371,8 +386,8 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
  * Sand board pieces
  ******************************************************************************/
 
-hundo.Sand = function(id, row, col) {
-    this.id = id;
+hundo.Sand = function(row, col) {
+    this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.SAND;
     this.row = row;
     this.col = col;
@@ -396,26 +411,11 @@ hundo.Sand.prototype.eq = function(piece) {
 }
 
 /**
- * Generates uuids for board pieces
- ******************************************************************************/
-
-hundo.IdGenerator = function() {
-    this.nextId = 0;
-}
-
-// I'll be impressed if this ever overflows
-hundo.IdGenerator.prototype.next = function() {
-    return this.nextId++;
-}
-
-hundo.idGenerator = new hundo.IdGenerator();
-
-/**
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
 // TODO: Assume boardConfig is untrusted
-hundo.Board = function(boardConfig, idGen) {
+hundo.Board = function(boardConfig) {
 
     // is the ball at rest?
     this.atRest = true;
@@ -450,7 +450,7 @@ hundo.Board = function(boardConfig, idGen) {
 
     // Add blocks to the matrix
     _.each(boardConfig.blocks, function(block){
-        var piece = new hundo.Block(idGen.next(), block.row, block.col)
+        var piece = new hundo.Block(block.row, block.col)
         THIS.addPiece(piece);
     });
 
@@ -458,7 +458,7 @@ hundo.Board = function(boardConfig, idGen) {
     if ("ball" in boardConfig) {
         var row = boardConfig.ball.row;
         var col = boardConfig.ball.col;
-        var ball = new hundo.Ball(idGen.next(), row, col, hundo.DirectionEnum.NODIR);
+        var ball = new hundo.Ball(row, col, hundo.DirectionEnum.NODIR);
         this.addPiece(ball);
     }
 
@@ -467,7 +467,7 @@ hundo.Board = function(boardConfig, idGen) {
         var row = goal.row;
         var col = goal.col;
         var dir = goal.dir;
-        var piece = new hundo.Goal(idGen.next(), row, col, dir);
+        var piece = new hundo.Goal(row, col, dir);
         THIS.addPiece(piece);
     });
 
@@ -477,7 +477,7 @@ hundo.Board = function(boardConfig, idGen) {
         if (THIS.inBounds(ice.row, ice.col)) {
             var row = ice.row;
             var col = ice.col;
-            var piece = new hundo.Ice(idGen.next(), row, col);
+            var piece = new hundo.Ice(row, col);
             THIS.addPiece(piece);
         } else {
             THIS.oob.push(ice);
@@ -489,7 +489,7 @@ hundo.Board = function(boardConfig, idGen) {
         var row = arrow.row;
         var col = arrow.col;
         var dir = arrow.dir;
-        var piece = new hundo.Arrow(idGen.next(), row, col, dir);
+        var piece = new hundo.Arrow(row, col, dir);
         THIS.addPiece(piece);
     });
 
@@ -498,7 +498,7 @@ hundo.Board = function(boardConfig, idGen) {
         var row = gblock.row;
         var col = gblock.col;
         var groupNum = gblock.groupNum;
-        var piece = new hundo.Gblock(idGen.next(), row, col, groupNum);
+        var piece = new hundo.Gblock(row, col, groupNum);
         THIS.addPiece(piece);
     });
 
@@ -506,7 +506,7 @@ hundo.Board = function(boardConfig, idGen) {
     _.each(boardConfig.sand, function(sand) {
         var row = sand.row;
         var col = sand.col;
-        var piece = new hundo.Sand(idGen.next(), row, col);
+        var piece = new hundo.Sand(row, col);
         THIS.addPiece(piece);
     });
 }
@@ -1033,7 +1033,7 @@ hundo.Board.prototype.move = function(dir) {
 // TODO: rm getJson
 hundo.Board.prototype.clone = function() {
     var config = this.getJson();
-    return new hundo.Board(config, hundo.idGenerator);
+    return new hundo.Board(config);
 
 }
 
@@ -1339,11 +1339,9 @@ hundo.Viz = function(config) {
 
     this.drawGrid();
 
-    this.idGen = hundo.idGenerator;
-
     var boardConfig = this.levels[0];
 
-    this.board = new hundo.Board(boardConfig, this.idGen);
+    this.board = new hundo.Board(boardConfig);
 
     this.drawBoard();
 
@@ -1542,19 +1540,19 @@ hundo.Viz.prototype.cellFromXY = function(x, y) {
 hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
 
     if (this.paletteSelection.type == hundo.PieceTypeEnum.BALL) {
-        return new hundo.Ball(this.idGen.next(), row, col);
+        return new hundo.Ball(row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.BLOCK) {
-        return new hundo.Block(this.idGen.next(), row, col);
+        return new hundo.Block(row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GOAL) {
-        return new hundo.Goal(this.idGen.next(), row, col, this.paletteSelection.dir);
+        return new hundo.Goal(row, col, this.paletteSelection.dir);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ICE) {
-        return new hundo.Ice(this.idGen.next(), row, col);
+        return new hundo.Ice(row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ARROW) {
-        return new hundo.Arrow(this.idGen.next(), row, col, this.paletteSelection.dir);
+        return new hundo.Arrow(row, col, this.paletteSelection.dir);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GBLOCK) {
-        return new hundo.Gblock(this.idGen.next(), row, col, this.paletteSelection.groupNum);
+        return new hundo.Gblock(row, col, this.paletteSelection.groupNum);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.SAND) {
-        return new hundo.Sand(this.idGen.next(), row, col);
+        return new hundo.Sand(row, col);
         
     } else {
         console.error("Unrecognized piece type")
@@ -2298,8 +2296,7 @@ hundo.Viz.prototype.prevLevel = function() {
     this.animateSolvedQuick();
 
     this.level--;
-    this.board = new hundo.Board(this.levels[this.level],
-        this.idGen);
+    this.board = new hundo.Board(this.levels[this.level]);
     this.drawBoardQuick();
     this.updateLevelSelect();
 
@@ -2318,8 +2315,7 @@ hundo.Viz.prototype.loadNextLevel = function(quick) {
             this.levelMax = this.level;
         }
 
-        this.board = new hundo.Board(this.levels[this.level],
-            this.idGen);
+        this.board = new hundo.Board(this.levels[this.level]);
 
         if (quick) {
             this.drawBoardQuick();
