@@ -586,12 +586,10 @@ board1.move(hundo.DirectionEnum.UP);
 assert(5, Object.compare(board1.getJson(), config2));
 
 /**
- * Passing through arrows
+ * Passing through arrows, and exiting clogged arrow
  **************************************************/
 
-// TODO: Ball exiting clogged arrow
-
-TEST = "Passing through arrows";
+TEST = "Passing through arrows, and exiting clogged arrow";
 
 // level-editor.html?level=fl79-39757db9---5907727b3991--
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9},{"row":7,"col":5},{"row":7,"col":13},{"row":11,"col":9}],"goals":[],"ice":[],"arrows":[{"row":5,"col":9,"dir":"UP"},{"row":7,"col":7,"dir":"LEFT"},{"row":7,"col":11,"dir":"RIGHT"},{"row":9,"col":9,"dir":"DOWN"}],"gblocks":[],"sand":[],"ball":{"row":7,"col":9}};
@@ -621,6 +619,36 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
+
+// Exiting clogged arrow
+// level-editor.html?level=fl6a-5aba---6a0--
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":5,"col":10},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[{"row":6,"col":10,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":6,"col":10}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":5,"col":10},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[{"row":6,"col":10,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":10,"col":10}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(5, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":5,"col":10},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[{"row":6,"col":10,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":6,"col":10}};
+var config2 = config1;
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(6, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":5,"col":10},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[{"row":6,"col":10,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":6,"col":10}};
+var config2 = config1;
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(7, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":5,"col":10},{"row":11,"col":10}],"goals":[],"ice":[],"arrows":[{"row":6,"col":10,"dir":"UP"}],"gblocks":[],"sand":[],"ball":{"row":6,"col":10}};
+var config2 = config1;
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(8, board1.eq(board2));
 
 /**
  * Bumping into arrows
