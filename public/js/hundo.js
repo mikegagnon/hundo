@@ -1086,10 +1086,10 @@ hundo.Solver = function(board) {
 
     this.winningEdges = this.explore(board);
 
-    console.log("Edges");
-    console.log(JSON.stringify(this.getCellEdges()));
-    console.log("Winning edges")
-    console.log(JSON.stringify(this.getCellWinningEdges()));
+    // console.log("Edges");
+    // console.log(JSON.stringify(this.getCellEdges()));
+    // console.log("Winning edges")
+    // console.log(JSON.stringify(this.getCellWinningEdges()));
 
 }
 
