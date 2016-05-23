@@ -536,10 +536,10 @@ board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
 
 /**
- * Ice bumping into block
+ * Ice bumping into block and going into goal
  **************************************************/
 
-TEST = "Ice bumping into block";
+TEST = "Ice bumping into block and going into goal";
 
 // one ice
 // level-editor.html?level=fl79-39757db9--59777b99---
@@ -563,6 +563,15 @@ assert(2, board1.eq(board2));
 // level-editor.html?level=fl79-39757db9--495969777b99---
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9},{"row":7,"col":5},{"row":7,"col":13},{"row":11,"col":9}],"goals":[],"ice":[{"row":4,"col":9},{"row":5,"col":9},{"row":6,"col":9},{"row":7,"col":7},{"row":7,"col":11},{"row":9,"col":9}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":7,"col":9}};
 var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9},{"row":7,"col":5},{"row":7,"col":13},{"row":11,"col":9}],"goals":[],"ice":[{"row":4,"col":9},{"row":5,"col":9},{"row":6,"col":9},{"row":7,"col":7},{"row":7,"col":11},{"row":9,"col":9}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":7,"col":9}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(3, board1.eq(board2));
+
+// ice going into goal
+// level-editor.html?level=fla9--291-596979---
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":2,"col":9,"dir":"DOWN"}],"ice":[{"row":5,"col":9},{"row":6,"col":9},{"row":7,"col":9}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":10,"col":9}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":2,"col":9,"dir":"DOWN"}],"ice":[{"row":2,"col":9},{"row":3,"col":9},{"row":4,"col":9}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":5,"col":9}};
 var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
