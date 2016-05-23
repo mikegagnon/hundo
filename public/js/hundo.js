@@ -333,7 +333,6 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
 
         var pushingIntoGblock;
 
-        // TODO: factor out this if expression into a function
         if (board.inBounds(row, col)) {
             pushingIntoGblock =
                 board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK);
