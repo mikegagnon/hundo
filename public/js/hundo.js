@@ -594,63 +594,61 @@ hundo.Board.prototype.getPiece = function(row, col, type) {
     });
 }
 
-// TODO: refactor with a function piece.compatible()
+hundo.Board.compatible = {}
+
+hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
+    hundo.PieceTypeEnum.ARROW,
+    hundo.PieceTypeEnum.SAND,
+    hundo.PieceTypeEnum.GOAL
+]
+
+hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
+
+hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
+    hundo.PieceTypeEnum.ARROW,
+    hundo.PieceTypeEnum.SAND,
+    hundo.PieceTypeEnum.GOAL
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.ARROW] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.GBLOCK] = [
+    hundo.PieceTypeEnum.SAND
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+    hundo.PieceTypeEnum.GBLOCK
+]
+
 hundo.Board.prototype.canAddPiece = function(piece) {
 
-    if (piece.type == hundo.PieceTypeEnum.BALL) {
-        return !this.hasBall() &&
-            (this.matrix[piece.row][piece.col].length == 0  ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW) ||
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.SAND) ||
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL))));
-    }
+    // TODO: have getPieces default to returning all pieces
+    var pieces = this.getPieces(function(p){
+        return p.row == piece.row && p.col == piece.col;
+    });
 
-    else if (piece.type == hundo.PieceTypeEnum.BLOCK ||
-        piece.type == hundo.PieceTypeEnum.BALL) {
-        return this.matrix[piece.row][piece.col].length == 0;
-    }
+    if (pieces.length == 0) {
+        return true;
+    } else if (pieces.length == 1) {
+        var incumbent = pieces[0];
+        var compatibles = hundo.Board.compatible[piece.type];
+        var i = _.findIndex(compatibles, function(p){
+            return p == incumbent.type;
+        });
 
-    else if (piece.type == hundo.PieceTypeEnum.ICE) {
-        return this.matrix[piece.row][piece.col].length == 0 ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW)));
-    }
+        return i >= 0;
 
-    else if (piece.type == hundo.PieceTypeEnum.GOAL) {
-        return this.matrix[piece.row][piece.col].length == 0 ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
     }
-
-    else if (piece.type == hundo.PieceTypeEnum.ARROW) {
-        return this.matrix[piece.row][piece.col].length == 0 ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
-    }
-
-    else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
-        return this.matrix[piece.row][piece.col].length == 0;
-    }
-
-    else if (piece.type == hundo.PieceTypeEnum.SAND) {
-        return this.matrix[piece.row][piece.col].length == 0 ||
-            (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GBLOCK) ||
-             this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
-    }
-
-    else {
-        console.error("Unimplemented addPiece");
-        console.error(piece);
-        return false;
-    }
-
 }
 
 hundo.Board.prototype.addPiece = function(piece) {
