@@ -451,18 +451,52 @@ var configDown = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3
 board = new hundo.Board(config, idGen);
 var boardDown = new hundo.Board(configDown, idGen);
 board.move(hundo.DirectionEnum.DOWN);
-assert(1, board.eq(boardDown));
+assert(2, board.eq(boardDown));
 
 var configLeft = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":1}};
 board = new hundo.Board(config, idGen);
 var boardLeft = new hundo.Board(configLeft, idGen);
 board.move(hundo.DirectionEnum.LEFT);
-assert(1, board.eq(boardLeft));
+assert(3, board.eq(boardLeft));
 
 var configRight = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":5}};
 board = new hundo.Board(config, idGen);
 var boardRight = new hundo.Board(configRight, idGen);
 board.move(hundo.DirectionEnum.RIGHT);
-assert(1, board.eq(boardRight));
+assert(4, board.eq(boardRight));
 
+/**
+ * Ball moving into goal slot
+ **************************************************/
+
+TEST = "Ball moving into goal slot"
+
+// level-editor.html?level=fl33--031303362630----
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":3}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":0,"col":3}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(1, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":3}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":6,"col":3}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(2, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":3}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":0}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(3, board1.eq(board2));
+
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":3}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":0,"col":3,"dir":"DOWN"},{"row":3,"col":0,"dir":"RIGHT"},{"row":3,"col":6,"dir":"LEFT"},{"row":6,"col":3,"dir":"UP"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":6}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(3, board1.eq(board2));
 

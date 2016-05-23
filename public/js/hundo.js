@@ -607,7 +607,8 @@ hundo.Board.prototype.canAddPiece = function(piece) {
             (this.matrix[piece.row][piece.col].length == 0  ||
             (this.matrix[piece.row][piece.col].length == 1 &&
             (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ARROW) ||
-            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.SAND))));
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.SAND) ||
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.GOAL))));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.BLOCK ||
@@ -625,7 +626,8 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     else if (piece.type == hundo.PieceTypeEnum.GOAL) {
         return this.matrix[piece.row][piece.col].length == 0 ||
             (this.matrix[piece.row][piece.col].length == 1 &&
-            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE)));
+            (this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.ICE) ||
+            this.getPiece(piece.row, piece.col, hundo.PieceTypeEnum.BALL)));
     }
 
     else if (piece.type == hundo.PieceTypeEnum.ARROW) {
