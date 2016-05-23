@@ -602,6 +602,11 @@ hundo.Board.prototype.getPiece = function(row, col, type) {
     });
 }
 
+
+// hundo.Board.compatible[piece.type] == the array of pieces that are
+// compatible with the piece. Compatibility means two pieces can occupy the
+// same cell.
+
 hundo.Board.compatible = {}
 
 hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
