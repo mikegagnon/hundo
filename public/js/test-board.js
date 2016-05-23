@@ -431,3 +431,38 @@ boardConfig2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4},{"row":2,"
 board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
 board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
 assert(7, board1.eq(board2));
+
+
+/**
+ * Ball moving into block
+ **************************************************/
+
+TEST = "Ball moving into block"
+
+// level-editor.html?level=fl33-03303663-----
+var config = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":3}};
+var configUp = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":1,"col":3}};
+var board = new hundo.Board(config, idGen);
+var boardUp = new hundo.Board(configUp, idGen);
+board.move(hundo.DirectionEnum.UP);
+assert(1, board.eq(boardUp));
+
+var configDown = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":5,"col":3}};
+board = new hundo.Board(config, idGen);
+var boardDown = new hundo.Board(configDown, idGen);
+board.move(hundo.DirectionEnum.DOWN);
+assert(1, board.eq(boardDown));
+
+var configLeft = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":1}};
+board = new hundo.Board(config, idGen);
+var boardLeft = new hundo.Board(configLeft, idGen);
+board.move(hundo.DirectionEnum.LEFT);
+assert(1, board.eq(boardLeft));
+
+var configRight = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3},{"row":3,"col":0},{"row":3,"col":6},{"row":6,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":3,"col":5}};
+board = new hundo.Board(config, idGen);
+var boardRight = new hundo.Board(configRight, idGen);
+board.move(hundo.DirectionEnum.RIGHT);
+assert(1, board.eq(boardRight));
+
+

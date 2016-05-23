@@ -1017,6 +1017,16 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
+hundo.Board.prototype.move = function(dir) {
+    this.setDir(dir);
+
+    this.step();
+
+    while (!this.done && !this.solved && !this.atRest) {
+        this.step();
+    }
+}
+
 // Deep copy the board
 // TODO: rm getJson
 hundo.Board.prototype.clone = function() {
@@ -1125,6 +1135,7 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 }
 
 // push the ball in direction dir
+// TODO: use board.move(...)
 hundo.Solver.move = function(board, dir) {
     board.setDir(dir);
 
@@ -1163,9 +1174,6 @@ hundo.Solver.prototype.getCellWinningEdges = function() {
 }
 
 hundo.Solver.prototype.explore = function(board) {
-
-    console.log(this.edges.length);
-
     if (this.edges.length >= 100) {
         return [];
     }
