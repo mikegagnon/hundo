@@ -1016,10 +1016,11 @@ hundo.Board.prototype.move = function(dir) {
     while (!this.done && !this.solved && !this.atRest) {
         this.step();
     }
+
+    return this;
 }
 
 // Deep copy the board
-// TODO: rm getJson
 hundo.Board.prototype.clone = function() {
     var config = this.getJson();
     return new hundo.Board(config);
@@ -1125,20 +1126,6 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
     }
 }
 
-// push the ball in direction dir
-// TODO: use board.move(...)
-hundo.Solver.move = function(board, dir) {
-    board.setDir(dir);
-
-    board.step();
-
-    while (!board.done && !board.solved && !board.atRest) {
-        board.step();
-    }
-
-    return board;
-}
-
 hundo.Solver.prototype.getCellEdges = function() {
     return _.map(this.edges, function(edge) {
         var [b1, b2] = edge;
@@ -1178,10 +1165,10 @@ hundo.Solver.prototype.explore = function(board) {
 
     var boards = [];
 
-    boards[0] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.UP);
-    boards[1] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.DOWN);
-    boards[2] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.LEFT);
-    boards[3] = hundo.Solver.move(board.clone(), hundo.DirectionEnum.RIGHT);
+    boards[0] = board.clone().move(hundo.DirectionEnum.UP);
+    boards[1] = board.clone().move(hundo.DirectionEnum.DOWN);
+    boards[2] = board.clone().move(hundo.DirectionEnum.LEFT);
+    boards[3] = board.clone().move(hundo.DirectionEnum.RIGHT);
 
     var THIS = this;
 
@@ -2662,6 +2649,7 @@ hundo.Viz.prototype.clickSave = function() {
 
     $("#" + this.levelUrlFieldId()).select();
 
+    console.log(url);
     console.log(JSON.stringify(this.board.getJson()));
 }
 
