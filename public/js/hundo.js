@@ -513,7 +513,7 @@ hundo.Board.prototype.inBounds = function(row, col) {
 }
 
 
-// TODO: is there a better way to do this?
+// compare two arrays as if they are sets, using .eq as the comparator
 hundo.setEq = function(set1, set2) {
     if (set1.length != set2.length) {
         return false;
