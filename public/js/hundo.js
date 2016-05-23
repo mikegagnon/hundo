@@ -254,7 +254,6 @@ hundo.Arrow.prototype.eq = function(piece) {
 
 hundo.Arrow.getPusher = hundo.Goal.getPusher;
 
-// TODO: implement
 hundo.Arrow.prototype.nudge = function(dir, board) {
 
     var [pusherRow, pusherCol] = hundo.Arrow.getPusher(this.row, this.col, dir);
@@ -335,14 +334,12 @@ hundo.Gblock.prototype.nudge = function(dir, board, commit, fromGblock) {
         var pushingIntoGblock;
 
         // TODO: factor out this if expression into a function
-        if (row >= 0 && row < board.numRows &&
-            col >= 0 && col < board.numCols) {
+        if (board.inBounds(row, col)) {
             pushingIntoGblock =
                 board.getPiece(row, col, hundo.PieceTypeEnum.GBLOCK);
         }
 
-        if (row < 0 || row >= board.numRows ||
-            col < 0 || col >= board.numCols) {
+        if (!board.inBounds(row, col)) {
             nudged = false;
             animations = [];
 
@@ -850,9 +847,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 
     var i;
 
-    if (piece.row < 0 || piece.row >= this.numRows ||
-        piece.col < 0 || piece.col >= this.numCols) {
-
+    if (!this.inBounds(piece.row, piece.col)) {
         i = hundo.arrayRemove(this.oob, function(p) {
             return p.id == piece.id;
         })
@@ -869,8 +864,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
         return;
     }
 
-    if (row < 0 || row >= this.numRows ||
-        col < 0 || col >= this.numCols) {
+    if (!this.inBounds(row, col)) {
         this.oob.push(piece);
     } else {
         // add the piece to its new location
@@ -884,7 +878,7 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 // see hundo.nudge
 hundo.Board.prototype.nudge = function(row, col, dir, commit) {
 
-    if (row < 0 || row >= this.numRows || col < 0 || col >= this.numCols) {
+    if (!this.inBounds(row, col)) {
         return [true, []];
     }
 
@@ -960,8 +954,7 @@ hundo.Board.prototype.step = function() {
     var newCol = this.ball.col + dc;
 
     // Check for out of bounds
-    if (newRow < 0 || newRow >= this.numRows ||
-        newCol < 0 || newCol >= this.numCols) {
+    if (!this.inBounds(newRow, newCol)) {
 
         this.atRest = true;
         this.done = true;
@@ -1182,9 +1175,7 @@ hundo.Solver.prototype.explore = function(board) {
     this.boards.push(board);
 
     // if out of bounds or solved
-    if (board.ball.row < 0 || board.ball.row >= board.numRows ||
-        board.ball.col < 0 || board.ball.col >= board.numCols ||
-        board.solved) {
+    if (!board.inBounds(board.ball.row, board.ball.col) || board.solved) {
         return [];
     }
 
