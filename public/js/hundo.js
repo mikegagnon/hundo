@@ -441,68 +441,67 @@ hundo.Board = function(boardConfig) {
         });
     });
 
-    // TODO: check return values for addPiece
-
-    // Add blocks to the matrix
+    // Add blocks
     _.each(boardConfig.blocks, function(block){
         var piece = new hundo.Block(block.row, block.col)
-        THIS.addPiece(piece);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     });
 
-    // Add the ball to the matrix
+    // Add the ball
     if ("ball" in boardConfig) {
         var row = boardConfig.ball.row;
         var col = boardConfig.ball.col;
-        var ball = new hundo.Ball(row, col, hundo.DirectionEnum.NODIR);
-        this.addPiece(ball);
+        var piece = new hundo.Ball(row, col, hundo.DirectionEnum.NODIR);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     }
 
-    // Add goals to the matrix
+    // Add goals
     _.each(boardConfig.goals, function(goal) {
-        var row = goal.row;
-        var col = goal.col;
-        var dir = goal.dir;
-        var piece = new hundo.Goal(row, col, dir);
-        THIS.addPiece(piece);
+        var piece = new hundo.Goal(goal.row, goal.col, goal.dir);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     });
 
-    // Add ice to the matrix
+    // Add ice
     _.each(boardConfig.ice, function(ice) {
 
         if (THIS.inBounds(ice.row, ice.col)) {
-            var row = ice.row;
-            var col = ice.col;
-            var piece = new hundo.Ice(row, col);
-            THIS.addPiece(piece);
+            var piece = new hundo.Ice(ice.row, ice.col);
+            if (!THIS.addPiece(piece)) {
+                console.error("Could not add piece: ", piece);
+            }
         } else {
             THIS.oob.push(ice);
         }
     });
 
-    // Add arrows to the matrix
+    // Add arrows
     _.each(boardConfig.arrows, function(arrow) {
-        var row = arrow.row;
-        var col = arrow.col;
-        var dir = arrow.dir;
-        var piece = new hundo.Arrow(row, col, dir);
-        THIS.addPiece(piece);
+        var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     });
 
-    // Add gblocks to the matrix
+    // Add gblocks
     _.each(boardConfig.gblocks, function(gblock) {
-        var row = gblock.row;
-        var col = gblock.col;
-        var groupNum = gblock.groupNum;
-        var piece = new hundo.Gblock(row, col, groupNum);
-        THIS.addPiece(piece);
+        var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupNum);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     });
 
-    // Add sand to the matrix
+    // Add sand
     _.each(boardConfig.sand, function(sand) {
-        var row = sand.row;
-        var col = sand.col;
-        var piece = new hundo.Sand(row, col);
-        THIS.addPiece(piece);
+        var piece = new hundo.Sand(sand.row, sand.col);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
     });
 }
 
