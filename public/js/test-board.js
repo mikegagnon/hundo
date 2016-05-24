@@ -143,6 +143,8 @@ assert(4, board.matrix[4][4][hundo.LayerEnum.TOP].eq(new hundo.Ball(4, 4, NODIR)
 /**
  * Board.reset
  **************************************************/
+
+/*
 TEST = "Board.reset ball"
 var board = new hundo.Board(config1, idGen);
 
@@ -202,12 +204,13 @@ assert(3, board.matrix[2][2][0].eq(
     new hundo.Block(2, 2)));
 assert(4, board.matrix[2][3][0].eq(
     new hundo.Ball(2, 3, hundo.DirectionEnum.NODIR)));
-
+*/
 
 /**
  * Board.step once
  **************************************************/
 
+/*
 TEST = "Board.step once"
 
 
@@ -256,11 +259,13 @@ var expectedBall = new hundo.Ball(2, 4, hundo.DirectionEnum.RIGHT);
 assert(11, board.matrix[2][4][0].eq(expectedBall));
 assert(12, board.ball.eq(expectedBall));
 assertEquals(13, result[0].move.dir, hundo.DirectionEnum.RIGHT);
+*/
 
 /**
  * Board.step 
  **************************************************/
 
+/*
 TEST = "Board.step three times"
 
 var board = new hundo.Board(config2, idGen);
@@ -274,10 +279,13 @@ board.step();
 assertEquals(1, board.ball.col, 3);
 
 // TODO: assert
+*/
 
 /**
  * Board.nudge
  **************************************************/
+
+/*
 TEST = "Board.nudge"
 
 var board = new hundo.Board(config1, idGen);
@@ -299,11 +307,12 @@ assertEquals(9, false, board.nudge(1,7, hundo.DirectionEnum.UP)[0]);
 assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN)[0]);
 assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT)[0]);
 assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT)[0]);
+*/
 
 /**
  * Board.checkSolved
  **************************************************/
-TEST = "Board.checkSolved"
+/*TEST = "Board.checkSolved"
 
 var board = new hundo.Board(config1, idGen);
 
@@ -312,22 +321,24 @@ assert(1, !board.checkSolved());
 board.movePiece(board.ball, 1, 7);
 
 assert(2, board.checkSolved());
+*/
 
 /**
  * Board.clone
  **************************************************/
 
+/*
 TEST = "Board.clone"
 
 var board1 = new hundo.Board(config1, idGen);
 var board2 = board1.clone();
 
 assert(1, Object.compare(board1.getJson(), board2.getJson()));
-
+*/
 /**
  * Test piece.equality
  **************************************************/
-
+/*
  TEST = "Block equality"
 
  assert(1, (new hundo.Block(2, 3)).eq(new hundo.Block(2, 3)));
@@ -339,12 +350,12 @@ assert(1, Object.compare(board1.getJson(), board2.getJson()));
     new hundo.Ball(2, 3, hundo.DirectionEnum.UP)));
  assert(1, !(new hundo.Ball(2, 3, hundo.DirectionEnum.UP)).eq(
     new hundo.Ball(2, 3, hundo.DirectionEnum.DOWN)));
-
+*/
 
 /**
  * Test hundo.setEq
  **************************************************/
-
+/*
 TEST = "Set equality"
 
 var set1 = [new hundo.Block(2, 3),
@@ -375,11 +386,12 @@ assert(4, !hundo.setEq(set1, set2));
 set1 = [];
 set2 = [];
 assert(5, hundo.setEq(set1, set2));
+*/
 
 /**
  * Test board.eq
  **************************************************/
-
+/*
 TEST = "board.eq"
 
 
@@ -432,11 +444,11 @@ board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
 board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
 assert(7, board1.eq(board2));
 
-
+*/
 /**
  * Ball moving into block
  **************************************************/
-
+/*
 TEST = "Ball moving into block";
 
 // level-editor.html?level=fl33-03303663-----
@@ -464,11 +476,11 @@ board = new hundo.Board(config, idGen);
 var boardRight = new hundo.Board(configRight, idGen);
 board.move(hundo.DirectionEnum.RIGHT);
 assert(4, board.eq(boardRight));
-
+*/
 /**
  * Ball moving into goal slot
  **************************************************/
-
+/*
 TEST = "Ball moving into goal slot";
 
 // level-editor.html?level=fl33--031303362630----
@@ -499,11 +511,12 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-
+*/
 /**
  * Ball bumping into goal side
  **************************************************/
 
+/*
 TEST = "Ball bumping into goal side";
 
 // level-editor.html?level=fl33--030300360631----
@@ -534,11 +547,12 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-
+*/
 /**
  * Ice bumping into block and going into goal and going out of bounds
  **************************************************/
 
+/*
 TEST = "Ice bumping into block and going into goal and going out of bounds";
 
 // one ice
@@ -584,11 +598,11 @@ var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":-1
 var board1 = new hundo.Board(config1, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(5, Object.compare(board1.getJson(), config2));
-
+*/
 /**
  * Passing through arrows, and exiting clogged arrow
  **************************************************/
-
+/*
 TEST = "Passing through arrows, and exiting clogged arrow";
 
 // level-editor.html?level=fl79-39757db9---5907727b3991--
@@ -649,11 +663,12 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(8, board1.eq(board2));
-
+*/
 /**
  * Bumping into arrows
  **************************************************/
 
+/*
 TEST = "Bumping into arrows";
 
 // level-editor.html?level=fl79-39757db9---5917707b0990--
@@ -684,12 +699,12 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-
+*/
 
 /**
  * Ice and arrows
  **************************************************/
-
+/*
 TEST = "Ice and arrows";
 
 // one ice
@@ -727,11 +742,12 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(4, board1.eq(board2));
-
+*/
 /**
  * Gblocks
  **************************************************/
 
+/*
 TEST = "Gblocks";
 
 // Four single-cell gblocks (each a different groupNum) bumping into blocks
@@ -805,11 +821,13 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(6, board1.eq(board2));
+*/
 
 /**
  * Sand
  **************************************************/
 
+/*
 TEST = "Sand";
 
 // Ball going into sandpit
@@ -867,3 +885,6 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 //assert(6, board1.eq(board2));
+
+
+*/
