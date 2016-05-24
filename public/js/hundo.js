@@ -153,8 +153,6 @@ hundo.Ball.prototype.messageUp = function(board, message) {
     }
 
     return [success, animations];
-
-
 }
 
 /**
@@ -183,6 +181,48 @@ hundo.Goal.prototype.messageUp = function(board, message) {
         return [true, []]
     }
     return [false, []];
+}
+
+/**
+ * Ice board piece
+ ******************************************************************************/
+
+hundo.Ice = function(row, col) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.ICE;
+    this.layer = hundo.LayerEnum.TOP;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+}
+
+hundo.Ice.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece);
+}
+
+hundo.Ice.prototype.messageUp = function(board, message) {
+
+    var newMessage = {
+        sender: this,
+        forwarder: this,
+        dir: message.dir,
+    }
+
+    var [success, animations] = board.messageDown(newMessage);
+
+    if (success) {
+        board.moveDir(this, message.dir);
+        animations.push(
+            {
+                "move": {
+                    "ice": this,
+                    "dir": message.dir,
+                }
+            });
+    }
+
+    return [success, animations];
 }
 
 /**
@@ -294,6 +334,14 @@ hundo.Board = function(boardConfig) {
         }
     });
 
+    // Add ice
+    _.each(boardConfig.ice, function(ice) {
+        var piece = new hundo.Ice(ice.row, ice.col, ice.dir);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
     // Add arrows
     _.each(boardConfig.arrows, function(arrow) {
         var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
@@ -311,6 +359,10 @@ hundo.Board.prototype.inBounds = function(row, col) {
 }
 
 hundo.Board.prototype.getTopBottom = function(row, col) {
+    if (!this.inBounds(row, col)) {
+        return [undefined, undefined];
+    }
+
     var cell = this.matrix[row][col];
     return [cell[hundo.LayerEnum.TOP], cell[hundo.LayerEnum.BOTTOM]];
 }
@@ -664,13 +716,12 @@ hundo.Board.prototype.getGoals = function() {
     });
 };
 
-/*
+
 hundo.Board.prototype.getIce = function() {
     return this.getPieces(function(piece){
         return piece.type == hundo.PieceTypeEnum.ICE;
     });
 };
-*/
 
 hundo.Board.prototype.getArrows = function() {
     return this.getPieces(function(piece){
@@ -710,14 +761,12 @@ hundo.Board.prototype.getJson = function() {
                     dir: goal.dir
                 }
             }),
-        /*
         ice: _.map(this.getIce(), function(ice) {
                 return {
                     row: ice.row,
                     col: ice.col
                 }
             }),
-        */
         arrows: _.map(this.getArrows(), function(arrow) {
                 return {
                     row: arrow.row,
@@ -2105,7 +2154,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
-    /*
     var iceMargin = Math.floor(this.vizConfig.cellSize / 6);
 
     this.boardSvg.selectAll()
@@ -2125,6 +2173,8 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
 
         });
+
+    /*
 
     this.boardSvg.selectAll()
         .data(this.board.getGblocks())

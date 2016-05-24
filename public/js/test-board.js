@@ -483,7 +483,6 @@ assert(4, board1.eq(board2));
  * Ice bumping into block and going into goal and going out of bounds
  **************************************************/
 
-/*
 TEST = "Ice bumping into block and going into goal and going out of bounds";
 
 // one ice
@@ -529,7 +528,6 @@ var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":-1
 var board1 = new hundo.Board(config1, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(5, Object.compare(board1.getJson(), config2));
-*/
 
 /**
  * Passing through arrows, and exiting clogged arrow
@@ -677,7 +675,8 @@ assert(4, board1.eq(board2));
 /**
  * Gblocks
  **************************************************/
-
+// TODO: test case where a ball is nested in a gblock-cluster and a ball is
+// nested in a gblock-cluster
 /*
 TEST = "Gblocks";
 
