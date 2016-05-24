@@ -733,7 +733,6 @@ hundo.Board.prototype.getArrows = function() {
     });
 };
 
-/*
 hundo.Board.prototype.getGblocks = function() {
     return this.getPieces(function(piece){
         return piece.type == hundo.PieceTypeEnum.GBLOCK;
@@ -745,7 +744,6 @@ hundo.Board.prototype.getSand = function() {
         return piece.type == hundo.PieceTypeEnum.SAND;
     });
 };
-*/
 
 hundo.Board.prototype.getJson = function() {
 
@@ -778,7 +776,6 @@ hundo.Board.prototype.getJson = function() {
                     dir: arrow.dir
                 }
             }),
-        /*
         gblocks: _.map(this.getGblocks(), function(gblock) {
                 return {
                     row: gblock.row,
@@ -792,7 +789,6 @@ hundo.Board.prototype.getJson = function() {
                     col: sand.col,
                 }
             }),
-        */
     }
 
     if (this.ball) {
