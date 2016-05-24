@@ -675,9 +675,10 @@ assert(4, board1.eq(board2));
 /**
  * Gblocks
  **************************************************/
-// TODO: test case where a ball is nested in a gblock-cluster and a ball is
+// TODO: test case where ice is nested in a gblock-cluster and a ball is
 // nested in a gblock-cluster
-/*
+// TODO: test case where a large cluster is centered on sand
+
 TEST = "Gblocks";
 
 // Four single-cell gblocks (each a different groupNum) bumping into blocks
@@ -751,7 +752,7 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(6, board1.eq(board2));
-*/
+
 
 /**
  * Sand
