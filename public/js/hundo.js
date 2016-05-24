@@ -228,65 +228,6 @@ hundo.Board.prototype.inBounds = function(row, col) {
     }
 }
 
-hundo.Board.prototype.eq = function(board) {
-
-    if (this.numRows != board.numRows || this.numCols != board.numCols) {
-        return false;
-    }
-
-    if (this.ball && !board.ball || !this.ball && board.ball) {
-        return false;
-    }
-
-    if (this.ball && board.ball) {
-        if (this.ball.row != board.ball.row ||
-            this.ball.col != board.ball.col) {
-            return false;
-        }
-    }
-
-    var THIS = this;
-
-    var eq = true;
-
-    _.each(_.range(0, this.numRows), function(r) {
-        _.each(_.range(0, THIS.numCols), function(c) {
-            
-            var cell1 = this.matrix[r][c];
-            var cell2 = board.matrix[r][c];
-
-            var top1 = cell1[hundo.LayerEnum.TOP];
-            var top2 = cell2[hundo.LayerEnum.TOP];
-
-            var bottom1 = cell1[hundo.LayerEnum.TOP];
-            var bottom2 = cell2[hundo.LayerEnum.TOP];
-
-            if ((top1 && !top2) || (!top1 && top2)) {
-                eq = false;
-            } else if (top1 && top2 && !top1.eq(top2)) {
-                eq = false;
-            } else if (!top1 && !top2) {
-                // do nothing, since top1 == top2
-            } else {
-                console.error("This code should not be reachable")
-            }
-
-            if ((bottom1 && !bottom2) || (!bottom1 && bottom2)) {
-                eq = false;
-            } else if (bottom1 && bottom2 && !bottom1.eq(bottom2)) {
-                eq = false;
-            } else if (!bottom1 && !bottom2) {
-                // do nothing, since bottom1 == bottom2
-            } else {
-                console.error("This code should not be reachable")
-            }
-
-        });
-    });
-
-    return eq;
-}
-
 hundo.Board.prototype.numPieces = function(row, col) {
 
     var cell = this.matrix[row][col];
@@ -856,6 +797,65 @@ hundo.Board.prototype.clone = function() {
     var config = this.getJson();
     return new hundo.Board(config);
 
+}
+
+hundo.Board.prototype.eq = function(board) {
+
+    if (this.numRows != board.numRows || this.numCols != board.numCols) {
+        return false;
+    }
+
+    if (this.ball && !board.ball || !this.ball && board.ball) {
+        return false;
+    }
+
+    if (this.ball && board.ball) {
+        if (this.ball.row != board.ball.row ||
+            this.ball.col != board.ball.col) {
+            return false;
+        }
+    }
+
+    var THIS = this;
+
+    var eq = true;
+
+    _.each(_.range(0, this.numRows), function(r) {
+        _.each(_.range(0, THIS.numCols), function(c) {
+            
+            var cell1 = this.matrix[r][c];
+            var cell2 = board.matrix[r][c];
+
+            var top1 = cell1[hundo.LayerEnum.TOP];
+            var top2 = cell2[hundo.LayerEnum.TOP];
+
+            var bottom1 = cell1[hundo.LayerEnum.TOP];
+            var bottom2 = cell2[hundo.LayerEnum.TOP];
+
+            if ((top1 && !top2) || (!top1 && top2)) {
+                eq = false;
+            } else if (top1 && top2 && !top1.eq(top2)) {
+                eq = false;
+            } else if (!top1 && !top2) {
+                // do nothing, since top1 == top2
+            } else {
+                console.error("This code should not be reachable")
+            }
+
+            if ((bottom1 && !bottom2) || (!bottom1 && bottom2)) {
+                eq = false;
+            } else if (bottom1 && bottom2 && !bottom1.eq(bottom2)) {
+                eq = false;
+            } else if (!bottom1 && !bottom2) {
+                // do nothing, since bottom1 == bottom2
+            } else {
+                console.error("This code should not be reachable")
+            }
+
+        });
+    });
+
+    return eq;
 }
 
 /**
