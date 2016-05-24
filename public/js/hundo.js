@@ -674,7 +674,13 @@ hundo.Board.prototype.addPiece = function(piece) {
                 this.gblocks[piece.groupNum] = [];
             }   
 
-            this.gblocks[piece.groupNum].push(piece);
+            var i = _.findIndex(this.gblocks[piece.groupNum], function(p) {
+                return p.eq(piece);
+            })
+            
+            if (i < 0) {
+                this.gblocks[piece.groupNum].push(piece);
+            }
         }
 
         return true;
