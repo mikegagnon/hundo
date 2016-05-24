@@ -1040,8 +1040,10 @@ hundo.Board.prototype.eq = function(board) {
 
             if ((top1 && !top2) || (!top1 && top2)) {
                 eq = false;
-            } else if (top1 && top2 && !top1.eq(top2)) {
-                eq = false;
+            } else if (top1 && top2) {
+                if (!top1.eq(top2)) {
+                    eq = false;
+                }
             } else if (!top1 && !top2) {
                 // do nothing, since top1 == top2
             } else {
@@ -1050,8 +1052,10 @@ hundo.Board.prototype.eq = function(board) {
 
             if ((bottom1 && !bottom2) || (!bottom1 && bottom2)) {
                 eq = false;
-            } else if (bottom1 && bottom2 && !bottom1.eq(bottom2)) {
-                eq = false;
+            } else if (bottom1 && bottom2) {
+                if (!bottom1.eq(bottom2)) {
+                    eq = false;
+                }
             } else if (!bottom1 && !bottom2) {
                 // do nothing, since bottom1 == bottom2
             } else {
