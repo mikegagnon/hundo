@@ -113,9 +113,9 @@ var ball = board.ball;
 board.movePiece(ball, 2, 4);
 
 assert(1, ball.eq(new hundo.Ball(2, 4, NODIR)));
-assertEquals(2, board.matrix[2][3].length, 0);
-assert(3, board.matrix[2][4].length, 1);
-assert(4, board.matrix[2][4][0].eq(new hundo.Ball(2, 4, NODIR)));
+assert(2, !board.matrix[2][3][hundo.LayerEnum.TOP]);
+assert(3, board.matrix[2][4][hundo.LayerEnum.TOP]);
+assert(4, board.matrix[2][4][hundo.LayerEnum.TOP].eq(new hundo.Ball(2, 4, NODIR)));
 
 TEST = "Board.movePiece out of bounds"
 
