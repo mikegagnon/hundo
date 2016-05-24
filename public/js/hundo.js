@@ -670,14 +670,71 @@ hundo.Board.prototype.getJson = function() {
  *      
  *          col0     col1    col2    col3    col4    col5
  *
+ * Let's say col3 holds the ball:
+ *
+ *                                    O
+ *          ____     ____    ____    ____    ____     ____
+ * top     |____|   |____|  |____|  |____|  |____|   |____|
+ *
+ *          ____     ____    ____    ____    ____     ____
+ * bottom  |____|   |____|  |____|  |____|  |____|   |____|
+ *      
+ *          col0     col1    col2    col3    col4    col5
+ *
+ * The ball can only leave its cell if it has permission from bottom piece of
+ * its cell.
+ *
+ * So, when the ball wants to leave its cell, it passes a message down to the
+ * bottom piece. If bottom piece returns true, the ball may move. Else, the
+ * ball may not move.
+ * 
+ *                                    O
+ *          ____     ____    ____    ____    ____     ____
+ * top     |____|   |____|  |____|  |_\/_|  |____|   |____|  messages going down
+ *
+ *          ____     ____    ____    ____    ____     ____
+ * bottom  |____|   |____|  |____|  |_\/_|  |____|   |____|
+ *      
+ *          col0     col1    col2    col3    col4    col5
+ *
+ * The bottom piece may decide to veto the movement out right (say, because
+ * it is an arrow piece, and the movement goes against a wall of the arrow).
+ *
+ * Or the bottom piece may decide to allow the move. But! The bottom piece
+ * doesn't have sufficient information to decide whether or not the move is
+ * legal. So, the bottom piece passes the message UP on the cell the ball
+ * wants to move into.
+ *
+ *                                    O
+ *          ____     ____    ____    ____    ____     ____
+ * top     |____|   |____|  |_/\_|  |_\/_|  |____|   |____| 
+ *
+ *          ____     ____    ____    ____    ____     ____
+ * bottom  |____|   |____|  |_/\_|  |_\/_|  |____|   |____| messages going up
+ *      
+ *          col0     col1    col2    col3    col4    col5
+ *
+ * First, the bottom piece reviews the message (possibly vetoing it).
+ * Then, the top piece reviews the message (possibly vetoing it).
+ *
+ * Oh yeah, bottom pieces can mutate messages as well..
+ *
+ * To review:
+ *      - Top piece sends message down to bottom piece
+ *      - Bottom piece vetoes message, or sends message down to board
+ *      - Board passes message up to bottom piece (to the recipient of messsage)
+ *      - Bottom piece vetoes message, or sends message up to top piece
+ *      - The top piece won't forward the message, but it might create a new
+ *        message, creating a cascade of messages.
  ******************************************************************************/
 
+// might be called by top piece or bottom piece
 hundo.Board.prototype.messageDown = function(message) {
 
     if (message.sender.layer == hundo.LayerEnum.TOP) {
         var cell = this.matrix[sender.row][sender.col]
         if (cell.bottom) {
-            return cell.bottom.pushDown(message);
+            return cell.bottom.messageDown(message);
         }
     }
 
