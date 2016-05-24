@@ -292,6 +292,9 @@ hundo.Gblock.prototype.eq = function(piece) {
 
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
+
+    
+
     //return [false, []]
 
     // Three cases:
@@ -324,7 +327,8 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 forwarder: THIS,
                 dir: message.dir,
                 row: neighbor.row,
-                col: neighbor.col
+                col: neighbor.col,
+                commit: false
             }
 
             var [success, animations] = board.messageDown(newMessage);
@@ -335,6 +339,33 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 totalSuccess = false;
             }
         });
+
+        if (totalSuccess) {
+
+            _.each(neighbors, function(neighbor) {
+                neighbor.result = undefined;
+            });
+
+            _.each(neighbors, function(neighbor) {
+
+                var newMessage = {
+                    sender: THIS,
+                    forwarder: THIS,
+                    dir: message.dir,
+                    row: neighbor.row,
+                    col: neighbor.col,
+                    commit: true
+                }
+
+                var [success, animations] = board.messageDown(newMessage);
+
+                totalAnimations = _.concat(totalAnimations, animations);
+
+                if (!success) {
+                    totalSuccess = false;
+                }
+            });
+        }
 
         return [totalSuccess, totalAnimations];
 
@@ -351,13 +382,14 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             sender: this,
             forwarder: this,
             dir: message.dir,
+            commit: message.commit
         }
 
         var [success, animations] = board.messageDown(newMessage);
 
         this.result = [success, animations];
 
-        if (success) {
+        if (success && message.commit) {
             board.moveDir(this, message.dir);
             animations.push(
                 {
