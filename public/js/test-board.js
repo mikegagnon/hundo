@@ -264,7 +264,7 @@ assertEquals(13, result[0].move.dir, hundo.DirectionEnum.RIGHT);
  * Board.step 
  **************************************************/
 
-/*
+
 TEST = "Board.step three times"
 
 var board = new hundo.Board(config2, idGen);
@@ -277,41 +277,12 @@ board.step();
 
 assertEquals(1, board.ball.col, 3);
 
-// TODO: assert
-*/
 
-/**
- * Board.nudge
- **************************************************/
-
-/*
-TEST = "Board.nudge"
-
-var board = new hundo.Board(config1, idGen);
-
-// nudging empty space
-assertEquals(1, true, board.nudge(0,0, hundo.DirectionEnum.UP)[0]);
-assertEquals(2, true, board.nudge(0,0, hundo.DirectionEnum.DOWN)[0]);
-assertEquals(3, true, board.nudge(0,0, hundo.DirectionEnum.LEFT)[0]);
-assertEquals(4, true, board.nudge(0,0, hundo.DirectionEnum.RIGHT)[0]);
-
-// nudging a block
-assertEquals(5, false, board.nudge(2,1, hundo.DirectionEnum.UP)[0]);
-assertEquals(6, false, board.nudge(2,1, hundo.DirectionEnum.DOWN)[0]);
-assertEquals(7, false, board.nudge(2,1, hundo.DirectionEnum.LEFT)[0]);
-assertEquals(8, false, board.nudge(2,1, hundo.DirectionEnum.RIGHT)[0]);
-
-// nudging a goal
-assertEquals(9, false, board.nudge(1,7, hundo.DirectionEnum.UP)[0]);
-assertEquals(10, true, board.nudge(1,7, hundo.DirectionEnum.DOWN)[0]);
-assertEquals(11, false, board.nudge(1,7, hundo.DirectionEnum.LEFT)[0]);
-assertEquals(12, false, board.nudge(1,7, hundo.DirectionEnum.RIGHT)[0]);
-*/
 
 /**
  * Board.checkSolved
  **************************************************/
-/*TEST = "Board.checkSolved"
+TEST = "Board.checkSolved"
 
 var board = new hundo.Board(config1, idGen);
 
@@ -320,24 +291,23 @@ assert(1, !board.checkSolved());
 board.movePiece(board.ball, 1, 7);
 
 assert(2, board.checkSolved());
-*/
 
 /**
  * Board.clone
  **************************************************/
 
-/*
+
 TEST = "Board.clone"
 
 var board1 = new hundo.Board(config1, idGen);
 var board2 = board1.clone();
 
 assert(1, Object.compare(board1.getJson(), board2.getJson()));
-*/
+
 /**
  * Test piece.equality
  **************************************************/
-/*
+
  TEST = "Block equality"
 
  assert(1, (new hundo.Block(2, 3)).eq(new hundo.Block(2, 3)));
@@ -349,43 +319,6 @@ assert(1, Object.compare(board1.getJson(), board2.getJson()));
     new hundo.Ball(2, 3, hundo.DirectionEnum.UP)));
  assert(1, !(new hundo.Ball(2, 3, hundo.DirectionEnum.UP)).eq(
     new hundo.Ball(2, 3, hundo.DirectionEnum.DOWN)));
-*/
-
-/**
- * Test hundo.setEq
- **************************************************/
-/*
-TEST = "Set equality"
-
-var set1 = [new hundo.Block(2, 3),
-            new hundo.Ball(2, 3, hundo.DirectionEnum.UP)];
-var set2 = [new hundo.Block(2, 3),
-            new hundo.Ball(2, 3, hundo.DirectionEnum.UP)];
-assert(1, hundo.setEq(set1, set2));
-
-set1 = [new hundo.Block(2, 3),
-        new hundo.Ball(2, 3, hundo.DirectionEnum.UP)];
-set2 = [new hundo.Ball(2, 3, hundo.DirectionEnum.UP),
-        new hundo.Block(2, 3)];
-assert(2, hundo.setEq(set1, set2));
-
-set1 = [new hundo.Block(2, 3),
-        new hundo.Ball(2, 3, hundo.DirectionEnum.UP)];
-set2 = [new hundo.Block(2, 3),
-        new hundo.Ball(2, 4, hundo.DirectionEnum.UP)];
-assert(3, !hundo.setEq(set1, set2));
-
-set1 = [new hundo.Block(2, 3),
-        new hundo.Ball(2, 3, hundo.DirectionEnum.UP)];
-set2 = [new hundo.Ball(2, 3, hundo.DirectionEnum.UP),
-        new hundo.Block(2, 4)];
-assert(4, !hundo.setEq(set1, set2));
-
-
-set1 = [];
-set2 = [];
-assert(5, hundo.setEq(set1, set2));
-*/
 
 /**
  * Test board.eq
