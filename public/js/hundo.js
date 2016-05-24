@@ -345,30 +345,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         [totalSuccess, totalAnimations] = pushNeighbor(false);
 
         if (totalSuccess) {
-
-            _.each(neighbors, function(neighbor) {
-                neighbor.result = undefined;
-            });
-
-            _.each(neighbors, function(neighbor) {
-
-                var newMessage = {
-                    sender: THIS,
-                    forwarder: THIS,
-                    dir: message.dir,
-                    row: neighbor.row,
-                    col: neighbor.col,
-                    commit: true
-                }
-
-                var [success, animations] = board.messageDown(newMessage);
-
-                totalAnimations = _.concat(totalAnimations, animations);
-
-                if (!success) {
-                    totalSuccess = false;
-                }
-            });
+            [totalSuccess, totalAnimations] = pushNeighbor(true);
         }
 
         return [totalSuccess, totalAnimations];
