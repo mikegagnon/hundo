@@ -633,7 +633,7 @@ assert(4, board1.eq(board2));
 /**
  * Ice and arrows
  **************************************************/
-/*
+
 TEST = "Ice and arrows";
 
 // one ice
@@ -671,7 +671,7 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(4, board1.eq(board2));
-*/
+
 /**
  * Gblocks
  **************************************************/
