@@ -186,6 +186,47 @@ hundo.Goal.prototype.messageUp = function(board, message) {
 }
 
 /**
+ * Arrow board pieces
+ ******************************************************************************/
+
+hundo.Arrow = function(row, col, dir) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.ARROW;
+    this.layer = hundo.LayerEnum.BOTTOM;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+    this.dir = dir;
+}
+
+hundo.Arrow.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
+}
+
+hundo.Arrow.prototype.messageUp = function(board, message) {
+
+    if (hundo.Board.isCompatible(this, message.sender) &&
+        this.dir == message.dir) {
+        message.forwarder = this;
+        return board.messageUp(message) 
+    } else {
+        return [false, []];
+    }
+}
+
+hundo.Arrow.prototype.messageDown = function(board, message) {
+    if (this.dir == message.dir ||
+        this.dir == hundo.oppositeDir(message.dir)) {
+        message.forwarder = this;
+        return board.messageDown(message) 
+    } else {
+        return [false, []];
+    }
+}
+
+/**
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
@@ -248,6 +289,16 @@ hundo.Board = function(boardConfig) {
     // Add goals
     _.each(boardConfig.goals, function(goal) {
         var piece = new hundo.Goal(goal.row, goal.col, goal.dir);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
+    console.log(boardConfig.arrows)
+
+    // Add arrows
+    _.each(boardConfig.arrows, function(arrow) {
+        var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -347,15 +398,6 @@ hundo.Board.prototype.clearCell = function(row, col) {
     cell[hundo.LayerEnum.BOTTOM] = undefined;
 
 }
-
-/*
-hundo.Board.prototype.getPiece = function(row, col, type) {
-
-    return _.find(this.matrix[row][col], function(piece){
-        return piece.type == type;
-    });
-}
-*/
 
 // hundo.Board.compatible[piece.type] == the array of pieces that are
 // compatible with the piece. Compatibility means two pieces can occupy the
@@ -630,6 +672,7 @@ hundo.Board.prototype.getIce = function() {
         return piece.type == hundo.PieceTypeEnum.ICE;
     });
 };
+*/
 
 hundo.Board.prototype.getArrows = function() {
     return this.getPieces(function(piece){
@@ -637,6 +680,7 @@ hundo.Board.prototype.getArrows = function() {
     });
 };
 
+/*
 hundo.Board.prototype.getGblocks = function() {
     return this.getPieces(function(piece){
         return piece.type == hundo.PieceTypeEnum.GBLOCK;
@@ -675,6 +719,7 @@ hundo.Board.prototype.getJson = function() {
                     col: ice.col
                 }
             }),
+        */
         arrows: _.map(this.getArrows(), function(arrow) {
                 return {
                     row: arrow.row,
@@ -682,6 +727,7 @@ hundo.Board.prototype.getJson = function() {
                     dir: arrow.dir
                 }
             }),
+        /*
         gblocks: _.map(this.getGblocks(), function(gblock) {
                 return {
                     row: gblock.row,
@@ -2094,7 +2140,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
-
+    */
     this.boardSvg.selectAll()
         .data(this.board.getArrows())
         .enter()
@@ -2105,7 +2151,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
-    */
 
     if (this.maker.showSolution) {
         this.drawSolution();
