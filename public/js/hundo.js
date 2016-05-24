@@ -137,11 +137,12 @@ hundo.Ball.prototype.messageUp = function(board, message) {
         sender: this,
         forwarder: this,
         dir: message.dir,
+        commit: message.commit
     }
 
     var [success, animations] = board.messageDown(newMessage);
 
-    if (success) {
+    if (success && message.commit) {
         board.moveDir(this, this.dir);
         animations.push(
             {
@@ -211,11 +212,12 @@ hundo.Ice.prototype.messageUp = function(board, message) {
         sender: this,
         forwarder: this,
         dir: message.dir,
+        commit: message.commit
     }
 
     var [success, animations] = board.messageDown(newMessage);
 
-    if (success) {
+    if (success && message.commit) {
         board.moveDir(this, message.dir);
         animations.push(
             {
@@ -297,14 +299,12 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var totalSuccess = true;
     var totalAnimations = [];
 
-    function pushNeighbor(commit) {
+    function pushNeighbor() {
 
         // clear out memoization
         _.each(neighbors, function(neighbor) {
             neighbor.result = undefined;
         });
-
-        //return [false, []];
 
         // push every member of this gblock's group
         _.each(neighbors, function(neighbor) {
@@ -315,7 +315,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 row: neighbor.row,
                 col: neighbor.col,
-                commit: commit
+                commit: message.commit
             }
 
             var [success, animations] = board.messageDown(newMessage);
@@ -331,9 +331,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
-
-    //return [false, []]
-
     // Three cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
     //         all gblocks
@@ -342,13 +339,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
 
-        [totalSuccess, totalAnimations] = pushNeighbor(false);
-
-        if (totalSuccess) {
-            [totalSuccess, totalAnimations] = pushNeighbor(true);
-        }
-
-        return [totalSuccess, totalAnimations];
+        return pushNeighbor();
 
     } else {
 
@@ -1136,13 +1127,19 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] = this.ball.messageUp(this, {
-            dir: direction
+    var [success, animations] = this.ball.messageUp(this, {
+            dir: direction,
+            commit: false
         })
 
         // this.nudge(this.ball.row, this.ball.col, this.ball.dir, false);
 
-    if (nudged) {
+    if (success) {
+
+        [success, animations] = this.ball.messageUp(this, {
+            dir: direction,
+            commit: true
+        })
 
         // now commit the nudge
         //[nudged, animations] =
