@@ -1038,7 +1038,6 @@ hundo.Board.prototype.eq = function(board) {
         }
     }
 
-
     _.each(_.range(0, this.numRows), function(r) {
         _.each(_.range(0, THIS.numCols), function(c) {
 

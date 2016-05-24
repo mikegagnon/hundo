@@ -380,7 +380,7 @@ assert(7, board1.eq(board2));
 /**
  * Ball moving into block
  **************************************************/
-/*
+
 TEST = "Ball moving into block";
 
 // level-editor.html?level=fl33-03303663-----
@@ -408,11 +408,11 @@ board = new hundo.Board(config, idGen);
 var boardRight = new hundo.Board(configRight, idGen);
 board.move(hundo.DirectionEnum.RIGHT);
 assert(4, board.eq(boardRight));
-*/
+
 /**
  * Ball moving into goal slot
  **************************************************/
-/*
+
 TEST = "Ball moving into goal slot";
 
 // level-editor.html?level=fl33--031303362630----
@@ -443,12 +443,11 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-*/
+
 /**
  * Ball bumping into goal side
  **************************************************/
 
-/*
 TEST = "Ball bumping into goal side";
 
 // level-editor.html?level=fl33--030300360631----
@@ -479,7 +478,7 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-*/
+
 /**
  * Ice bumping into block and going into goal and going out of bounds
  **************************************************/
