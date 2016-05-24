@@ -212,7 +212,7 @@ assert(4, board.matrix[2][3][TOP].eq(
 
 
 TEST = "Board.step once"
-/*
+
 
 // UP
 var board = new hundo.Board(config1, idGen);
@@ -221,7 +221,7 @@ board.ball.dir = hundo.DirectionEnum.UP;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(1, 3, hundo.DirectionEnum.UP);
-assert(1, board.matrix[1][3][0].eq(expectedBall));
+assert(1, board.matrix[1][3][TOP].eq(expectedBall));
 assert(2, board.ball.eq(expectedBall));
 assertEquals(3, result[0].move.dir, hundo.DirectionEnum.UP);
 
@@ -232,7 +232,7 @@ board.ball.dir = hundo.DirectionEnum.DOWN;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(3, 3, hundo.DirectionEnum.DOWN);
-assert(4, board.matrix[3][3][0].eq(expectedBall));
+assert(4, board.matrix[3][3][TOP].eq(expectedBall));
 assert(5, board.ball.eq(expectedBall));
 assertEquals(6, result[0].move.dir, hundo.DirectionEnum.DOWN);
 
@@ -243,7 +243,7 @@ board.ball.dir = hundo.DirectionEnum.LEFT;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 3, hundo.DirectionEnum.NODIR);
-assert(7, board.matrix[2][3][0].eq(expectedBall));
+assert(7, board.matrix[2][3][TOP].eq(expectedBall));
 assert(8, board.ball.eq(expectedBall));
 assertEquals(9, result[0].collide.dir, hundo.DirectionEnum.LEFT);
 assert(10, result[0].collide.recipients[0].eq(
@@ -256,10 +256,10 @@ board.ball.dir = hundo.DirectionEnum.RIGHT;
 
 var result = board.step();
 var expectedBall = new hundo.Ball(2, 4, hundo.DirectionEnum.RIGHT);
-assert(11, board.matrix[2][4][0].eq(expectedBall));
+assert(11, board.matrix[2][4][TOP].eq(expectedBall));
 assert(12, board.ball.eq(expectedBall));
 assertEquals(13, result[0].move.dir, hundo.DirectionEnum.RIGHT);
-*/
+
 /**
  * Board.step 
  **************************************************/
