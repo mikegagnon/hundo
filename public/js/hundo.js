@@ -96,7 +96,7 @@ hundo.Block = function(row, col) {
     this.origCol = col;
 }
 
-hundo.Block.prototype.pushInto = function(dir, board) {
+hundo.Block.prototype.messageUp = function(board, message) {
     return [false, []];
 }
 
@@ -134,15 +134,19 @@ hundo.Ball.prototype.messageUp = function(board, message) {
         return [false, []];        
     }
 
-
-
     var newMessage = {
         sender: this,
         forwarder: this,
         dir: message.dir,
     }
 
-    return board.messageDown(newMessage);
+    var [success, animations] = board.messageDown(newMessage);
+
+    if (success) {
+        board.moveDir(this, this.dir);
+    }
+
+    return [success, animations];
 
 
 }
@@ -167,7 +171,7 @@ hundo.Goal.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
-hundo.Goal.prototype.pushInto = function(dir, board) {
+hundo.Goal.prototype.messageUp = function(board, message) {
     return [false, []];
 }
 
@@ -487,6 +491,26 @@ hundo.arrayRemove = function(array, func) {
     return i;
 }
 
+hundo.Board.drdc = function(direction) {
+
+    var dr = 0, dc = 0;
+
+    if (direction == hundo.DirectionEnum.UP) {
+        dr = -1;
+    } else if (direction == hundo.DirectionEnum.DOWN) {
+        dr = 1;
+    } else if (direction == hundo.DirectionEnum.LEFT) {
+        dc = -1;
+    } else if (direction == hundo.DirectionEnum.RIGHT) {
+        dc = 1;
+    } else {
+        console.error("Bad direction: " + direction);
+        return null;
+    }
+
+    return [dr, dc];
+}
+
 hundo.Board.prototype.movePiece = function(piece, row, col) {
 
     var i;
@@ -523,6 +547,15 @@ hundo.Board.prototype.movePiece = function(piece, row, col) {
 
     return true;
 
+}
+
+hundo.Board.prototype.moveDir = function(piece, dir) {
+    var [dr, dc] = hundo.Board.drdc(dir);
+
+    var newRow = piece.row + dr;
+    var newCol = piece.col + dc;
+
+    this.movePiece(piece, newRow, newCol);
 }
 
 hundo.Board.prototype.reset = function() {
@@ -833,26 +866,6 @@ hundo.Board.prototype.checkSolved = function() {
     } else {
         return false;
     }
-}
-
-hundo.Board.drdc = function(direction) {
-
-    var dr = 0, dc = 0;
-
-    if (direction == hundo.DirectionEnum.UP) {
-        dr = -1;
-    } else if (direction == hundo.DirectionEnum.DOWN) {
-        dr = 1;
-    } else if (direction == hundo.DirectionEnum.LEFT) {
-        dc = -1;
-    } else if (direction == hundo.DirectionEnum.RIGHT) {
-        dc = 1;
-    } else {
-        console.error("Bad direction: " + direction);
-        return null;
-    }
-
-    return [dr, dc];
 }
 
 // returns null on fatal error
