@@ -136,8 +136,8 @@ board.movePiece(ball, 4, 4);
 
 assert(1, ball.eq(new hundo.Ball(4, 4, NODIR)));
 assertEquals(2, board.oob.length, 0);
-assert(3, board.matrix[4][4].length, 1);
-assert(4, board.matrix[4][4][0].eq(new hundo.Ball(4, 4, NODIR)));
+assert(3, board.matrix[4][4][hundo.LayerEnum.TOP]);
+assert(4, board.matrix[4][4][hundo.LayerEnum.TOP].eq(new hundo.Ball(4, 4, NODIR)));
 
 
 /**
