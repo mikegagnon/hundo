@@ -5,7 +5,7 @@
 
 /**
  * Board configs
- **************************************************/
+ ******************************************************************************/
 
 var config1 = {
     numRows: 5,
@@ -65,7 +65,7 @@ var config2 = {
 
 /**
  * Test Board constructor
- **************************************************/
+ ******************************************************************************/
 TEST = "Board constructor"
 
 var idGen = new hundo.IdGenerator();
@@ -73,15 +73,18 @@ var board = new hundo.Board(config1, idGen);
 var NODIR = hundo.DirectionEnum.NODIR;
 assertEquals(1, board.numRows, 5);
 assertEquals(2, board.numCols, 10);
-assert(3, board.matrix[2][1][hundo.LayerEnum.BOTTOM].eq(new hundo.Block(2, 1, NODIR)));
-assert(4, board.matrix[2][2][hundo.LayerEnum.BOTTOM].eq(new hundo.Block(2, 2, NODIR)));
-assert(5, board.matrix[2][3][hundo.LayerEnum.TOP].eq(new hundo.Ball(2, 3, NODIR)));
+assert(3, board.matrix[2][1][hundo.LayerEnum.BOTTOM].eq(
+    new hundo.Block(2, 1, NODIR)));
+assert(4, board.matrix[2][2][hundo.LayerEnum.BOTTOM].eq(
+    new hundo.Block(2, 2, NODIR)));
+assert(5, board.matrix[2][3][hundo.LayerEnum.TOP].eq(
+    new hundo.Ball(2, 3, NODIR)));
 assert(6, board.matrix[1][7][hundo.LayerEnum.BOTTOM].eq(
     new hundo.Goal(1, 7, hundo.DirectionEnum.UP)));
 
 /**
  * Test Board.getBlocks
- **************************************************/
+ ******************************************************************************/
 TEST = "Board.getBlocks"
 
 var board = new hundo.Board(config1, idGen);
@@ -92,7 +95,7 @@ assert(2, blocks[0].eq(new hundo.Block(2,1)));
 
 /**
  * Test Board.getBalls
- **************************************************/
+ ******************************************************************************/
 TEST = "Board.getBalls"
 
 var board = new hundo.Board(config1, idGen);
@@ -100,9 +103,10 @@ var board = new hundo.Board(config1, idGen);
 var blocks = board.getBalls();
 assertEquals(1, blocks.length, 1);
 
+
 /**
  * Board.movePiece
- **************************************************/
+ ******************************************************************************/
 
 TEST = "Board.movePiece in bound to inbound"
 
@@ -115,7 +119,8 @@ board.movePiece(ball, 2, 4);
 assert(1, ball.eq(new hundo.Ball(2, 4, NODIR)));
 assert(2, !board.matrix[2][3][hundo.LayerEnum.TOP]);
 assert(3, board.matrix[2][4][hundo.LayerEnum.TOP]);
-assert(4, board.matrix[2][4][hundo.LayerEnum.TOP].eq(new hundo.Ball(2, 4, NODIR)));
+assert(4, board.matrix[2][4][hundo.LayerEnum.TOP].eq(
+    new hundo.Ball(2, 4, NODIR)));
 
 TEST = "Board.movePiece out of bounds"
 
@@ -137,7 +142,8 @@ board.movePiece(ball, 4, 4);
 assert(1, ball.eq(new hundo.Ball(4, 4, NODIR)));
 assertEquals(2, board.oob.length, 0);
 assert(3, board.matrix[4][4][hundo.LayerEnum.TOP]);
-assert(4, board.matrix[4][4][hundo.LayerEnum.TOP].eq(new hundo.Ball(4, 4, NODIR)));
+assert(4, board.matrix[4][4][hundo.LayerEnum.TOP].eq(
+    new hundo.Ball(4, 4, NODIR)));
 
 
 /**
