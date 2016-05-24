@@ -73,10 +73,10 @@ var board = new hundo.Board(config1, idGen);
 var NODIR = hundo.DirectionEnum.NODIR;
 assertEquals(1, board.numRows, 5);
 assertEquals(2, board.numCols, 10);
-assert(3, board.matrix[2][1][0].eq(new hundo.Block(2, 1, NODIR)));
-assert(4, board.matrix[2][2][0].eq(new hundo.Block(2, 2, NODIR)));
-assert(5, board.matrix[2][3][0].eq(new hundo.Ball(2, 3, NODIR)));
-assert(6, board.matrix[1][7][0].eq(
+assert(3, board.matrix[2][1][hundo.LayerEnum.BOTTOM].eq(new hundo.Block(2, 1, NODIR)));
+assert(4, board.matrix[2][2][hundo.LayerEnum.BOTTOM].eq(new hundo.Block(2, 2, NODIR)));
+assert(5, board.matrix[2][3][hundo.LayerEnum.TOP].eq(new hundo.Ball(2, 3, NODIR)));
+assert(6, board.matrix[1][7][hundo.LayerEnum.BOTTOM].eq(
     new hundo.Goal(1, 7, hundo.DirectionEnum.UP)));
 
 /**
