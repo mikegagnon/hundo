@@ -244,16 +244,22 @@ hundo.Board.prototype.inBounds = function(row, col) {
     }
 }
 
+hundo.Board.prototype.getTopBottom = function(row, col) {
+    var cell = this.matrix[row][col];
+    return [cell[hundo.LayerEnum.TOP], cell[hundo.LayerEnum.BOTTOM]];
+}
+
 hundo.Board.prototype.numPieces = function(row, col) {
 
-    var cell = this.matrix[row][col];
     var count = 0;
-
-    if (cell[hundo.LayerEnum.TOP]) {
+    
+    var [top, bottom] = this.getTopBottom(row, col);
+    
+    if (top) {
         count ++;
     }
 
-    if (cell[hundo.LayerEnum.BOTTOM]) {
+    if (bottom) {
         count ++;
     }
     
@@ -404,9 +410,7 @@ hundo.Board.prototype.getOnePiece = function(row, col) {
         console.error("Num pieces == " + numPieces + " != 1");
     }
 
-    var cell = this.matrix[row][col];
-    var top = cell[hundo.LayerEnum.TOP];
-    var bottom = cell[hundo.LayerEnum.BOTTOM];
+    var [top, bottom] = this.getTopBottom(row, col);
     
     if (top) {
         return top;
@@ -719,6 +723,9 @@ hundo.Board.prototype.getJson = function() {
  *
  * Oh yeah, bottom pieces can mutate messages as well..
  *
+ * And, if a piece is absent from the top or bottom, the board will simply
+ * forward the messsage up or down.
+ * 
  * To review:
  *      - Top piece sends message down to bottom piece
  *      - Bottom piece vetoes message, or sends message down to board
@@ -731,11 +738,18 @@ hundo.Board.prototype.getJson = function() {
 // might be called by top piece or bottom piece
 hundo.Board.prototype.messageDown = function(message) {
 
+    var [top, bottom] = this.getTopBottom(sender.row, sender.col);
+    
     if (message.sender.layer == hundo.LayerEnum.TOP) {
-        var cell = this.matrix[sender.row][sender.col]
-        if (cell.bottom) {
-            return cell.bottom.messageDown(message);
+        if (bottom) {
+            return bottom.messageDown(message);
         }
+    }
+
+    if (!((message.sender.layer == hundo.LayerEnum.TOP && !bottom) || 
+        message.sender.layer == hundo.LayerEnum.BOTTOM)) {
+        console.error("This code should not be reachable");
+        return undefined;
     }
 
     var [dr, dc] = hundo.Board.drdc(message.dir);
@@ -743,9 +757,15 @@ hundo.Board.prototype.messageDown = function(message) {
     var newRow = message.sender.row + dr;
     var newCol = message.sender.col + dc;
 
-    var cell = this.matrix[newRow][newCol];
-
-
+    var [top, bottom] = this.getTopBottom(newRow, newCol);
+    
+    if (bottom) {
+        bottom.messageUp(message);
+    } else if (top) {
+        top.messageUp(message)
+    } else {
+        return [true, []];
+    }
 
 }
 
