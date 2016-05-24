@@ -63,9 +63,7 @@ var config2 = {
     ]
 }
 
-/**
- * Test Board constructor
- ******************************************************************************/
+/******************************************************************************/
 TEST = "Board constructor"
 
 var idGen = new hundo.IdGenerator();
@@ -82,9 +80,7 @@ assert(5, board.matrix[2][3][hundo.LayerEnum.TOP].eq(
 assert(6, board.matrix[1][7][hundo.LayerEnum.BOTTOM].eq(
     new hundo.Goal(1, 7, hundo.DirectionEnum.UP)));
 
-/**
- * Test Board.getBlocks
- ******************************************************************************/
+/******************************************************************************/
 TEST = "Board.getBlocks"
 
 var board = new hundo.Board(config1, idGen);
@@ -93,9 +89,7 @@ var blocks = board.getBlocks();
 assertEquals(1, blocks.length, 2);
 assert(2, blocks[0].eq(new hundo.Block(2,1)));
 
-/**
- * Test Board.getBalls
- ******************************************************************************/
+/******************************************************************************/
 TEST = "Board.getBalls"
 
 var board = new hundo.Board(config1, idGen);
@@ -103,10 +97,7 @@ var board = new hundo.Board(config1, idGen);
 var blocks = board.getBalls();
 assertEquals(1, blocks.length, 1);
 
-
-/**
- * Board.movePiece
- ******************************************************************************/
+/******************************************************************************/
 
 TEST = "Board.movePiece in bound to inbound"
 
