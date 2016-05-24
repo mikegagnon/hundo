@@ -292,6 +292,84 @@ hundo.Gblock.prototype.eq = function(piece) {
 
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
+    //return [false, []]
+
+    // Three cases:
+    //      1. A non-gblock bumps into this gblock, which case we bump
+    //         all gblocks
+    //      2. A gbock bumps into this gblock, in which case we do the recursive
+    //         bumps as usual, except we memoize results,
+
+    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
+
+        var neighbors = board.gblocks[this.groupNum];
+
+        var totalSuccess = true;
+        var totalAnimations = [];
+
+        // clear out memoization
+        _.each(neighbors, function(neighbor) {
+            neighbor.result = undefined;
+        });
+
+        var THIS = this;
+
+        //return [false, []];
+
+        // push every member of this gblock's group
+        _.each(neighbors, function(neighbor) {
+
+            var newMessage = {
+                sender: THIS,
+                forwarder: THIS,
+                dir: message.dir,
+                row: neighbor.row,
+                col: neighbor.col
+            }
+
+            var [success, animations] = board.messageDown(newMessage);
+
+            totalAnimations = _.concat(totalAnimations, animations);
+
+            if (!success) {
+                totalSuccess = false;
+            }
+        });
+
+        return [totalSuccess, totalAnimations];
+
+    } else {
+
+
+        if (this.result) {
+            // TODO: returning empty animations is correct, right?
+            return [this.result[0], []];
+        }
+
+        // TODO: factor out code common to this and ice, etc.
+        var newMessage = {
+            sender: this,
+            forwarder: this,
+            dir: message.dir,
+        }
+
+        var [success, animations] = board.messageDown(newMessage);
+
+        this.result = [success, animations];
+
+        if (success) {
+            board.moveDir(this, message.dir);
+            animations.push(
+                {
+                    "move": {
+                        "gblock": this,
+                        "dir": message.dir,
+                    }
+                });
+        }
+
+        return [success, animations];
+    }
 }
 
 /**
@@ -911,16 +989,24 @@ hundo.Board.prototype.messageDown = function(message) {
         }
     }
 
-    if (!((message.forwarder.layer == hundo.LayerEnum.TOP && !bottom) || 
-        message.forwarder.layer == hundo.LayerEnum.BOTTOM)) {
+    // !((message.forwarder.layer == hundo.LayerEnum.TOP && !bottom) || 
+        
+    /*if (message.forwarder.layer == hundo.LayerEnum.BOTTOM) {
         console.error("This code should not be reachable");
         return undefined;
+    }*/
+
+    var newRow, newCol;
+
+    if (message.row && message.col) {
+        newRow = message.row;
+        newCol = message.col;
+    } else {
+        var [dr, dc] = hundo.Board.drdc(message.dir);
+
+        newRow = message.sender.row + dr;
+        newCol = message.sender.col + dc;
     }
-
-    var [dr, dc] = hundo.Board.drdc(message.dir);
-
-    var newRow = message.sender.row + dr;
-    var newCol = message.sender.col + dc;
 
     var [top, bottom] = this.getTopBottom(newRow, newCol);
     
