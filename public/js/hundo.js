@@ -124,8 +124,24 @@ hundo.Ball.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
-hundo.Ball.prototype.pushInto = function(dir, board) {
-    return [false, []];
+hundo.Ball.prototype.pushInto = function(board, message) {
+
+    // When a keypress leads to ball.pushInto, sender is empty.
+    // So, when there is a sender, it means another piece is pushing into the 
+    // ball.
+    if (message.sender) {
+        // TODO: implement version that allows pushes from other pieces
+        return [false, []];        
+    }
+
+    var newMessage = {
+        sender: this,
+        dir: message.dir,
+    }
+
+    var [pushed, animations] = board.messageDown(newMessage);
+
+
 }
 
 /**
@@ -641,6 +657,41 @@ hundo.Board.prototype.getJson = function() {
 
 }
 
+/**
+ * Every cell has two layers, a top and a bottom. The top layer can only hold
+ * a top piece, and the bottom layer can only hold a bottom piece.
+ *
+ * Let's look at one row:
+ *          ____     ____    ____    ____    ____     ____
+ * top     |____|   |____|  |____|  |____|  |____|   |____|
+ *
+ *          ____     ____    ____    ____    ____     ____
+ * bottom  |____|   |____|  |____|  |____|  |____|   |____|
+ *      
+ *          col0     col1    col2    col3    col4    col5
+ *
+ ******************************************************************************/
+
+hundo.Board.prototype.messageDown = function(message) {
+
+    if (message.sender.layer == hundo.LayerEnum.TOP) {
+        var cell = this.matrix[sender.row][sender.col]
+        if (cell.bottom) {
+            return cell.bottom.pushDown(message);
+        }
+    }
+
+    var [dr, dc] = hundo.Board.drdc(message.dir);
+
+    var newRow = message.sender.row + dr;
+    var newCol = message.sender.col + dc;
+
+    var cell = this.matrix[newRow][newCol];
+
+
+
+}
+
 
 // see hundo.nudge
 /*
@@ -742,7 +793,7 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] = this.ball.pushInto({
+    var [nudged, animations] = this.ball.pushInto(this, {
             dir: direction
         })
 
