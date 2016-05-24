@@ -124,7 +124,7 @@ hundo.Ball.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
-hundo.Ball.prototype.pushInto = function(board, message) {
+hundo.Ball.prototype.messageUp = function(board, message) {
 
     // When a keypress leads to ball.pushInto, sender is empty.
     // So, when there is a sender, it means another piece is pushing into the 
@@ -138,6 +138,7 @@ hundo.Ball.prototype.pushInto = function(board, message) {
 
     var newMessage = {
         sender: this,
+        forwarder: this,
         dir: message.dir,
     }
 
@@ -740,16 +741,17 @@ hundo.Board.prototype.getJson = function() {
 // might be called by top piece or bottom piece
 hundo.Board.prototype.messageDown = function(message) {
 
-    var [top, bottom] = this.getTopBottom(message.sender.row, message.sender.col);
-    
-    if (message.sender.layer == hundo.LayerEnum.TOP) {
+    var [top, bottom] = this.getTopBottom(message.forwarder.row, message.forwarder.col);
+
+    // TODO: we we really need to keep track of the forwarder and/or sender?    
+    if (message.forwarder.layer == hundo.LayerEnum.TOP) {
         if (bottom) {
-            return bottom.messageDown(message);
+            return bottom.messageDown(this, message);
         }
     }
 
-    if (!((message.sender.layer == hundo.LayerEnum.TOP && !bottom) || 
-        message.sender.layer == hundo.LayerEnum.BOTTOM)) {
+    if (!((message.forwarder.layer == hundo.LayerEnum.TOP && !bottom) || 
+        message.forwarder.layer == hundo.LayerEnum.BOTTOM)) {
         console.error("This code should not be reachable");
         return undefined;
     }
@@ -762,9 +764,11 @@ hundo.Board.prototype.messageDown = function(message) {
     var [top, bottom] = this.getTopBottom(newRow, newCol);
     
     if (bottom) {
-        return bottom.messageUp(message);
+        message.forwarder = undefined;
+        return bottom.messageUp(this, message);
     } else if (top) {
-        return top.messageUp(message)
+        message.forwarder = undefined;
+        return top.messageUp(this, message)
     } else {
         return [true, []];
     }
@@ -773,12 +777,13 @@ hundo.Board.prototype.messageDown = function(message) {
 
 // only callable from bottom pieces
 // row, col are the coordinates  of the bottom piece making the call
-hundo.Board.prototype.messageUp = function(row, col, message) {
+hundo.Board.prototype.messageUp = function(message) {
 
-    var [top, bottom] = this.getTopBottom(row, col);
+    var [top, bottom] = this.getTopBottom(
+        message.forwarder.row, message.forwarder.col);
     
     if (top) {
-        return top.messageUp(message);
+        return top.messageUp(this, message);
     } else {
         return [true, []];
     }
@@ -885,7 +890,7 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] = this.ball.pushInto(this, {
+    var [nudged, animations] = this.ball.messageUp(this, {
             dir: direction
         })
 
