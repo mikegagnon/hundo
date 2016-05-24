@@ -185,10 +185,12 @@ hundo.Board = function(boardConfig) {
     _.each(_.range(0, this.numRows), function(r){
         THIS.matrix[r] = new Array();
         _.each(_.range(0, THIS.numCols), function(c){
-            THIS.matrix[r][c] = {
-                hundo.LayerEnum.TOP: undefined,
-                hundo.LayerEnum.BOTTOM: undefined
-            }
+            THIS.matrix[r][c] = {};
+
+            var cell = THIS.matrix[r][c];
+
+            cell[hundo.LayerEnum.TOP] = undefined;
+            cell[hundo.LayerEnum.BOTTOM] = undefined;
         });
     });
 
@@ -295,11 +297,11 @@ hundo.Board.prototype.getPieces = function(func) {
             var bottom = cell[hundo.LayerEnum.BOTTOM];
 
             if (top && func(top)) {
-                pieces.push(piece);
+                pieces.push(top);
             }
 
             if (bottom && func(bottom)) {
-                pieces.push(piece);
+                pieces.push(bottom);
             }
         })
     });
@@ -1785,6 +1787,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
+    /*
     var sandRadius = this.vizConfig.cellSize / 3;
     this.boardSvg.selectAll()
         .data(this.board.getSand())
@@ -1801,6 +1804,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
 
         });
+    */
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
     this.boardSvg.selectAll()
@@ -1830,6 +1834,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
+    /*
     var iceMargin = Math.floor(this.vizConfig.cellSize / 6);
 
     this.boardSvg.selectAll()
@@ -1873,6 +1878,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
+    */
 
     if (this.maker.showSolution) {
         this.drawSolution();
