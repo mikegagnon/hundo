@@ -126,7 +126,7 @@ var ball = board.ball;
 board.movePiece(ball, -1, 4);
 
 assert(1, ball.eq(new hundo.Ball(-1, 4, NODIR)));
-assertEquals(2, board.matrix[2][3].length, 0);
+assert(2, !board.matrix[2][3][hundo.LayerEnum.TOP]);
 assert(3, board.oob.length, 1);
 assert(4, board.oob[0].eq(new hundo.Ball(-1, 4, NODIR)));
 
