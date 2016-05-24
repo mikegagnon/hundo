@@ -251,9 +251,36 @@ hundo.Board.prototype.eq = function(board) {
 
     _.each(_.range(0, this.numRows), function(r) {
         _.each(_.range(0, THIS.numCols), function(c) {
-            if (!hundo.setEq(THIS.matrix[r][c], board.matrix[r][c])) {
+            
+            var cell1 = this.matrix[r][c];
+            var cell2 = board.matrix[r][c];
+
+            var top1 = cell1[hundo.LayerEnum.TOP];
+            var top2 = cell2[hundo.LayerEnum.TOP];
+
+            var bottom1 = cell1[hundo.LayerEnum.TOP];
+            var bottom2 = cell2[hundo.LayerEnum.TOP];
+
+            if ((top1 && !top2) || (!top1 && top2)) {
                 eq = false;
+            } else if (top1 && top2 && !top1.eq(top2)) {
+                eq = false;
+            } else if (!top1 && !top2) {
+                // do nothing, since top1 == top2
+            } else {
+                console.error("This code should not be reachable")
             }
+
+            if ((bottom1 && !bottom2) || (!bottom1 && bottom2)) {
+                eq = false;
+            } else if (bottom1 && bottom2 && !bottom1.eq(bottom2)) {
+                eq = false;
+            } else if (!bottom1 && !bottom2) {
+                // do nothing, since bottom1 == bottom2
+            } else {
+                console.error("This code should not be reachable")
+            }
+
         });
     });
 
