@@ -297,15 +297,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var totalSuccess = true;
     var totalAnimations = [];
 
-    //return [false, []]
-
-    // Three cases:
-    //      1. A non-gblock bumps into this gblock, which case we bump
-    //         all gblocks
-    //      2. A gbock bumps into this gblock, in which case we do the recursive
-    //         bumps as usual, except we memoize results,
-
-    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
+    function pushNeighbor(commit) {
 
         // clear out memoization
         _.each(neighbors, function(neighbor) {
@@ -323,7 +315,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 row: neighbor.row,
                 col: neighbor.col,
-                commit: false
+                commit: commit
             }
 
             var [success, animations] = board.messageDown(newMessage);
@@ -334,6 +326,23 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 totalSuccess = false;
             }
         });
+
+        return [totalSuccess, totalAnimations];
+
+    }
+
+
+    //return [false, []]
+
+    // Three cases:
+    //      1. A non-gblock bumps into this gblock, which case we bump
+    //         all gblocks
+    //      2. A gbock bumps into this gblock, in which case we do the recursive
+    //         bumps as usual, except we memoize results,
+
+    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
+
+        [totalSuccess, totalAnimations] = pushNeighbor(false);
 
         if (totalSuccess) {
 
