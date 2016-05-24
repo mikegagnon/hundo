@@ -28,7 +28,6 @@ hundo.DirectionEnum = {
     NODIR: "NODIR"
 }
 
-// TODO: use this instead of true false
 hundo.LayerEnum = {
     TOP: "TOP",
     BOTTOM: "BOTTOM"
