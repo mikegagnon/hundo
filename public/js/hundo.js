@@ -271,6 +271,30 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 }
 
 /**
+ * Gblock board pieces
+ ******************************************************************************/
+
+hundo.Gblock = function(row, col, groupNum) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.GBLOCK;
+    this.layer = hundo.LayerEnum.TOP;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+    this.groupNum = groupNum;
+}
+
+hundo.Gblock.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.dir == piece.dir;
+}
+
+hundo.Gblock.prototype.messageUp = function(board, message) {
+
+}
+
+/**
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
@@ -349,6 +373,14 @@ hundo.Board = function(boardConfig) {
     // Add arrows
     _.each(boardConfig.arrows, function(arrow) {
         var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
+    // Add gblocks
+    _.each(boardConfig.gblocks, function(gblock) {
+        var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupNum);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -493,14 +525,6 @@ hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
     hundo.PieceTypeEnum.GBLOCK
 ]
 
-/*hundo.Board.prototype.getTop = function(row, col) {
-    return this.matrix[row][col][true];
-}
-
-hundo.Board.prototype.getBottom = function(row, col) {
-    return this.matrix[row][col][false];
-}*/
-
 // Returns true iff piece1 and piece2 are compatible
 hundo.Board.isCompatible = function(piece1, piece2) {
 
@@ -565,7 +589,7 @@ hundo.Board.prototype.addPiece = function(piece) {
             this.ball = piece;
         }
 
-        /*
+        
         else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
 
             if (!(piece.groupNum in this.gblocks)){
@@ -574,7 +598,6 @@ hundo.Board.prototype.addPiece = function(piece) {
 
             this.gblocks[piece.groupNum].push(piece);
         }
-        */
 
         return true;
     } else {
@@ -1035,6 +1058,7 @@ hundo.Board.prototype.step = function() {
         // collision
         var recipients = [];
 
+        // TODO: factor this into Gblock code?
         /*
         var gblock = this.getPiece(newRow, newCol, hundo.PieceTypeEnum.GBLOCK);
         if (gblock) {
@@ -2174,8 +2198,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
 
         });
 
-    /*
-
     this.boardSvg.selectAll()
         .data(this.board.getGblocks())
         .enter()
@@ -2188,7 +2210,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
-    */
+
     this.boardSvg.selectAll()
         .data(this.board.getArrows())
         .enter()
