@@ -643,6 +643,7 @@ hundo.Board.prototype.getJson = function() {
 
 
 // see hundo.nudge
+/*
 hundo.Board.prototype.nudge = function(row, col, dir, commit) {
 
     if (!this.inBounds(row, col)) {
@@ -671,7 +672,10 @@ hundo.Board.prototype.nudge = function(row, col, dir, commit) {
     return [result, animations];
 
 }
+*/
 
+
+// TODO: reimplement using top and bottom
 hundo.Board.prototype.checkSolved = function() {
 
     var pieces = this.matrix[this.ball.row][this.ball.col]
@@ -712,7 +716,7 @@ hundo.Board.prototype.step = function() {
 
     if (direction == hundo.DirectionEnum.NODIR) {
         console.error("Ball must have a direction to step");
-        return null;
+        return undefined;
     }
     
     var [dr, dc] = hundo.Board.drdc(direction);
@@ -738,14 +742,17 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] =
-        this.nudge(this.ball.row, this.ball.col, this.ball.dir, false);
+    var [nudged, animations] = this.ball.nudge({
+            dir: direction
+        })
+
+        // this.nudge(this.ball.row, this.ball.col, this.ball.dir, false);
 
     if (nudged) {
 
         // now commit the nudge
-        [nudged, animations] =
-            this.nudge(this.ball.row, this.ball.col, this.ball.dir, true);
+        //[nudged, animations] =
+        //    this.nudge(this.ball.row, this.ball.col, this.ball.dir, true);
 
         if (this.checkSolved()) {
             this.solved = true;
@@ -766,10 +773,15 @@ hundo.Board.prototype.step = function() {
         }
         */
         
-        recipients = _.concat(recipients,
-            this.matrix[newRow][newCol].slice(0));
-        recipients = _.concat(recipients,
-            this.matrix[this.ball.row][this.ball.col]);
+        var pushIntoCell = this.matrix[newRow][newCol];
+
+        recipients.push(pushIntoCell[hundo.LayerEnum.TOP]);
+        recipients.push(pushIntoCell[hundo.LayerEnum.BOTTOM]);
+
+        var cell = this.matrix[this.ball.row][this.ball.col];
+
+        recipients.push(cell[hundo.LayerEnum.TOP]);
+        recipients.push(cell[hundo.LayerEnum.BOTTOM]);
 
         return [{
             "collide": {
