@@ -530,10 +530,11 @@ var board1 = new hundo.Board(config1, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(5, Object.compare(board1.getJson(), config2));
 */
+
 /**
  * Passing through arrows, and exiting clogged arrow
  **************************************************/
-/*
+
 TEST = "Passing through arrows, and exiting clogged arrow";
 
 // level-editor.html?level=fl79-39757db9---5907727b3991--
@@ -594,12 +595,11 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(8, board1.eq(board2));
-*/
+
 /**
  * Bumping into arrows
  **************************************************/
 
-/*
 TEST = "Bumping into arrows";
 
 // level-editor.html?level=fl79-39757db9---5917707b0990--
@@ -630,7 +630,7 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(4, board1.eq(board2));
-*/
+
 
 /**
  * Ice and arrows

@@ -294,8 +294,6 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-    console.log(boardConfig.arrows)
-
     // Add arrows
     _.each(boardConfig.arrows, function(arrow) {
         var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
