@@ -331,14 +331,17 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
-    // Three cases:
+    // Two cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
     //         all gblocks
-    //      2. A gbock bumps into this gblock, in which case we do the recursive
-    //         bumps as usual, except we memoize results,
+    //      2. A gbock (from the same group) bumps into this gblock, in which
+    //         case we do the recursive bumps as usual, except we memoize
+    //         results.
 
-    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
+    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK ||
+        message.sender.groupNum != this.groupNum) {
 
+        // TODO: put pushNeighbor code here
         return pushNeighbor();
 
     } else {
@@ -347,6 +350,16 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         if (this.result) {
             // TODO: returning empty animations is correct, right?
             return [this.result[0], []];
+        }
+
+
+        var [dr, dc] = hundo.Board.drdc(message.dir);
+
+        var newRow = this.row + dr;
+        var newCol = this.col + dc;
+
+        if (!board.inBounds(newRow, newCol)) {
+            return [false, []];
         }
 
         // TODO: factor out code common to this and ice, etc.
