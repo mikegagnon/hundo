@@ -176,8 +176,12 @@ hundo.Goal.prototype.eq = function(piece) {
 }
 
 hundo.Goal.prototype.messageUp = function(board, message) {
+
+    var [top, bottom] = board.getTopBottom(this.row, this.col);
+
     if (hundo.Board.isCompatible(this, message.sender) &&
-        this.dir == hundo.oppositeDir(message.dir)) {
+        this.dir == hundo.oppositeDir(message.dir) &&
+        !top) {
         return [true, []]
     }
     return [false, []];
