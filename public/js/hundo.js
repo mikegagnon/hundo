@@ -418,7 +418,7 @@ hundo.Board.isCompatible = function(piece1, piece2) {
 
 // Assuming matrix[row][col] is holding exactly one piece, returns that piece
 hundo.Board.prototype.getOnePiece = function(row, col) {
-    var numPieces = this.numPieces(piece.row, piece.col);
+    var numPieces = this.numPieces(row, col);
 
     if (numPieces != 1) {
         console.error("Num pieces == " + numPieces + " != 1");
@@ -581,14 +581,14 @@ hundo.Board.prototype.reset = function() {
         })
     })
 
+    var THIS = this;
+
     _.each(pieces, function(p) {
-        this.addPiece(p);
+        THIS.addPiece(p);
     })
 
     this.done = false;
     this.solved = false;
-
-    return moved;
 }
 
 hundo.Board.prototype.setDir = function(direction) {
