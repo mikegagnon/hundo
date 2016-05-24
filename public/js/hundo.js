@@ -144,6 +144,13 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
     if (success) {
         board.moveDir(this, this.dir);
+        animations.push(
+            {
+                "move": {
+                    "ball": this,
+                    "dir": this.dir,
+                }
+            });
     }
 
     return [success, animations];
