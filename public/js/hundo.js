@@ -742,7 +742,7 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [nudged, animations] = this.ball.nudge({
+    var [nudged, animations] = this.ball.pushInto({
             dir: direction
         })
 
@@ -764,6 +764,9 @@ hundo.Board.prototype.step = function() {
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
         
+
+        // recipients is the array of pieces that will be animated in the
+        // collision
         var recipients = [];
 
         /*
@@ -773,15 +776,33 @@ hundo.Board.prototype.step = function() {
         }
         */
         
-        var pushIntoCell = this.matrix[newRow][newCol];
+        var cell, top, bottom;
 
-        recipients.push(pushIntoCell[hundo.LayerEnum.TOP]);
-        recipients.push(pushIntoCell[hundo.LayerEnum.BOTTOM]);
+        // First, add the pieces from newRow, newCol
+        cell = this.matrix[newRow][newCol];
 
-        var cell = this.matrix[this.ball.row][this.ball.col];
+        top = cell[hundo.LayerEnum.TOP];
+        if (top) {
+            recipients.push(top);
+        }
 
-        recipients.push(cell[hundo.LayerEnum.TOP]);
-        recipients.push(cell[hundo.LayerEnum.BOTTOM]);
+        bottom = cell[hundo.LayerEnum.BOTTOM];
+        if (bottom) {
+            recipients.push(bottom);
+        }
+
+        // Second, add the pieces from ball.Row, ball.Col
+        cell = this.matrix[this.ball.row][this.ball.col];
+
+        top = cell[hundo.LayerEnum.TOP];
+        if (top) {
+            recipients.push(top);
+        }
+
+        bottom = cell[hundo.LayerEnum.BOTTOM];
+        if (bottom) {
+            recipients.push(bottom);
+        }
 
         return [{
             "collide": {
