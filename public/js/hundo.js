@@ -133,11 +133,16 @@ hundo.Ball.prototype.messageUp = function(board, message) {
         return [false, []];        
     }
 
+    var [newRow, newCol] = hundo.Board.dirRowCol(
+        message.dir, this.row, this.col);
+
     var newMessage = {
         sender: this,
         forwarder: this,
         dir: message.dir,
-        commit: message.commit
+        commit: message.commit,
+        newRow: newRow,
+        newCol: newCol
     }
 
     var [success, animations] = board.messageDown(newMessage);
@@ -208,10 +213,15 @@ hundo.Ice.prototype.eq = function(piece) {
 
 hundo.Ice.prototype.messageUp = function(board, message) {
 
+    var [newRow, newCol] = hundo.Board.dirRowCol(
+        message.dir, this.row, this.col);
+
     var newMessage = {
         sender: this,
         forwarder: this,
         dir: message.dir,
+        newRow: newRow,
+        newCol: newCol,
         commit: message.commit
     }
 
@@ -313,8 +323,8 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 sender: THIS,
                 forwarder: THIS,
                 dir: message.dir,
-                row: neighbor.row,
-                col: neighbor.col,
+                newRow: neighbor.row,
+                newCol: neighbor.col,
                 commit: message.commit
             }
 
@@ -362,11 +372,16 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             return [false, []];
         }
 
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
+
         // TODO: factor out code common to this and ice, etc.
         var newMessage = {
             sender: this,
             forwarder: this,
             dir: message.dir,
+            newRow: newRow,
+            newCol: newCol,
             commit: message.commit
         }
 
@@ -741,6 +756,13 @@ hundo.Board.drdc = function(direction) {
     return [dr, dc];
 }
 
+// TODO: find all instances where this function should be used
+hundo.Board.dirRowCol = function(direction, row, col) {
+    var [dr, dc] = hundo.Board.drdc(direction);
+
+    return [row + dr, col + dc];
+}
+
 hundo.Board.prototype.movePiece = function(piece, row, col) {
 
     var i;
@@ -1019,17 +1041,8 @@ hundo.Board.prototype.messageDown = function(message) {
         return undefined;
     }*/
 
-    var newRow, newCol;
-
-    if (message.row && message.col) {
-        newRow = message.row;
-        newCol = message.col;
-    } else {
-        var [dr, dc] = hundo.Board.drdc(message.dir);
-
-        newRow = message.sender.row + dr;
-        newCol = message.sender.col + dc;
-    }
+    var newRow = message.newRow;
+    var newCol = message.newCol;
 
     var [top, bottom] = this.getTopBottom(newRow, newCol);
     
@@ -1142,6 +1155,8 @@ hundo.Board.prototype.step = function() {
 
     var [success, animations] = this.ball.messageUp(this, {
             dir: direction,
+            newRow: this.ball.row,
+            newCol: this.ball.col,
             commit: false
         })
 
@@ -1151,6 +1166,8 @@ hundo.Board.prototype.step = function() {
 
         [success, animations] = this.ball.messageUp(this, {
             dir: direction,
+            newRow: this.ball.row,
+            newCol: this.ball.col,
             commit: true
         })
 
