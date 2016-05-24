@@ -323,7 +323,7 @@ assert(1, Object.compare(board1.getJson(), board2.getJson()));
 /**
  * Test board.eq
  **************************************************/
-/*
+
 TEST = "board.eq"
 
 
@@ -376,7 +376,7 @@ board1 = new hundo.Board(boardConfig1, hundo.idGenerator)
 board2 = new hundo.Board(boardConfig2, hundo.idGenerator)
 assert(7, board1.eq(board2));
 
-*/
+
 /**
  * Ball moving into block
  **************************************************/

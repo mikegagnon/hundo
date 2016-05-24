@@ -1029,7 +1029,7 @@ hundo.Board.prototype.eq = function(board) {
     _.each(_.range(0, this.numRows), function(r) {
         _.each(_.range(0, THIS.numCols), function(c) {
             
-            var cell1 = this.matrix[r][c];
+            var cell1 = THIS.matrix[r][c];
             var cell2 = board.matrix[r][c];
 
             var top1 = cell1[hundo.LayerEnum.TOP];
