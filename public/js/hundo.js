@@ -292,8 +292,10 @@ hundo.Gblock.prototype.eq = function(piece) {
 
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
-
-    
+    var THIS = this;
+    var neighbors = board.gblocks[this.groupNum];
+    var totalSuccess = true;
+    var totalAnimations = [];
 
     //return [false, []]
 
@@ -305,17 +307,10 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     if (message.sender.type != hundo.PieceTypeEnum.GBLOCK) {
 
-        var neighbors = board.gblocks[this.groupNum];
-
-        var totalSuccess = true;
-        var totalAnimations = [];
-
         // clear out memoization
         _.each(neighbors, function(neighbor) {
             neighbor.result = undefined;
         });
-
-        var THIS = this;
 
         //return [false, []];
 
