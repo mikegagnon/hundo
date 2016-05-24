@@ -134,12 +134,14 @@ hundo.Ball.prototype.pushInto = function(board, message) {
         return [false, []];        
     }
 
+
+
     var newMessage = {
         sender: this,
         dir: message.dir,
     }
 
-    var [pushed, animations] = board.messageDown(newMessage);
+    return board.messageDown(newMessage);
 
 
 }
@@ -738,7 +740,7 @@ hundo.Board.prototype.getJson = function() {
 // might be called by top piece or bottom piece
 hundo.Board.prototype.messageDown = function(message) {
 
-    var [top, bottom] = this.getTopBottom(sender.row, sender.col);
+    var [top, bottom] = this.getTopBottom(message.sender.row, message.sender.col);
     
     if (message.sender.layer == hundo.LayerEnum.TOP) {
         if (bottom) {
@@ -760,13 +762,26 @@ hundo.Board.prototype.messageDown = function(message) {
     var [top, bottom] = this.getTopBottom(newRow, newCol);
     
     if (bottom) {
-        bottom.messageUp(message);
+        return bottom.messageUp(message);
     } else if (top) {
-        top.messageUp(message)
+        return top.messageUp(message)
     } else {
         return [true, []];
     }
 
+}
+
+// only callable from bottom pieces
+// row, col are the coordinates  of the bottom piece making the call
+hundo.Board.prototype.messageUp = function(row, col, message) {
+
+    var [top, bottom] = this.getTopBottom(row, col);
+    
+    if (top) {
+        return top.messageUp(message);
+    } else {
+        return [true, []];
+    }
 }
 
 
@@ -806,13 +821,13 @@ hundo.Board.prototype.nudge = function(row, col, dir, commit) {
 // TODO: reimplement using top and bottom
 hundo.Board.prototype.checkSolved = function() {
 
-    var pieces = this.matrix[this.ball.row][this.ball.col]
+    var [top, bottom] = this.getTopBottom(this.ball.row, this.ball.col)
 
-    var result = _.filter(pieces, function(piece){
-        return piece.type == hundo.PieceTypeEnum.GOAL;
-    })
-
-    return result.length == 1;
+    if (bottom) {
+        return bottom.type == hundo.PieceTypeEnum.GOAL;
+    } else {
+        return false;
+    }
 }
 
 hundo.Board.drdc = function(direction) {
