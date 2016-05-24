@@ -141,7 +141,7 @@ assert(4, board.matrix[4][4][hundo.LayerEnum.TOP].eq(
  * Board.reset
  **************************************************/
 
-/*
+
 TEST = "Board.reset ball"
 var board = new hundo.Board(config1, idGen);
 
@@ -162,7 +162,7 @@ assert(1, board.oob[0].eq(
 
 board.reset();
 assertEquals(2, board.oob.length, 0);
-assert(3, board.matrix[2][3][0],
+assert(3, board.matrix[2][3][hundo.LayerEnum.TOP],
     new hundo.Ball(2, 3, hundo.DirectionEnum.NODIR));
 
 TEST = "Board.reset multiple oob"
@@ -173,35 +173,35 @@ board.ball.dir = hundo.DirectionEnum.NODIR;
 assert(1, board.oob[0].eq(
     new hundo.Ball(-1, 3, hundo.DirectionEnum.NODIR)));
 
-board.movePiece(board.matrix[2][2][0], -1, -1);
+board.movePiece(board.matrix[2][2][hundo.LayerEnum.BOTTOM], -1, -1);
 assert(2, board.oob[1].eq(
     new hundo.Block(-1, -1)));
 board.reset();
 
 
 assertEquals(3, board.oob.length, 0);
-assert(4, board.matrix[2][3][0],
+assert(4, board.matrix[2][3][hundo.LayerEnum.TOP],
     new hundo.Ball(2, 3, hundo.DirectionEnum.NODIR));
-assert(5, board.matrix[2][2][0],
+assert(5, board.matrix[2][2][hundo.LayerEnum.BOTTOM],
     new hundo.Block(2, 2));
 
 TEST = "Board.reset in bounds and out of bounds"
 var board = new hundo.Board(config1, idGen);
 
-board.movePiece(board.matrix[2][2][0], -1, -1);
+board.movePiece(board.matrix[2][2][hundo.LayerEnum.BOTTOM], -1, -1);
 assert(1, board.oob[0].eq(
     new hundo.Block(-1, -1)));
 
 board.movePiece(board.ball, 0, 0);
-assert(2, board.matrix[0][0][0].eq(
+assert(2, board.matrix[0][0][hundo.LayerEnum.TOP].eq(
     new hundo.Ball(0, 0, hundo.DirectionEnum.NODIR)));
 
 board.reset();
-assert(3, board.matrix[2][2][0].eq(
+assert(3, board.matrix[2][2][hundo.LayerEnum.BOTTOM].eq(
     new hundo.Block(2, 2)));
-assert(4, board.matrix[2][3][0].eq(
+assert(4, board.matrix[2][3][hundo.LayerEnum.TOP].eq(
     new hundo.Ball(2, 3, hundo.DirectionEnum.NODIR)));
-*/
+
 
 /**
  * Board.step once

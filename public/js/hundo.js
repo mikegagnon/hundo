@@ -179,6 +179,10 @@ hundo.Goal.prototype.eq = function(piece) {
 }
 
 hundo.Goal.prototype.messageUp = function(board, message) {
+    if (hundo.Board.isCompatible(this, message.sender) &&
+        this.dir == hundo.oppositeDir(message.dir)) {
+        return [true, []]
+    }
     return [false, []];
 }
 
@@ -580,6 +584,8 @@ hundo.Board.prototype.reset = function() {
             cell[hundo.LayerEnum.BOTTOM] = undefined;
         })
     })
+
+    this.oob = [];
 
     var THIS = this;
 
