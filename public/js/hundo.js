@@ -28,6 +28,12 @@ hundo.DirectionEnum = {
     NODIR: "NODIR"
 }
 
+// TODO: use this instead of true false
+hundo.LayerEnum = {
+    TOP: "TOP",
+    BOTTOM: "BOTTOM"
+}
+
 /**
  * Functionality common to all pieces
  ******************************************************************************/
@@ -69,18 +75,28 @@ hundo.oppositeDir = function(dir) {
  * Block board pieces
  ******************************************************************************/
 
+// There are two classes of pieces: bottom pieces and top pieces.
+//
+//      - Bottom pieces are stationary
+//      - Top pieces are mobile
+//
+// Certain top pieces are "compatible" with certain bottom pieces, which is to
+// say that the top piece and the bottom piece may occupy the same cell
+// at the same time.
+
+
 // id is a uuid relative to board pieces
 hundo.Block = function(row, col) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.BLOCK;
+    this.layer = hundo.LayerEnum.BOTTOM;
     this.row = row;
     this.col = col;
     this.origRow = row;
     this.origCol = col;
 }
 
-// returns true iff the piece were pushed in direction dir
-hundo.Block.prototype.nudge = function(dir, board) {
+hundo.Block.prototype.pushInto = function(dir, board) {
     return [false, []];
 }
 
@@ -95,6 +111,7 @@ hundo.Block.prototype.eq = function(piece) {
 hundo.Ball = function(row, col, dir) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.BALL;
+    this.layer = hundo.LayerEnum.TOP;
     this.row = row;
     this.col = col;
     this.origRow = row;
@@ -107,30 +124,8 @@ hundo.Ball.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
-hundo.Ball.prototype.nudge = function(dir, board, commit) {
-
-    var [dr, dc] = hundo.Board.drdc(dir);
-
-    var row = this.row + dr;
-    var col = this.col + dc;
-
-    var [nudged, animations] = board.nudge(row, col, dir, commit)
-
-    if (nudged) {
-        if (commit) {
-            board.movePiece(this, row, col);
-        }
-        animations.push(
-            {
-                "move": {
-                    "ball": this,
-                    "dir": dir,
-                }
-            });
-        return [true, animations];
-    } else {
-        return [false, animations];
-    }
+hundo.Ball.prototype.pushInto = function(dir, board) {
+    return [false, []];
 }
 
 /**
@@ -140,6 +135,7 @@ hundo.Ball.prototype.nudge = function(dir, board, commit) {
 hundo.Goal = function(row, col, dir) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GOAL;
+    this.layer = hundo.LayerEnum.BOTTOM;
     this.row = row;
     this.col = col;
     this.origRow = row;
@@ -152,29 +148,8 @@ hundo.Goal.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
-hundo.Goal.getPusher = function(row, col, dir) {
-
-    var [dr, dc] = hundo.Board.drdc(dir);
-
-    dr *= -1;
-    dc *= -1;
-
-    return [row + dr, col + dc];
-}
-
-// dir is the direction of the momentum of piece doing the nudging
-// returns true if this piece can accept the nudging piece
-hundo.Goal.prototype.nudge = function(dir, board) {
-
-    var [pusherRow, pusherCol] = hundo.Goal.getPusher(this.row, this.col, dir);
-
-    // gblocks not allowed in goals
-    if (board.getPiece(pusherRow, pusherCol, hundo.PieceTypeEnum.GBLOCK)) {
-        return [false, []];
-    }
-
-    return [this.dir == hundo.oppositeDir(dir), []];
-
+hundo.Goal.prototype.pushInto = function(dir, board) {
+    return [false, []];
 }
 
 /**
@@ -204,12 +179,16 @@ hundo.Board = function(boardConfig) {
 
     var THIS = this;
 
-    // this.matrix[row][col] == array of piece objects
+    // this.matrix[row][col][true] == the top piece, or undefined
+    // this.matrix[row][col][false] == the bottom piece, or undefined
     this.matrix = new Array();
     _.each(_.range(0, this.numRows), function(r){
         THIS.matrix[r] = new Array();
         _.each(_.range(0, THIS.numCols), function(c){
-            THIS.matrix[r][c] = new Array();
+            THIS.matrix[r][c] = {
+                hundo.LayerEnum.TOP: undefined,
+                hundo.LayerEnum.BOTTOM: undefined
+            }
         });
     });
 
@@ -238,43 +217,6 @@ hundo.Board = function(boardConfig) {
             console.error("Could not add piece: ", piece);
         }
     });
-
-    // Add ice
-    _.each(boardConfig.ice, function(ice) {
-
-        if (THIS.inBounds(ice.row, ice.col)) {
-            var piece = new hundo.Ice(ice.row, ice.col);
-            if (!THIS.addPiece(piece)) {
-                console.error("Could not add piece: ", piece);
-            }
-        } else {
-            THIS.oob.push(ice);
-        }
-    });
-
-    // Add arrows
-    _.each(boardConfig.arrows, function(arrow) {
-        var piece = new hundo.Arrow(arrow.row, arrow.col, arrow.dir);
-        if (!THIS.addPiece(piece)) {
-            console.error("Could not add piece: ", piece);
-        }
-    });
-
-    // Add gblocks
-    _.each(boardConfig.gblocks, function(gblock) {
-        var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupNum);
-        if (!THIS.addPiece(piece)) {
-            console.error("Could not add piece: ", piece);
-        }
-    });
-
-    // Add sand
-    _.each(boardConfig.sand, function(sand) {
-        var piece = new hundo.Sand(sand.row, sand.col);
-        if (!THIS.addPiece(piece)) {
-            console.error("Could not add piece: ", piece);
-        }
-    });
 }
 
 hundo.Board.prototype.inBounds = function(row, col) {
@@ -282,31 +224,6 @@ hundo.Board.prototype.inBounds = function(row, col) {
         col >= 0 && col < this.numCols) {
         return true;
     }
-}
-
-
-// compare two arrays as if they are sets, using .eq as the comparator
-hundo.setEq = function(set1, set2) {
-    if (set1.length != set2.length) {
-        return false;
-    }
-
-    var matches = true;
-    _.each(set1, function(x) {
-        var singleMatch = false;
-        _.each(set2, function(y) {
-            if (x.eq(y)) {
-                singleMatch = true;
-            }
-        })
-
-        if (!singleMatch) {
-            matches = false;
-        }
-    });
-
-    return matches;
-
 }
 
 hundo.Board.prototype.eq = function(board) {
@@ -341,8 +258,59 @@ hundo.Board.prototype.eq = function(board) {
     return eq;
 }
 
+hundo.Board.prototype.numPieces = function(row, col) {
+
+    var cell = this.matrix[row][col];
+    var count = 0;
+
+    if (cell[hundo.LayerEnum.TOP]) {
+        count ++;
+    }
+
+    if (cell[hundo.LayerEnum.BOTTOM]) {
+        count ++;
+    }
+    
+    return count;
+}
+
 hundo.Board.prototype.isEmptyCell = function(row, col) {
-    return this.matrix[row][col].length == 0;
+    return this.numPieces(row, col) == 0;
+}
+
+// func(piece) should return true iff the piece is of the type being gotten
+// or, if func is undefined then returns all pieces
+hundo.Board.prototype.getPieces = function(func) {
+
+    if (!func) {
+        func = function(p) { return true };
+    }
+
+    var pieces = [];
+
+    _.each(this.matrix, function(row) {
+        _.each(row, function(cell) {
+
+            var top = cell[hundo.LayerEnum.TOP];
+            var bottom = cell[hundo.LayerEnum.BOTTOM];
+
+            if (top && func(top)) {
+                pieces.push(piece);
+            }
+
+            if (bottom && func(bottom)) {
+                pieces.push(piece);
+            }
+        })
+    });
+
+    _.each(this.oob, function(piece){
+        if (func(piece)) {
+            pieces.push(piece);
+        }
+    })
+
+    return pieces;
 }
 
 hundo.Board.prototype.hasBall = function() {
@@ -360,20 +328,25 @@ hundo.Board.prototype.hasBall = function() {
 }
 
 hundo.Board.prototype.clearCell = function(row, col) {
-    if (typeof this.ball != "undefined" &&
-        this.ball.row == row && this.ball.col == col) {
+    if (this.ball && this.ball.row == row && this.ball.col == col) {
         this.ball = undefined;
     }
-    this.matrix[row][col] = [];
+
+    var cell = this.matrix[row][col];
+
+    cell[hundo.LayerEnum.TOP] = undefined;
+    cell[hundo.LayerEnum.BOTTOM] = undefined;
+
 }
 
+/*
 hundo.Board.prototype.getPiece = function(row, col, type) {
 
     return _.find(this.matrix[row][col], function(piece){
         return piece.type == type;
     });
 }
-
+*/
 
 // hundo.Board.compatible[piece.type] == the array of pieces that are
 // compatible with the piece. Compatibility means two pieces can occupy the
@@ -415,35 +388,82 @@ hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
     hundo.PieceTypeEnum.GBLOCK
 ]
 
-hundo.Board.prototype.canAddPiece = function(piece) {
+/*hundo.Board.prototype.getTop = function(row, col) {
+    return this.matrix[row][col][true];
+}
 
-    // TODO: have getPieces default to returning all pieces
-    var pieces = this.getPieces(function(p){
-        return p.row == piece.row && p.col == piece.col;
+hundo.Board.prototype.getBottom = function(row, col) {
+    return this.matrix[row][col][false];
+}*/
+
+// Returns true iff piece1 and piece2 are compatible
+hundo.Board.isCompatible = function(piece1, piece2) {
+
+    var compatible = hundo.Board.compatible[piece1.type];
+
+    var i = _.findIndex(compatible, function(p) {
+        return piece2.type == p;
     });
 
-    if (pieces.length == 0) {
+    return i >= 0;
+
+}
+
+
+// Assuming matrix[row][col] is holding exactly one piece, returns that piece
+hundo.Board.prototype.getOnePiece = function(row, col) {
+    var numPieces = this.numPieces(piece.row, piece.col);
+
+    if (numPieces != 1) {
+        console.error("Num pieces == " + numPieces + " != 1");
+    }
+
+    var cell = this.matrix[row][col];
+    var top = cell[hundo.LayerEnum.TOP];
+    var bottom = cell[hundo.LayerEnum.BOTTOM];
+    
+    if (top) {
+        return top;
+    } else if (bottom) {
+        return bottom;
+    } else {
+        console.error("This code shouldn't be reachable");
+        return undefined;
+    }
+
+}
+
+hundo.Board.prototype.canAddPiece = function(piece) {
+
+    var numPieces = this.numPieces(piece.row, piece.col);
+
+    if (numPieces == 0) {
         return true;
-    } else if (pieces.length == 1) {
-        var incumbent = pieces[0];
-        var compatibles = hundo.Board.compatible[piece.type];
-        var i = _.findIndex(compatibles, function(p){
-            return p == incumbent.type;
-        });
-
-        return i >= 0;
-
+    } else if (numPieces == 2) {
+        return false;
+    } else if (numPieces == 1) {
+        var incumbent = this.getOnePiece(piece.row, piece.col);
+        return hundo.Board.isCompatible(piece, incumbent);
+    } else {
+        console.error("Num pieces == " + numPieces);
+        return undefined;
     }
 }
 
 hundo.Board.prototype.addPiece = function(piece) {
 
     if (this.canAddPiece(piece)) {
-        this.matrix[piece.row][piece.col].push(piece)
+
+        var cell = this.matrix[piece.row][piece.col];
+
+        cell[piece.layer] = piece;
 
         if (piece.type == hundo.PieceTypeEnum.BALL) {
             this.ball = piece;
-        } else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
+        }
+
+        /*
+        else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
 
             if (!(piece.groupNum in this.gblocks)){
                 this.gblocks[piece.groupNum] = [];
@@ -451,6 +471,7 @@ hundo.Board.prototype.addPiece = function(piece) {
 
             this.gblocks[piece.groupNum].push(piece);
         }
+        */
 
         return true;
     } else {
@@ -458,18 +479,78 @@ hundo.Board.prototype.addPiece = function(piece) {
     }
 }
 
+// removes the first element in array for which func(element) is true
+// if an element is removed, returns the index of the element removed
+// otherwise, returns -1
+hundo.arrayRemove = function(array, func) {
+    var i = _.findIndex(array, func);
+
+    if (i < 0) {
+        return -1;
+    }
+
+    array.splice(i, 1);
+
+    return i;
+}
+
+hundo.Board.prototype.movePiece = function(piece, row, col) {
+
+    var i;
+
+    if (!this.inBounds(piece.row, piece.col)) {
+        i = hundo.arrayRemove(this.oob, function(p) {
+            return p.id == piece.id;
+        })
+
+        if (i == -1) {
+            return false;
+        }
+    } else {
+        var oldCell = this.matrix[piece.row][piece.col];
+
+        if (!oldCell[piece.layer].eq(piece)) {
+            return false;
+        }
+
+        oldCell[piece.layer] = undefined;
+    }
+
+    piece.row = row;
+    piece.col = col;
+
+    if (!this.inBounds(row, col)) {
+        this.oob.push(piece);
+    } else {
+
+        if (!this.addPiece(piece)) {
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 hundo.Board.prototype.reset = function() {
 
-    var THIS = this;
+    var pieces = this.getPieces();
 
-    // moved is the set of all pieces that have moved
-    var moved = this.getPieces(function(piece) {
-        return (piece.row != piece.origRow) || (piece.col != piece.origCol);
+    _.each(pieces, function(p) {
+        p.row = p.origRow;
+        p.col = p.origCol;
     });
 
-    _.each(moved, function(piece){
-        THIS.movePiece(piece, piece.origRow, piece.origCol); 
-    });
+    _.each(this.matrix, function(row) {
+        _.each(row, function(cell) {
+            cell[hundo.LayerEnum.TOP] = undefined;
+            cell[hundo.LayerEnum.BOTTOM] = undefined;
+        })
+    })
+
+    _.each(pieces, function(p) {
+        this.addPiece(p);
+    })
 
     this.done = false;
     this.solved = false;
@@ -485,30 +566,6 @@ hundo.Board.prototype.setDir = function(direction) {
 hundo.Board.prototype.stopBall = function() {
     this.ball.dir = hundo.DirectionEnum.NODIR;
     this.atRest = true;
-}
-
-// func(piece) should return true iff the piece is of the type being gotten
-hundo.Board.prototype.getPieces = function(func) {
-
-    var pieces = [];
-
-    _.each(this.matrix, function(row) {
-        _.each(row, function(col) {
-            _.each(col, function(piece) {
-                if (func(piece)) {
-                    pieces.push(piece);
-                }
-            })
-        })
-    });
-
-    _.each(this.oob, function(piece){
-        if (func(piece)) {
-            pieces.push(piece);
-        }
-    })
-
-    return pieces;
 }
  
 hundo.Board.prototype.getBlocks = function() {
@@ -529,6 +586,7 @@ hundo.Board.prototype.getGoals = function() {
     });
 };
 
+/*
 hundo.Board.prototype.getIce = function() {
     return this.getPieces(function(piece){
         return piece.type == hundo.PieceTypeEnum.ICE;
@@ -552,6 +610,7 @@ hundo.Board.prototype.getSand = function() {
         return piece.type == hundo.PieceTypeEnum.SAND;
     });
 };
+*/
 
 hundo.Board.prototype.getJson = function() {
 
@@ -571,6 +630,7 @@ hundo.Board.prototype.getJson = function() {
                     dir: goal.dir
                 }
             }),
+        /*
         ice: _.map(this.getIce(), function(ice) {
                 return {
                     row: ice.row,
@@ -597,9 +657,10 @@ hundo.Board.prototype.getJson = function() {
                     col: sand.col,
                 }
             }),
+        */
     }
 
-    if (typeof this.ball != "undefined") {
+    if (this.ball) {
         j.ball = {
             row: this.ball.row,
             col: this.ball.col
@@ -610,52 +671,6 @@ hundo.Board.prototype.getJson = function() {
 
 }
 
-// removes the first element in array for which func(element) is true
-// if an element is removed, returns the index of the element removed
-// otherwise, returns -1
-hundo.arrayRemove = function(array, func) {
-    var i = _.findIndex(array, func);
-
-    if (i < 0) {
-        return -1;
-    }
-
-    array.splice(i, 1);
-
-    return i;
-}
-
-hundo.Board.prototype.movePiece = function(piece, row, col) {
-
-    var i;
-
-    if (!this.inBounds(piece.row, piece.col)) {
-        i = hundo.arrayRemove(this.oob, function(p) {
-            return p.id == piece.id;
-        })
-    } else {
-        var pieces = this.matrix[piece.row][piece.col];
-
-        i = hundo.arrayRemove(pieces, function(p) {
-            return p.id == piece.id;
-        })
-    }
-
-    if (i == -1) {
-        console.error("Could not remove piece");
-        return;
-    }
-
-    if (!this.inBounds(row, col)) {
-        this.oob.push(piece);
-    } else {
-        // add the piece to its new location
-        this.matrix[row][col].push(piece);
-    }
-    piece.row = row;
-    piece.col = col;
-
-}
 
 // see hundo.nudge
 hundo.Board.prototype.nudge = function(row, col, dir, commit) {
@@ -774,10 +789,12 @@ hundo.Board.prototype.step = function() {
         
         var recipients = [];
 
+        /*
         var gblock = this.getPiece(newRow, newCol, hundo.PieceTypeEnum.GBLOCK);
         if (gblock) {
             recipients = _.concat(recipients, this.gblocks[gblock.groupNum]);
         }
+        */
         
         recipients = _.concat(recipients,
             this.matrix[newRow][newCol].slice(0));
