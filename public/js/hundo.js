@@ -443,9 +443,8 @@ hundo.ClusterGblock = function(board) {
     // depends on groupNumB for direction Dir
     this.depends = {}
 
-    // compute depends
-    var dir = hundo.DirectionEnum.UP;
-
+    // compute the "direct" depends
+    // todo: comment more
     _.each(groupNums, function(groupNum) {
 
         THIS.depends[groupNum] = {}
@@ -478,6 +477,18 @@ hundo.ClusterGblock = function(board) {
 
         });
     });
+
+    // Compute the transitive closure of the dependencies.
+    // In other words, if A depends on B, and B depends on C, then have A
+    // depend on C as well.
+    _.each(groupNums, function(groupNumA) {
+        _.each(groupNums, function(groupNumB) {
+            _.each(hundo.FourDirections, function(dir){
+
+            });
+        });
+    });
+
 }
 
 // returns an array containing every member of the cluster that groupNum
