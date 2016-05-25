@@ -735,10 +735,19 @@ assert(6, board1.eq(board2));
 
 // TODO: TEST FAIL: level-editor.html?level=fl52--5k2-5455565b5e5h5j--4804g35805c15d15g35i36806g36h36i3-
 
-// Mutually dependent gblocks
+// Mutually dependent gblocks, case 1: two mutually dependent groups
 // level-editor.html?level=fl6f-----681770781790870880890-
 var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":6,"col":8,"groupNum":1},{"row":7,"col":7,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":9,"groupNum":0},{"row":8,"col":7,"groupNum":0},{"row":8,"col":8,"groupNum":0},{"row":8,"col":9,"groupNum":0}],"sand":[],"ball":{"row":6,"col":15}};
 var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":6,"col":1,"groupNum":1},{"row":7,"col":0,"groupNum":0},{"row":7,"col":1,"groupNum":1},{"row":7,"col":2,"groupNum":0},{"row":8,"col":0,"groupNum":0},{"row":8,"col":1,"groupNum":0},{"row":8,"col":2,"groupNum":0}],"sand":[],"ball":{"row":6,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(6, board1.eq(board2));
+
+// Mutually dependent gblocks, case 2: pushing into an independent group
+// level-editor.html?level=fl6f-----662672681762770781790862870880890-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":6,"col":6,"groupNum":2},{"row":6,"col":7,"groupNum":2},{"row":6,"col":8,"groupNum":1},{"row":7,"col":6,"groupNum":2},{"row":7,"col":7,"groupNum":0},{"row":7,"col":8,"groupNum":1},{"row":7,"col":9,"groupNum":0},{"row":8,"col":6,"groupNum":2},{"row":8,"col":7,"groupNum":0},{"row":8,"col":8,"groupNum":0},{"row":8,"col":9,"groupNum":0}],"sand":[],"ball":{"row":6,"col":15}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":6,"col":0,"groupNum":2},{"row":6,"col":1,"groupNum":2},{"row":6,"col":2,"groupNum":1},{"row":7,"col":0,"groupNum":2},{"row":7,"col":1,"groupNum":0},{"row":7,"col":2,"groupNum":1},{"row":7,"col":3,"groupNum":0},{"row":8,"col":0,"groupNum":2},{"row":8,"col":1,"groupNum":0},{"row":8,"col":2,"groupNum":0},{"row":8,"col":3,"groupNum":0}],"sand":[],"ball":{"row":6,"col":3}};
 var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.LEFT);
