@@ -447,29 +447,29 @@ hundo.ClusterGblock = function(board) {
 
     // compute the "direct" depends
     // todo: comment more
-    _.each(groupNums, function(groupNum) {
+    _.each(groupNums, function(a) {
 
-        THIS.depends[groupNum] = {}
+        THIS.depends[a] = {}
 
         _.each(hundo.FourDirections, function(dir){
 
-            THIS.depends[groupNum][dir] = new Set([]);
+            THIS.depends[a][dir] = new Set([]);
 
-            var groupAMembers = board.gblocks[groupNum];
+            var aMembers = board.gblocks[a];
 
-            _.each(groupAMembers, function(groupAMember) {
+            _.each(aMembers, function(aMember) {
 
-                var [rowA, colA] = [groupAMember.row, groupAMember.col];
-                var [rowB, colB] = hundo.Board.dirRowCol(dir, rowA, colA);
+                var [aRow, aCol] = [aMember.row, aMember.col];
+                var [bRow, bCol] = hundo.Board.dirRowCol(dir, aRow, aCol);
 
-                if (board.inBounds(rowB, colB)) {
+                if (board.inBounds(bRow, bCol)) {
 
-                    var top = board.matrix[rowB][colB][hundo.LayerEnum.TOP];
+                    var top = board.matrix[bRow][bCol][hundo.LayerEnum.TOP];
 
                     if (top && top.type == hundo.PieceTypeEnum.GBLOCK &&
-                        top.groupNum != groupNum) {
+                        top.groupNum != a) {
 
-                        THIS.depends[groupNum][dir].add(String(top.groupNum));
+                        THIS.depends[a][dir].add(String(top.groupNum));
 
                     }
                 }
@@ -483,19 +483,19 @@ hundo.ClusterGblock = function(board) {
     // Compute the transitive closure for the dependencies.
     // In other words, if A depends on B, and B depends on C, then have A
     // depend on C as well.
-    _.each(groupNums, function(groupNumX) {
-        _.each(groupNums, function(groupNumA) {
-            _.each(groupNums, function(groupNumB) {
+    _.each(groupNums, function(x) {
+        _.each(groupNums, function(a) {
+            _.each(groupNums, function(b) {
                 _.each(hundo.FourDirections, function(dir){
     
                     // If A depends on B
-                    if (THIS.depends[groupNumA][dir].has(String(groupNumB))) {
+                    if (THIS.depends[a][dir].has(String(b))) {
 
                         // Then A depends on B's dependencies
-                        THIS.depends[groupNumB][dir].forEach(
-                            function(dependency) {
-                                THIS.depends[groupNumA][dir].add(
-                                    String(dependency));
+                        THIS.depends[b][dir].forEach(
+                            function(c) {
+                                THIS.depends[a][dir].add(
+                                    String(c));
                         });
                     }
 
@@ -516,34 +516,34 @@ hundo.ClusterGblock = function(board) {
     // A and B form a cluster, and C could be safely excluded. However,
     // because A and B have a cycle, then C gets pulled into the cluster
     // which is unncessary, but fine.
-    _.each(groupNums, function(groupNumA) {
+    _.each(groupNums, function(a) {
 
-        THIS.cluster[groupNumA] = {};
+        THIS.cluster[a] = {};
 
         _.each(hundo.FourDirections, function(dir){
 
-            THIS.cluster[groupNumA][dir] = new Set();
-            THIS.cluster[groupNumA][dir].add(String(groupNumA));
+            THIS.cluster[a][dir] = new Set();
+            THIS.cluster[a][dir].add(String(a));
 
             // If A depends on itself, then there is a cycle.
             // Every group in the cycle is part of the same cluster
-            if (THIS.depends[groupNumA][dir].has(String(groupNumA))) {
+            if (THIS.depends[a][dir].has(String(a))) {
 
                 // For each of A's dependencies
                 // TODO: hack
-                _.each(Array.from(THIS.depends[groupNumA][dir]), function(groupNumB) {
+                _.each(Array.from(THIS.depends[a][dir]), function(b) {
 
                     // IF B depends on A
-                    if (THIS.depends[groupNumB][dir].has(String(groupNumB))) {
+                    if (THIS.depends[b][dir].has(String(b))) {
 
-                        THIS.cluster[groupNumA][dir].add(String(groupNumB))
+                        THIS.cluster[a][dir].add(String(b))
                     }
                 })
 
                 //THIS.cluster[groupNumA][dir] =
                 //    THIS.depends[groupNumA][dir];
             } else {
-                THIS.cluster[groupNumA][dir] = new Set(groupNumA);
+                THIS.cluster[a][dir] = new Set(a);
             }
         });
     });
@@ -553,14 +553,14 @@ hundo.ClusterGblock = function(board) {
     // this.clusterMembers[groupNum][dir] == an array containing every member
     // of every group in this.cluster[groupNum][dir]
     this.clusterMembers = {};
-    _.each(groupNums, function(groupNumA){
+    _.each(groupNums, function(a){
         
-        THIS.clusterMembers[groupNumA] = {};
+        THIS.clusterMembers[a] = {};
         
         _.each(hundo.FourDirections, function(dir){
-            var groups = THIS.cluster[groupNumA][dir];
+            var groups = THIS.cluster[a][dir];
 
-            THIS.clusterMembers[groupNumA][dir] = board.getPieces(
+            THIS.clusterMembers[a][dir] = board.getPieces(
                 function(piece) {
                     return piece.type == hundo.PieceTypeEnum.GBLOCK &&
                         groups.has(String(piece.groupNum));
