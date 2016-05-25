@@ -433,6 +433,11 @@ hundo.Cluster = function(board) {
     // groupIds is an array containing every groupId for every set of gblocks
     var groupIds = _.keysIn(board.gblocks);
 
+    // iceGroups[dir][N] = the Nth ice group for direction dir, where an ice
+    // group is an array of ice pieces, such that the pieces form a contiguous
+    // line of adjacent ice pieces in direction dir
+    this.iceGroups = hundo.Cluster.getIceGroups(board, groupIds);
+
     // this.depends[groupId][dir] == the set of groupIds that groupId
     // __directly__ depends upon in direction dir.
     //
@@ -460,6 +465,57 @@ hundo.Cluster = function(board) {
     // In other words, all the gblock pieces in this.cluster[a][dir].
     this.clusterMembers = hundo.Cluster.clusterMembers(groupIds,
         board, this.cluster);
+}
+
+hundo.Cluster.getIceGroups = function(board, groupIds) {
+
+    var pieces = board.getIce();
+
+    var groupId = 0;
+
+    // reset ice groups
+    _.each(hundo.FourDirections, function(dir) {
+        _.each(pieces, function(ice) {
+            ice.groupId = {};
+        });
+    });
+
+    _.each(hundo.FourDirections, function(dir) {
+        _.each(pieces, function(ice) {
+
+            // E.g., if dir == right, then oppositeRow, oppositeCol is the
+            // the coordinates for the cell to the left
+            var [oppositeRow, oppositeCol] = hundo.Board.dirRowCol(
+                hundo.oppositeDir(dir), ice.row, ice.col);
+
+            var [top, bottom] = board.getTopBottom(oppositeRow, oppositeCol);
+
+            if (!top || top.type != hundo.PieceTypeEnum.ICE) {
+                hundo.Cluster.markIceGroup(board, ice.row, ice.col, dir,
+                    groupId);
+                groupId++;
+            }
+        });
+    });
+}
+
+// TODO: is setting ice.groupId necessary?
+// TODO: .groupId[dir ]
+hundo.Cluster.markIceGroup = function(board, row, col, dir, groupId) {
+
+    var [top, bottom] = board.getTopBottom(row, col);
+
+    while (top && top.type == hundo.PieceTypeEnum.ICE) {
+
+        if (!top.groupId) {
+            top.groupId = {};
+        }
+        top.groupId[dir] = groupId;
+        [row, col] = hundo.Board.dirRowCol(dir, row, col);
+        var [top, bottom] = board.getTopBottom(row, col);
+
+    }
+
 }
 
 // depends[groupIdA][Dir] == an array of groupIdB's, for which groupIdA
