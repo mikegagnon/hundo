@@ -305,10 +305,12 @@ hundo.Gblock.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
+
+// TODO: BUG: level-editor.html?level=fl9e-----870881890970981990a70a80a90-
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.clusterGblock.clusterMembers[this.groupNum][message.dir]; //board.gblocks[this.groupNum];
+    var neighbors = board.clusterGblock.clusterMembers[this.groupNum][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
 
@@ -529,8 +531,10 @@ hundo.ClusterGblock = function(board) {
     });
 
 
+    // Computes this.clusterMembers
+    // this.clusterMembers[groupNum][dir] == an array containing every member
+    // of every group in this.cluster[groupNum][dir]
     this.clusterMembers = {};
-    // 
     _.each(groupNums, function(groupNumA){
         
         THIS.clusterMembers[groupNumA] = {};
