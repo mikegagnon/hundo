@@ -310,7 +310,7 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.clusterGblock.clusterMembers[this.groupNum][message.dir];
+    var neighbors = board.cluster.clusterMembers[this.groupNum][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
 
@@ -346,7 +346,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
-    var cluster = board.clusterGblock.cluster[this.groupNum][message.dir];
+    var cluster = board.cluster.cluster[this.groupNum][message.dir];
 
     // Two cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
@@ -413,7 +413,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 }
 
 /**
- * ClusterGblock provides functionality for dealing with interdependencies
+ * Cluster provides functionality for dealing with interdependencies
  * between gblock groups during step
  *
  * A gblock group (A) depends on group (B), in direction (Dir), iff:
@@ -428,7 +428,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
  *
  * Mutually dependent groups form clusters.
  ******************************************************************************/
-hundo.ClusterGblock = function(board) {
+hundo.Cluster = function(board) {
 
     // groupNums is an array containing every groupNum for every set of gblocks
     var groupNums = _.keysIn(board.gblocks);
@@ -438,12 +438,12 @@ hundo.ClusterGblock = function(board) {
     //
     // For example if A would bump into B in direction LEFT, then
     // this.dependsp[A][LEFT] = Set(B)
-    this.depends = hundo.ClusterGblock.directDepends(board, groupNums);
+    this.depends = hundo.Cluster.directDepends(board, groupNums);
 
     // this.depends[groupNum][dir] == the transitive closure of depends.
     // E.g. if A depends on B, and B depends on C, in direction LEFT, then
     // this.depends[A][LEFT] == Set(B, C)
-    this.depends = hundo.ClusterGblock.transitiveClosure(board, groupNums,
+    this.depends = hundo.Cluster.transitiveClosure(board, groupNums,
         this.depends);
 
     // this.cluster[a][dir] == an array of groupNums that are in a's cluster for
@@ -451,20 +451,20 @@ hundo.ClusterGblock = function(board) {
     //
     // A cluster is a collection of groupNums for which, every groupNum
     // in the cluster in dependent on every other groupNum in the cluster
-    this.cluster = hundo.ClusterGblock.cluster(groupNums, this.depends);
+    this.cluster = hundo.Cluster.cluster(groupNums, this.depends);
 
     // this.clusterMembers[a][dir] == an array of glbock pieces such that
     // every gblock piece for every group in this.cluster[a][dir] is included
     // in this.clusterMembers[a][dir].
     //
     // In other words, all the gblock pieces in this.cluster[a][dir].
-    this.clusterMembers = hundo.ClusterGblock.clusterMembers(groupNums,
+    this.clusterMembers = hundo.Cluster.clusterMembers(groupNums,
         board, this.cluster);
 }
 
 // depends[groupNumA][Dir] == an array of groupNumB's, for which groupNumA
 // directly depends on groupNumB for direction Dir
-hundo.ClusterGblock.directDepends = function(board, groupNums) {
+hundo.Cluster.directDepends = function(board, groupNums) {
 
     depends = {}
 
@@ -509,7 +509,7 @@ hundo.ClusterGblock.directDepends = function(board, groupNums) {
 // Compute the transitive closure for the dependencies.
 // In other words, if A depends on B, and B depends on C, then have A
 // depend on C as well.
-hundo.ClusterGblock.transitiveClosure = function(board, groupNums, depends) {
+hundo.Cluster.transitiveClosure = function(board, groupNums, depends) {
 
     _.each(groupNums, function(x) {
         _.each(groupNums, function(a) {
@@ -534,7 +534,7 @@ hundo.ClusterGblock.transitiveClosure = function(board, groupNums, depends) {
 }
 
 // this.cluster[a] == an array of groupNums that are in a's cluster.
-hundo.ClusterGblock.cluster = function(groupNums, depends) {
+hundo.Cluster.cluster = function(groupNums, depends) {
 
     var cluster = {}
 
@@ -570,7 +570,7 @@ hundo.ClusterGblock.cluster = function(groupNums, depends) {
 // Computes this.clusterMembers
 // this.clusterMembers[a][dir] == an array containing every member
 // of every group in this.cluster[a][dir]
-hundo.ClusterGblock.clusterMembers = function(groupNums, board, cluster) {
+hundo.Cluster.clusterMembers = function(groupNums, board, cluster) {
 
     clusterMembers = {};
 
@@ -683,7 +683,7 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-    this.clusterGblock = new hundo.ClusterGblock(this);
+    this.cluster = new hundo.Cluster(this);
 }
 
 hundo.Board.prototype.inBounds = function(row, col) {
@@ -1278,7 +1278,7 @@ hundo.Board.prototype.checkSolved = function() {
 // the step should be animated
 hundo.Board.prototype.step = function() {
 
-    this.clusterGblock = new hundo.ClusterGblock(this);
+    this.cluster = new hundo.Cluster(this);
 
     var direction = this.ball.dir;
 
