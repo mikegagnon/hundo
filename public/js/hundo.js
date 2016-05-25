@@ -424,6 +424,11 @@ hundo.ClusterGblock = function(board) {
     // Mutually dependent groups form clusters.
     //
 
+}
+
+// returns an array containing every member of the cluster that groupNum
+// belongs to
+hundo.ClusterGblock.prototype.clusterMembers = function(groupNum) {
 
 }
 
