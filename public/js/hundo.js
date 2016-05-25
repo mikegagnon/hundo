@@ -504,6 +504,9 @@ hundo.ClusterGblock = function(board) {
         });
     });
 
+    // TODO: clean up this whole class
+    // mv groupNumA to a, etc.
+
     // compute this.cluster
     //
     // NOTE: This implementatoin includes more groups in the cluster than
@@ -519,11 +522,26 @@ hundo.ClusterGblock = function(board) {
 
         _.each(hundo.FourDirections, function(dir){
 
+            THIS.cluster[groupNumA][dir] = new Set();
+            THIS.cluster[groupNumA][dir].add(String(groupNumA));
+
             // If A depends on itself, then there is a cycle.
             // Every group in the cycle is part of the same cluster
             if (THIS.depends[groupNumA][dir].has(String(groupNumA))) {
-                THIS.cluster[groupNumA][dir] =
-                    THIS.depends[groupNumA][dir];
+
+                // For each of A's dependencies
+                // TODO: hack
+                _.each(Array.from(THIS.depends[groupNumA][dir]), function(groupNumB) {
+
+                    // IF B depends on A
+                    if (THIS.depends[groupNumB][dir].has(String(groupNumB))) {
+
+                        THIS.cluster[groupNumA][dir].add(String(groupNumB))
+                    }
+                })
+
+                //THIS.cluster[groupNumA][dir] =
+                //    THIS.depends[groupNumA][dir];
             } else {
                 THIS.cluster[groupNumA][dir] = new Set(groupNumA);
             }
