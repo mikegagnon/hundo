@@ -412,6 +412,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
  * between gblock groups during step
  ******************************************************************************/
 
+// TODO: unit test
 hundo.ClusterGblock = function(board) {
 
     // A gblock group (A) depends on group (B), in direction (Dir), iff:
@@ -434,10 +435,6 @@ hundo.ClusterGblock = function(board) {
     var groupNums = _.keysIn(board.gblocks);
 
     var THIS = this;
-
-    _.each(groupNums, function(groupNum){
-        THIS.cluster[groupNum] = [groupNum];
-    });
 
     // depends[groupNumA][Dir] == an array of groupNumB's, for which groupNumA
     // depends on groupNumB for direction Dir
@@ -492,12 +489,39 @@ hundo.ClusterGblock = function(board) {
                         // Then A depends on B's dependencies
                         THIS.depends[groupNumB][dir].forEach(
                             function(dependency) {
-                                THIS.depends[groupNumA][dir].add(String(dependency));
+                                THIS.depends[groupNumA][dir].add(
+                                    String(dependency));
                         });
                     }
 
                 });
             });
+        });
+    });
+
+    // compute this.cluster
+    //
+    // NOTE: This implementatoin includes more groups in the cluster than
+    // strictly necessarry.
+    //
+    // For example, say A -> B, B -> A, and A -> C and C -\-> A
+    // A and B form a cluster, and C could be safely excluded. However,
+    // because A and B have a cycle, then C gets pulled into the cluster
+    // which is unncessary, but fine.
+    _.each(groupNums, function(groupNumA) {
+
+        THIS.cluster[groupNumA] = {};
+
+        _.each(hundo.FourDirections, function(dir){
+
+            // If A depends on itself, then there is a cycle.
+            // Every group in the cycle is part of the same cluster
+            if (THIS.depends[groupNumA][dir].has(String(groupNumA))) {
+                THIS.cluster[groupNumA][dir] =
+                    Array.from(THIS.depends[groupNumA][dir]);
+            } else {
+                THIS.cluster[groupNumA][dir] = [groupNumA];
+            }
         });
     });
 
