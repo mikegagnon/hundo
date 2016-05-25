@@ -1072,40 +1072,6 @@ hundo.Board.prototype.messageUp = function(message) {
     }
 }
 
-
-// see hundo.nudge
-/*
-hundo.Board.prototype.nudge = function(row, col, dir, commit) {
-
-    if (!this.inBounds(row, col)) {
-        return [true, []];
-    }
-
-    var pieces = this.matrix[row][col];
-
-    var result = true;
-    var animations = []
-
-    var THIS = this;
-
-    for (var i = 0; i < pieces.length; i++) {
-
-        var piece = pieces[i];
-
-        var [nudged, newAnimations] = piece.nudge(dir, THIS, commit);
-
-        animations = _.concat(animations, newAnimations);
-        if (!nudged) {
-            result = false;
-        }
-    }
-
-    return [result, animations];
-
-}
-*/
-
-
 // TODO: reimplement using top and bottom
 hundo.Board.prototype.checkSolved = function() {
 
