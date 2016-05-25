@@ -308,7 +308,7 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.gblocks[this.groupNum];
+    var neighbors = board.clusterGblock.clusterMembers[this.groupNum][message.dir]; //board.gblocks[this.groupNum];
     var totalSuccess = true;
     var totalAnimations = [];
 
@@ -344,6 +344,8 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
+    var cluster = board.clusterGblock.cluster[this.groupNum][message.dir];
+
     // Two cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
     //         all gblocks
@@ -351,8 +353,9 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     //         case we do the recursive bumps as usual, except we memoize
     //         results.
 
-    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK ||
-        message.sender.groupNum != this.groupNum) {
+    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+        cluster.has(String(message.sender.groupNum)))) {
+        //message.sender.groupNum == this.groupNum)) {
 
         // TODO: put pushNeighbor code here
         return pushNeighbor();
@@ -518,18 +521,32 @@ hundo.ClusterGblock = function(board) {
             // Every group in the cycle is part of the same cluster
             if (THIS.depends[groupNumA][dir].has(String(groupNumA))) {
                 THIS.cluster[groupNumA][dir] =
-                    Array.from(THIS.depends[groupNumA][dir]);
+                    THIS.depends[groupNumA][dir];
             } else {
-                THIS.cluster[groupNumA][dir] = [groupNumA];
+                THIS.cluster[groupNumA][dir] = new Set(groupNumA);
             }
         });
     });
 
-}
 
-// returns an array containing every member of the cluster that groupNum
-// belongs to
-hundo.ClusterGblock.prototype.clusterMembers = function(groupNum) {
+    this.clusterMembers = {};
+    // 
+    _.each(groupNums, function(groupNumA){
+        
+        THIS.clusterMembers[groupNumA] = {};
+        
+        _.each(hundo.FourDirections, function(dir){
+            var groups = THIS.cluster[groupNumA][dir];
+
+            THIS.clusterMembers[groupNumA][dir] = board.getPieces(
+                function(piece) {
+                    return piece.type == hundo.PieceTypeEnum.GBLOCK &&
+                        groups.has(String(piece.groupNum));
+                });
+
+            console.log(THIS.clusterMembers[groupNumA][dir]);
+        });
+    });
 
 }
 
@@ -624,6 +641,8 @@ hundo.Board = function(boardConfig) {
             console.error("Could not add piece: ", piece);
         }
     });
+
+    this.clusterGblock = new hundo.ClusterGblock(this);
 }
 
 hundo.Board.prototype.inBounds = function(row, col) {
@@ -1217,6 +1236,8 @@ hundo.Board.prototype.checkSolved = function() {
 // else, returns an animation object, which describes how the
 // the step should be animated
 hundo.Board.prototype.step = function() {
+
+    this.clusterGblock = new hundo.ClusterGblock(this);
 
     var direction = this.ball.dir;
 
