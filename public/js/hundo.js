@@ -467,7 +467,7 @@ hundo.ClusterGblock = function(board) {
                     if (top && top.type == hundo.PieceTypeEnum.GBLOCK &&
                         top.groupNum != groupNum) {
 
-                        THIS.depends[groupNum][dir].add(top.groupNum);
+                        THIS.depends[groupNum][dir].add(String(top.groupNum));
 
                     }
                 }
@@ -478,13 +478,25 @@ hundo.ClusterGblock = function(board) {
         });
     });
 
-    // Compute the transitive closure of the dependencies.
+    // Compute the transitive closure for the dependencies.
     // In other words, if A depends on B, and B depends on C, then have A
     // depend on C as well.
-    _.each(groupNums, function(groupNumA) {
-        _.each(groupNums, function(groupNumB) {
-            _.each(hundo.FourDirections, function(dir){
+    _.each(groupNums, function(groupNumX) {
+        _.each(groupNums, function(groupNumA) {
+            _.each(groupNums, function(groupNumB) {
+                _.each(hundo.FourDirections, function(dir){
+    
+                    // If A depends on B
+                    if (THIS.depends[groupNumA][dir].has(String(groupNumB))) {
 
+                        // Then A depends on B's dependencies
+                        THIS.depends[groupNumB][dir].forEach(
+                            function(dependency) {
+                                THIS.depends[groupNumA][dir].add(String(dependency));
+                        });
+                    }
+
+                });
             });
         });
     });
