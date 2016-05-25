@@ -565,8 +565,6 @@ hundo.ClusterGblock = function(board) {
                     return piece.type == hundo.PieceTypeEnum.GBLOCK &&
                         groups.has(String(piece.groupNum));
                 });
-
-            console.log(THIS.clusterMembers[groupNumA][dir]);
         });
     });
 
