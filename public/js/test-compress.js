@@ -250,7 +250,7 @@ var boardConfig3 = {
         {
             row: 6,
             col: 6,
-            groupNum: 0
+            groupId: 0
         }
     ],
     sand: [

@@ -289,7 +289,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
  * Gblock board pieces
  ******************************************************************************/
 
-hundo.Gblock = function(row, col, groupNum) {
+hundo.Gblock = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
     this.layer = hundo.LayerEnum.TOP;
@@ -297,7 +297,7 @@ hundo.Gblock = function(row, col, groupNum) {
     this.col = col;
     this.origRow = row;
     this.origCol = col;
-    this.groupNum = groupNum;
+    this.groupId = groupId;
 }
 
 hundo.Gblock.prototype.eq = function(piece) {
@@ -310,7 +310,7 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.cluster.clusterMembers[this.groupNum][message.dir];
+    var neighbors = board.cluster.clusterMembers[this.groupId][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
 
@@ -346,7 +346,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
-    var cluster = board.cluster.cluster[this.groupNum][message.dir];
+    var cluster = board.cluster.cluster[this.groupId][message.dir];
 
     // Two cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
@@ -356,8 +356,8 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     //         results.
 
     if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        cluster.has(String(message.sender.groupNum)))) {
-        //message.sender.groupNum == this.groupNum)) {
+        cluster.has(String(message.sender.groupId)))) {
+        //message.sender.groupId == this.groupId)) {
 
         // TODO: put pushNeighbor code here
         return pushNeighbor();
@@ -430,47 +430,47 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
  ******************************************************************************/
 hundo.Cluster = function(board) {
 
-    // groupNums is an array containing every groupNum for every set of gblocks
-    var groupNums = _.keysIn(board.gblocks);
+    // groupIds is an array containing every groupId for every set of gblocks
+    var groupIds = _.keysIn(board.gblocks);
 
-    // this.depends[groupNum][dir] == the set of groupNums that groupNum
+    // this.depends[groupId][dir] == the set of groupIds that groupId
     // __directly__ depends upon in direction dir.
     //
     // For example if A would bump into B in direction LEFT, then
     // this.dependsp[A][LEFT] = Set(B)
-    this.depends = hundo.Cluster.directDepends(board, groupNums);
+    this.depends = hundo.Cluster.directDepends(board, groupIds);
 
-    // this.depends[groupNum][dir] == the transitive closure of depends.
+    // this.depends[groupId][dir] == the transitive closure of depends.
     // E.g. if A depends on B, and B depends on C, in direction LEFT, then
     // this.depends[A][LEFT] == Set(B, C)
-    this.depends = hundo.Cluster.transitiveClosure(board, groupNums,
+    this.depends = hundo.Cluster.transitiveClosure(board, groupIds,
         this.depends);
 
-    // this.cluster[a][dir] == an array of groupNums that are in a's cluster for
+    // this.cluster[a][dir] == an array of groupIds that are in a's cluster for
     // direction dir.
     //
-    // A cluster is a collection of groupNums for which, every groupNum
-    // in the cluster in dependent on every other groupNum in the cluster
-    this.cluster = hundo.Cluster.cluster(groupNums, this.depends);
+    // A cluster is a collection of groupIds for which, every groupId
+    // in the cluster in dependent on every other groupId in the cluster
+    this.cluster = hundo.Cluster.cluster(groupIds, this.depends);
 
     // this.clusterMembers[a][dir] == an array of glbock pieces such that
     // every gblock piece for every group in this.cluster[a][dir] is included
     // in this.clusterMembers[a][dir].
     //
     // In other words, all the gblock pieces in this.cluster[a][dir].
-    this.clusterMembers = hundo.Cluster.clusterMembers(groupNums,
+    this.clusterMembers = hundo.Cluster.clusterMembers(groupIds,
         board, this.cluster);
 }
 
-// depends[groupNumA][Dir] == an array of groupNumB's, for which groupNumA
-// directly depends on groupNumB for direction Dir
-hundo.Cluster.directDepends = function(board, groupNums) {
+// depends[groupIdA][Dir] == an array of groupIdB's, for which groupIdA
+// directly depends on groupIdB for direction Dir
+hundo.Cluster.directDepends = function(board, groupIds) {
 
     depends = {}
 
     // compute the "direct" depends
     // todo: comment more
-    _.each(groupNums, function(a) {
+    _.each(groupIds, function(a) {
 
         depends[a] = {}
 
@@ -490,9 +490,9 @@ hundo.Cluster.directDepends = function(board, groupNums) {
                     var top = board.matrix[bRow][bCol][hundo.LayerEnum.TOP];
 
                     if (top && top.type == hundo.PieceTypeEnum.GBLOCK &&
-                        top.groupNum != a) {
+                        top.groupId != a) {
 
-                        depends[a][dir].add(String(top.groupNum));
+                        depends[a][dir].add(String(top.groupId));
 
                     }
                 }
@@ -509,11 +509,11 @@ hundo.Cluster.directDepends = function(board, groupNums) {
 // Compute the transitive closure for the dependencies.
 // In other words, if A depends on B, and B depends on C, then have A
 // depend on C as well.
-hundo.Cluster.transitiveClosure = function(board, groupNums, depends) {
+hundo.Cluster.transitiveClosure = function(board, groupIds, depends) {
 
-    _.each(groupNums, function(x) {
-        _.each(groupNums, function(a) {
-            _.each(groupNums, function(b) {
+    _.each(groupIds, function(x) {
+        _.each(groupIds, function(a) {
+            _.each(groupIds, function(b) {
                 _.each(hundo.FourDirections, function(dir){
     
                     // If A depends on B
@@ -533,12 +533,12 @@ hundo.Cluster.transitiveClosure = function(board, groupNums, depends) {
     return depends;
 }
 
-// this.cluster[a] == an array of groupNums that are in a's cluster.
-hundo.Cluster.cluster = function(groupNums, depends) {
+// this.cluster[a] == an array of groupIds that are in a's cluster.
+hundo.Cluster.cluster = function(groupIds, depends) {
 
     var cluster = {}
 
-    _.each(groupNums, function(a) {
+    _.each(groupIds, function(a) {
 
         cluster[a] = {};
 
@@ -570,11 +570,11 @@ hundo.Cluster.cluster = function(groupNums, depends) {
 // Computes this.clusterMembers
 // this.clusterMembers[a][dir] == an array containing every member
 // of every group in this.cluster[a][dir]
-hundo.Cluster.clusterMembers = function(groupNums, board, cluster) {
+hundo.Cluster.clusterMembers = function(groupIds, board, cluster) {
 
     clusterMembers = {};
 
-    _.each(groupNums, function(a){
+    _.each(groupIds, function(a){
         
         clusterMembers[a] = {};
         
@@ -583,7 +583,7 @@ hundo.Cluster.clusterMembers = function(groupNums, board, cluster) {
 
             clusterMembers[a][dir] = board.getPieces( function(piece) {
                     return piece.type == hundo.PieceTypeEnum.GBLOCK &&
-                        groups.has(String(piece.groupNum));
+                        groups.has(String(piece.groupId));
                 });
         });
     });
@@ -613,7 +613,7 @@ hundo.Board = function(boardConfig) {
     // The set of pieces that have moved out of bounds
     this.oob = [];
 
-    // this.gblocks[gblock.groupNum] == the set of gblocks in that group
+    // this.gblocks[gblock.groupId] == the set of gblocks in that group
     this.gblocks = {}
 
     var THIS = this;
@@ -677,7 +677,7 @@ hundo.Board = function(boardConfig) {
 
     // Add gblocks
     _.each(boardConfig.gblocks, function(gblock) {
-        var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupNum);
+        var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupId);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -891,16 +891,16 @@ hundo.Board.prototype.addPiece = function(piece) {
         
         else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
 
-            if (!(piece.groupNum in this.gblocks)){
-                this.gblocks[piece.groupNum] = [];
+            if (!(piece.groupId in this.gblocks)){
+                this.gblocks[piece.groupId] = [];
             }   
 
-            var i = _.findIndex(this.gblocks[piece.groupNum], function(p) {
+            var i = _.findIndex(this.gblocks[piece.groupId], function(p) {
                 return p.eq(piece);
             })
             
             if (i < 0) {
-                this.gblocks[piece.groupNum].push(piece);
+                this.gblocks[piece.groupId].push(piece);
             }
         }
 
@@ -1115,7 +1115,7 @@ hundo.Board.prototype.getJson = function() {
                 return {
                     row: gblock.row,
                     col: gblock.col,
-                    groupNum: gblock.groupNum
+                    groupId: gblock.groupId
                 }
             }),
         sand: _.map(this.getSand(), function(sand) {
@@ -1351,7 +1351,7 @@ hundo.Board.prototype.step = function() {
         /*
         var gblock = this.getPiece(newRow, newCol, hundo.PieceTypeEnum.GBLOCK);
         if (gblock) {
-            recipients = _.concat(recipients, this.gblocks[gblock.groupNum]);
+            recipients = _.concat(recipients, this.gblocks[gblock.groupId]);
         }
         */
         
@@ -1967,7 +1967,7 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.ARROW) {
         return new hundo.Arrow(row, col, this.paletteSelection.dir);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.GBLOCK) {
-        return new hundo.Gblock(row, col, this.paletteSelection.groupNum);
+        return new hundo.Gblock(row, col, this.paletteSelection.groupId);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.SAND) {
         return new hundo.Sand(row, col);
         
@@ -2139,28 +2139,28 @@ hundo.Viz.prototype.addPalette = function() {
             image: "gblock-0",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupNum: 0
+                groupId: 0
             }
         },
         {
             image: "gblock-1",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupNum: 1
+                groupId: 1
             }
         },
         {
             image: "gblock-2",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupNum: 2
+                groupId: 2
             }
         },
         {
             image: "gblock-3",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupNum: 3
+                groupId: 3
             }
         },
         {
@@ -2494,7 +2494,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("class", "gblock")
         .attr("id", hundo.Viz.pieceId)
         .attr("xlink:href", function (piece) {
-            return "#gblockTemplate-" + piece.groupNum;
+            return "#gblockTemplate-" + piece.groupId;
         })
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
@@ -3301,7 +3301,7 @@ hundo.Compress.compressLevel = function(level) {
     _.each(level.gblocks, function(gblock){
         levelArray.push(hundo.Compress.toBase64Digit(gblock.row));
         levelArray.push(hundo.Compress.toBase64Digit(gblock.col));
-        levelArray.push(hundo.Compress.toBase64Digit(gblock.groupNum));
+        levelArray.push(hundo.Compress.toBase64Digit(gblock.groupId));
     });
 
     // separator
@@ -3450,12 +3450,12 @@ hundo.Compress.decompressLevel = function(byteString) {
     // Get the gblocks
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
-        var groupNum = hundo.Compress.fromBase64Digit(bytes[0]);
+        var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
         bytes.shift();
         gblock = {
             row: r,
             col: c,
-            groupNum: groupNum
+            groupId: groupId
         }
         level.gblocks.push(gblock);
     }
