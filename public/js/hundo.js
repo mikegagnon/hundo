@@ -405,6 +405,29 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 }
 
 /**
+ * ClusterGblock provides functionality for dealing with interdependencies
+ * between gblock groups during step
+ ******************************************************************************/
+
+hundo.ClusterGblock = function(board) {
+
+    // A gblock group (A) depends on group (B), in direction (Dir), iff:
+    // group (A) would bump into group (B) if pushed in direction (Dir)
+    //
+    // It is possible for (A) and (B) to be mutually dependent
+    //
+    // For example:
+    //    BBB
+    //   ABAB   are mutually dependent for directions left and right
+    //   AAA
+    //
+    // Mutually dependent groups form clusters.
+    //
+
+
+}
+
+/**
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
