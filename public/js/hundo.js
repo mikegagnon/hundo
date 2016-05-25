@@ -28,6 +28,9 @@ hundo.DirectionEnum = {
     NODIR: "NODIR"
 }
 
+hundo.FourDirections = [hundo.DirectionEnum.UP, hundo.DirectionEnum.DOWN,
+    hundo.DirectionEnum.LEFT, hundo.DirectionEnum.RIGHT];
+
 hundo.LayerEnum = {
     TOP: "TOP",
     BOTTOM: "BOTTOM"
@@ -417,13 +420,64 @@ hundo.ClusterGblock = function(board) {
     // It is possible for (A) and (B) to be mutually dependent
     //
     // For example:
-    //    BBB
-    //   ABAB   are mutually dependent for directions left and right
+    //    B
+    //   ABA   are mutually dependent for directions left and right
     //   AAA
     //
     // Mutually dependent groups form clusters.
     //
 
+    // this.cluster[groupNum] == an array of groupNums that are in groupNum's
+    // cluster.
+    this.cluster = {}
+
+    var groupNums = _.keysIn(board.gblocks);
+
+    var THIS = this;
+
+    _.each(groupNums, function(groupNum){
+        THIS.cluster[groupNum] = [groupNum];
+    });
+
+    // depends[groupNumA][Dir] == an array of groupNumB's, for which groupNumA
+    // depends on groupNumB for direction Dir
+    this.depends = {}
+
+    // compute depends
+    var dir = hundo.DirectionEnum.UP;
+
+    _.each(groupNums, function(groupNum) {
+
+        THIS.depends[groupNum] = {}
+
+        _.each(hundo.FourDirections, function(dir){
+
+            THIS.depends[groupNum][dir] = new Set([]);
+
+            var groupAMembers = board.gblocks[groupNum];
+
+            _.each(groupAMembers, function(groupAMember) {
+
+                var [rowA, colA] = [groupAMember.row, groupAMember.col];
+                var [rowB, colB] = hundo.Board.dirRowCol(dir, rowA, colA);
+
+                if (board.inBounds(rowB, colB)) {
+
+                    var top = board.matrix[rowB][colB][hundo.LayerEnum.TOP];
+
+                    if (top && top.type == hundo.PieceTypeEnum.GBLOCK &&
+                        top.groupNum != groupNum) {
+
+                        THIS.depends[groupNum][dir].add(top.groupNum);
+
+                    }
+                }
+
+
+            });
+
+        });
+    });
 }
 
 // returns an array containing every member of the cluster that groupNum
