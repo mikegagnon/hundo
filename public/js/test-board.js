@@ -733,7 +733,14 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
-// TODO: TEST FAIL: level-editor.html?level=fl52--5k2-5455565b5e5h5j--4804g35805c15d15g35i36806g36h36i3-
+// Ice and gblocks pushing into goal
+// level-editor.html?level=fl52--5k2-5455565b5e5h5j--4804g35805c15d15g35i36806g36h36i3-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":5,"col":20,"dir":"LEFT"}],"ice":[{"row":5,"col":4},{"row":5,"col":5},{"row":5,"col":6},{"row":5,"col":11},{"row":5,"col":14},{"row":5,"col":17},{"row":5,"col":19}],"arrows":[],"gblocks":[{"row":4,"col":8,"groupId":0},{"row":4,"col":16,"groupId":3},{"row":5,"col":8,"groupId":0},{"row":5,"col":12,"groupId":1},{"row":5,"col":13,"groupId":1},{"row":5,"col":16,"groupId":3},{"row":5,"col":18,"groupId":3},{"row":6,"col":8,"groupId":0},{"row":6,"col":16,"groupId":3},{"row":6,"col":17,"groupId":3},{"row":6,"col":18,"groupId":3}],"sand":[],"ball":{"row":5,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[{"row":5,"col":20,"dir":"LEFT"}],"ice":[{"row":5,"col":9},{"row":5,"col":10},{"row":5,"col":11},{"row":5,"col":13},{"row":5,"col":16},{"row":5,"col":18},{"row":5,"col":20}],"arrows":[],"gblocks":[{"row":4,"col":12,"groupId":0},{"row":4,"col":17,"groupId":3},{"row":5,"col":12,"groupId":0},{"row":5,"col":14,"groupId":1},{"row":5,"col":15,"groupId":1},{"row":5,"col":17,"groupId":3},{"row":5,"col":19,"groupId":3},{"row":6,"col":12,"groupId":0},{"row":6,"col":17,"groupId":3},{"row":6,"col":18,"groupId":3},{"row":6,"col":19,"groupId":3}],"sand":[],"ball":{"row":5,"col":8}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
 
 // Mutually dependent gblocks, case 1: two mutually dependent groups
 // level-editor.html?level=fl6f-----681770781790870880890-
