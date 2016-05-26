@@ -319,8 +319,15 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     // If a neighbor has pushed into this gblock, then do the push and memoize
     // the result
-    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        cluster.has(String(message.sender.groupId))) {
+    if ((message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+         cluster.has(String(message.sender.groupId)))
+
+        ||
+
+        (message.sender.type == hundo.PieceTypeEnum.ICE &&
+         cluster.has(String(message.sender.groupId[message.dir])))
+
+        ) {
 
         if (this.result) {
             return [this.result[0], []];
