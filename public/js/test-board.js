@@ -796,13 +796,21 @@ TEST = "Sand";
 
 // Ball bumping into one ice, bumping into sand
 // level-editor.html?level=fl00---01---02
+
 var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":1}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":0}}
-var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":2}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":1}}
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":2}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":1}}
 var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
 
+// level-editor.html?level=fl02-03-----02
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
 
 
 /*

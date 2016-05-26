@@ -508,14 +508,32 @@ hundo.Sand = function(row, col) {
 
 hundo.Sand.prototype.messageDown = function(board, message) {
 
-    //board.stopBall();
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
 
-    return [true, [], []];
+    return board.messageDown(newMessage);
 }
 
 hundo.Sand.prototype.messageUp = function(board, message) {
 
-    return [true, [], ["stopBall"]];
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
+
+    var [success, animations, moves] = board.messageUp(newMessage);
+
+    moves.push("stopBall");
+
+    return [success, animations, moves];
 }
 
 hundo.Sand.prototype.eq = function(piece) {
