@@ -481,7 +481,9 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 newCol: neighbor.col,
             }
 
-            var [success, animations, moves] = board.messageDown(newMessage);
+            // Send message directly to neighbor; otherwise, the message
+            // will go down and up, which would be incorrect
+            var [success, animations, moves] = neighbor.messageUp(board, newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
             totalMoves = _.concat(totalMoves, moves);
@@ -1475,10 +1477,10 @@ hundo.Board.prototype.getJson = function() {
  *
  * Illustation:
  *
- *  |  piece that wants to move          ^  destination top
+ *  |  piece that wants to move          ^  newCell top
  *  V                                    | 
  *  |                                    | 
- *  | bottom                             ^  destination bottom
+ *  | bottom                             ^  newCell bottom
  *  V                                    |
  *   >-----------------------------------^
  *
