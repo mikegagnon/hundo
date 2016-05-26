@@ -804,6 +804,7 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
 
+// block to the right of sand; ball on sand, pushing right
 // level-editor.html?level=fl02-03-----02
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
 var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
@@ -811,6 +812,24 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
+
+// ice on sand; ball to the left of ice-sand; ball pushing right
+// level-editor.html?level=fl01---02---02
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":2}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":1}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":3}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
+
+// level-editor.html?level=fl02---03---02
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":3}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":0,"col":21}],"arrows":[],"gblocks":[],"sand":[{"row":0,"col":2}],"ball":{"row":0,"col":21}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
+
 
 
 /*

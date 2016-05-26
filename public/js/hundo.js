@@ -1114,9 +1114,12 @@ hundo.Board.prototype.addPiece = function(piece) {
 
     if (this.canAddPiece(piece)) {
 
-        var cell = this.matrix[piece.row][piece.col];
-
-        cell[piece.layer] = piece;
+        if (this.inBounds(piece.row, piece.col)) {
+            var cell = this.matrix[piece.row][piece.col];
+            cell[piece.layer] = piece;
+        } else {
+            this.oob.push(piece);
+        }
 
         if (piece.type == hundo.PieceTypeEnum.BALL) {
             this.ball = piece;
