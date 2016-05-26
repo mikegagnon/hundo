@@ -669,8 +669,17 @@ hundo.Cluster.clusterMembers = function(groupIds, board, cluster) {
             var groups = cluster[a][dir];
 
             clusterMembers[a][dir] = board.getPieces( function(piece) {
-                    return piece.type == hundo.PieceTypeEnum.GBLOCK &&
-                        groups.has(String(piece.groupId));
+                    return (
+
+                        (piece.type == hundo.PieceTypeEnum.GBLOCK &&
+                        groups.has(String(piece.groupId)))
+
+                        ||
+                        
+                        (piece.type == hundo.PieceTypeEnum.ICE &&
+                        groups.has(String(piece.groupId[dir])))
+
+                        );
                 });
         });
     });
