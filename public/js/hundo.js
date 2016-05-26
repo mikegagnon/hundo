@@ -317,52 +317,14 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var totalAnimations = [];
     var cluster = board.cluster.cluster[this.groupId][message.dir];
 
-    // Two cases:
-    //      1. A non-gblock bumps into this gblock, which case we bump
-    //         all gblocks
-    //      2. A gbock (from the same group) bumps into this gblock, in which
-    //         case we do the recursive bumps as usual, except we memoize
-    //         results.
-
-    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        cluster.has(String(message.sender.groupId)))) {
-
-        // clear out memoization
-        _.each(neighbors, function(neighbor) {
-            neighbor.result = undefined;
-        });
-
-        // push every member of this gblock's group
-        _.each(neighbors, function(neighbor) {
-
-            var newMessage = {
-                sender: THIS,
-                forwarder: THIS,
-                dir: message.dir,
-                newRow: neighbor.row,
-                newCol: neighbor.col,
-                commit: message.commit
-            }
-
-            var [success, animations] = board.messageDown(newMessage);
-
-            totalAnimations = _.concat(totalAnimations, animations);
-
-            if (!success) {
-                totalSuccess = false;
-            }
-        });
-
-        return [totalSuccess, totalAnimations];
-
-    } else {
-
+    // If a neighbor has pushed into this gblock, then do the push and memoize
+    // the result
+    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+        cluster.has(String(message.sender.groupId))) {
 
         if (this.result) {
-            // TODO: returning empty animations is correct, right?
             return [this.result[0], []];
         }
-
 
         var [dr, dc] = hundo.Board.drdc(message.dir);
 
@@ -402,6 +364,40 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         }
 
         return [success, animations];
+
+    }
+
+    // If a foreign piece pushes into this gblock, then push all the members.
+    // of this gblock's cluster 
+    else {
+
+        // clear out memoization
+        _.each(neighbors, function(neighbor) {
+            neighbor.result = undefined;
+        });
+
+        // push every member of this gblock's group
+        _.each(neighbors, function(neighbor) {
+
+            var newMessage = {
+                sender: THIS,
+                forwarder: THIS,
+                dir: message.dir,
+                newRow: neighbor.row,
+                newCol: neighbor.col,
+                commit: message.commit,
+            }
+
+            var [success, animations] = board.messageDown(newMessage);
+
+            totalAnimations = _.concat(totalAnimations, animations);
+
+            if (!success) {
+                totalSuccess = false;
+            }
+        });
+
+        return [totalSuccess, totalAnimations];
     }
 }
 
