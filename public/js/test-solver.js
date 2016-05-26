@@ -7,7 +7,6 @@ TEST = "Solver"
 
 // These tests are slow, so comment them out unless testing Solver specifically
 
-/*
 // level-editor.html?level=fl7a-393a3b666e767e868eb9babb-271----
 var config = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9},{"row":3,"col":10},{"row":3,"col":11},{"row":6,"col":6},{"row":6,"col":14},{"row":7,"col":6},{"row":7,"col":14},{"row":8,"col":6},{"row":8,"col":14},{"row":11,"col":9},{"row":11,"col":10},{"row":11,"col":11}],"goals":[{"row":2,"col":7,"dir":"DOWN"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":7,"col":10}};
 var edges = [{"row1":7,"col1":10,"row2":4,"col2":10},{"row1":4,"col1":10,"row2":10,"col2":10},{"row1":10,"col1":10,"row2":10,"col2":-1},{"row1":10,"col1":10,"row2":10,"col2":21},{"row1":4,"col1":10,"row2":4,"col2":-1},{"row1":4,"col1":10,"row2":4,"col2":21},{"row1":7,"col1":10,"row2":7,"col2":7},{"row1":7,"col1":7,"row2":2,"col2":7},{"row1":7,"col1":7,"row2":15,"col2":7},{"row1":7,"col1":7,"row2":7,"col2":13},{"row1":7,"col1":13,"row2":-1,"col2":13},{"row1":7,"col1":13,"row2":15,"col2":13}];
@@ -65,4 +64,3 @@ assert(Object.compare(winningEdges, solver.getCellWinningEdges()))
 
 // TODO: Solver fails for level-editor.html?level=fl22--7b3-2c--bd0cb0cc0cd0dd0-2425262i3i4i595a5f6f7fa7b7c7ci
 
-*/
