@@ -216,32 +216,96 @@ hundo.Ice.prototype.eq = function(piece) {
 
 hundo.Ice.prototype.messageUp = function(board, message) {
 
-    var [newRow, newCol] = hundo.Board.dirRowCol(
-        message.dir, this.row, this.col);
+    var THIS = this;
 
-    var newMessage = {
-        sender: this,
-        forwarder: this,
-        dir: message.dir,
-        newRow: newRow,
-        newCol: newCol,
-        commit: message.commit
+    var groupId = this.groupId[message.dir];
+
+    // includes gblocks and ice
+    var neighbors = board.cluster.clusterMembers[groupId][message.dir];
+    var totalSuccess = true;
+    var totalAnimations = [];
+    var cluster = board.cluster.cluster[groupId][message.dir];
+
+    // If a neighbor has pushed into this gblock, then do the push and memoize
+    // the result
+    if ((message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+         cluster.has(String(message.sender.groupId)))
+
+        ||
+
+        (message.sender.type == hundo.PieceTypeEnum.ICE &&
+         cluster.has(String(message.sender.groupId[message.dir])))
+
+        ) {
+
+        if (this.result) {
+            return [this.result[0], []];
+        }
+
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
+
+        // TODO: factor out code common to this and ice, etc.
+        var newMessage = {
+            sender: this,
+            forwarder: this,
+            dir: message.dir,
+            newRow: newRow,
+            newCol: newCol,
+            commit: message.commit
+        }
+
+        var [success, animations] = board.messageDown(newMessage);
+
+        this.result = [success, animations];
+
+        if (success && message.commit) {
+            board.moveDir(this, message.dir);
+            animations.push(
+                {
+                    "move": {
+                        "ice": this,
+                        "dir": message.dir,
+                    }
+                });
+        }
+
+        return [success, animations];
+
     }
 
-    var [success, animations] = board.messageDown(newMessage);
+    // If a foreign piece pushes into this gblock, then push all the members.
+    // of this gblock's cluster 
+    else {
 
-    if (success && message.commit) {
-        board.moveDir(this, message.dir);
-        animations.push(
-            {
-                "move": {
-                    "ice": this,
-                    "dir": message.dir,
-                }
-            });
+        // clear out memoization
+        _.each(neighbors, function(neighbor) {
+            neighbor.result = undefined;
+        });
+
+        // push every member of this gblock's group
+        _.each(neighbors, function(neighbor) {
+
+            var newMessage = {
+                sender: THIS,
+                forwarder: THIS,
+                dir: message.dir,
+                newRow: neighbor.row,
+                newCol: neighbor.col,
+                commit: message.commit,
+            }
+
+            var [success, animations] = board.messageDown(newMessage);
+
+            totalAnimations = _.concat(totalAnimations, animations);
+
+            if (!success) {
+                totalSuccess = false;
+            }
+        });
+
+        return [totalSuccess, totalAnimations];
     }
-
-    return [success, animations];
 }
 
 /**
@@ -339,8 +403,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         if (!board.inBounds(newRow, newCol)) {
             return [false, []];
         }
-
-
 
         // TODO: factor out code common to this and ice, etc.
         var newMessage = {
