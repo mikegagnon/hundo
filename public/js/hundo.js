@@ -99,7 +99,7 @@ hundo.Block = function(row, col) {
 }
 
 hundo.Block.prototype.messageUp = function(board, message) {
-    return [false, []];
+    return [false, [], []];
 }
 
 hundo.Block.prototype.eq = function(piece) {
@@ -133,7 +133,7 @@ hundo.Ball.prototype.messageUp = function(board, message) {
     // ball.
     if (message.sender) {
         // TODO: implement version that allows pushes from other pieces
-        return [false, []];        
+        return [false, [], []];        
     }
 
     var [newRow, newCol] = hundo.Board.dirRowCol(
@@ -143,25 +143,35 @@ hundo.Ball.prototype.messageUp = function(board, message) {
         sender: this,
         forwarder: this,
         dir: message.dir,
-        commit: message.commit,
         newRow: newRow,
         newCol: newCol
     }
 
-    var [success, animations] = board.messageDown(newMessage);
+    var [success, animations, moves] = board.messageDown(newMessage);
 
-    if (success && message.commit) {
-        board.moveDir(this, this.dir);
+    if (success) {
+
+        var [newRow , newCol] = hundo.Board.dirRowCol(this.dir, this.row, this.col);
+
+        moves.push({
+            piece: this,
+            newRow: newRow,
+            newCol: newCol
+        });
+
+        // TODO: remove quotes from all keys
         animations.push(
             {
-                "move": {
-                    "ball": this,
-                    "dir": this.dir,
+                move: {
+                    ball: this,
+                    dir: this.dir,
                 }
             });
+
     }
 
-    return [success, animations];
+
+    return [success, animations, moves];
 }
 
 /**
@@ -191,9 +201,9 @@ hundo.Goal.prototype.messageUp = function(board, message) {
     if (hundo.Board.isCompatible(this, message.sender) &&
         this.dir == hundo.oppositeDir(message.dir) &&
         !top) {
-        return [true, []]
+        return [true, [], []]
     }
-    return [false, []];
+    return [false, [], []];
 }
 
 /**
@@ -224,6 +234,7 @@ hundo.Ice.prototype.messageUp = function(board, message) {
     var neighbors = board.cluster.clusterMembers[groupId][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
+    var totalMoves = [];
     var cluster = board.cluster.cluster[groupId][message.dir];
 
     // If a neighbor has pushed into this gblock, then do the push and memoize
@@ -239,7 +250,9 @@ hundo.Ice.prototype.messageUp = function(board, message) {
         ) {
 
         if (this.result) {
-            return [this.result[0], []];
+
+            // IS returning emprty moves the right thing to do?
+            return [this.result[0], [], []];
         }
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
@@ -252,15 +265,23 @@ hundo.Ice.prototype.messageUp = function(board, message) {
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
-            commit: message.commit
         }
 
-        var [success, animations] = board.messageDown(newMessage);
+        var [success, animations, moves] = board.messageDown(newMessage);
 
-        this.result = [success, animations];
+        this.result = [success, animations, moves];
 
-        if (success && message.commit) {
-            board.moveDir(this, message.dir);
+        if (success) {
+
+            var [newRow , newCol] = hundo.Board.dirRowCol(message.dir, this.row,
+                this.col);
+
+            moves.push({
+                piece: this,
+                newRow: newRow,
+                newCol: newCol
+            });
+
             animations.push(
                 {
                     "move": {
@@ -270,7 +291,7 @@ hundo.Ice.prototype.messageUp = function(board, message) {
                 });
         }
 
-        return [success, animations];
+        return [success, animations, moves];
 
     }
 
@@ -292,19 +313,18 @@ hundo.Ice.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 newRow: neighbor.row,
                 newCol: neighbor.col,
-                commit: message.commit,
-            }
+            };
 
-            var [success, animations] = board.messageDown(newMessage);
+            [success, animations, moves] = board.messageDown(newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
-
+            totalMoves = _.concat(totalMoves, moves);
             if (!success) {
                 totalSuccess = false;
             }
         });
 
-        return [totalSuccess, totalAnimations];
+        return [totalSuccess, totalAnimations, totalMoves];
     }
 }
 
@@ -335,7 +355,7 @@ hundo.Arrow.prototype.messageUp = function(board, message) {
         message.forwarder = this;
         return board.messageUp(message) 
     } else {
-        return [false, []];
+        return [false, [], []];
     }
 }
 
@@ -345,7 +365,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
         message.forwarder = this;
         return board.messageDown(message) 
     } else {
-        return [false, []];
+        return [false, [], []];
     }
 }
 
@@ -379,6 +399,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var neighbors = board.cluster.clusterMembers[this.groupId][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
+    var totalMoves = [];
     var cluster = board.cluster.cluster[this.groupId][message.dir];
 
     // If a neighbor has pushed into this gblock, then do the push and memoize
@@ -394,14 +415,14 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         ) {
 
         if (this.result) {
-            return [this.result[0], []];
+            return [this.result[0], [], []];
         }
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
             message.dir, this.row, this.col);
 
         if (!board.inBounds(newRow, newCol)) {
-            return [false, []];
+            return [false, [], []];
         }
 
         // TODO: factor out code common to this and ice, etc.
@@ -411,25 +432,32 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
-            commit: message.commit
         }
 
-        var [success, animations] = board.messageDown(newMessage);
+        var [success, animations, moves] = board.messageDown(newMessage);
 
-        this.result = [success, animations];
+        this.result = [success, animations, moves];
 
-        if (success && message.commit) {
-            board.moveDir(this, message.dir);
+        if (success) {
+            var [newRow , newCol] = hundo.Board.dirRowCol(message.dir, this.row,
+                this.col);
+
+            moves.push({
+                piece: this,
+                newRow: newRow,
+                newCol: newCol
+            });
+
             animations.push(
                 {
-                    "move": {
-                        "gblock": this,
-                        "dir": message.dir,
-                    }
-                });
+                    move: {
+                        gblock: this,
+                        dir: message.dir,
+                }
+            });
         }
 
-        return [success, animations];
+        return [success, animations, moves];
 
     }
 
@@ -451,19 +479,19 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 newRow: neighbor.row,
                 newCol: neighbor.col,
-                commit: message.commit,
             }
 
-            var [success, animations] = board.messageDown(newMessage);
+            var [success, animations, moves] = board.messageDown(newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
+            totalMoves = _.concat(totalMoves, moves);
 
             if (!success) {
                 totalSuccess = false;
             }
         });
 
-        return [totalSuccess, totalAnimations];
+        return [totalSuccess, totalAnimations, totalMoves];
     }
 }
 
@@ -1393,7 +1421,7 @@ hundo.Board.prototype.messageDown = function(message) {
         message.forwarder = undefined;
         return top.messageUp(this, message)
     } else {
-        return [true, []];
+        return [true, [], []];
     }
 
 }
@@ -1408,7 +1436,7 @@ hundo.Board.prototype.messageUp = function(message) {
     if (top) {
         return top.messageUp(this, message);
     } else {
-        return [true, []];
+        return [true, [], []];
     }
 }
 
@@ -1461,27 +1489,19 @@ hundo.Board.prototype.step = function() {
         }];
     }
 
-    var [success, animations] = this.ball.messageUp(this, {
+    var [success, animations, moves] = this.ball.messageUp(this, {
             dir: direction,
             newRow: this.ball.row,
             newCol: this.ball.col,
-            commit: false
         })
-
-        // this.nudge(this.ball.row, this.ball.col, this.ball.dir, false);
 
     if (success) {
 
-        [success, animations] = this.ball.messageUp(this, {
-            dir: direction,
-            newRow: this.ball.row,
-            newCol: this.ball.col,
-            commit: true
-        })
+        var THIS = this;
 
-        // now commit the nudge
-        //[nudged, animations] =
-        //    this.nudge(this.ball.row, this.ball.col, this.ball.dir, true);
+        _.each(moves, function(move){
+            THIS.movePiece(move.piece, move.newRow, move.newCol);
+        });
 
         if (this.checkSolved()) {
             this.solved = true;
