@@ -495,6 +495,25 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     }
 }
 
+// id is a uuid relative to board pieces
+hundo.Sand = function(row, col) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.SAND;
+    this.layer = hundo.LayerEnum.BOTTOM;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+}
+
+hundo.Sand.prototype.messageUp = function(board, message) {
+    return [false, [], []];
+}
+
+hundo.Sand.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece);
+}
+
 /**
  * Cluster provides functionality for dealing with interdependencies
  * between gblock groups during step
@@ -857,6 +876,14 @@ hundo.Board = function(boardConfig) {
     // Add gblocks
     _.each(boardConfig.gblocks, function(gblock) {
         var piece = new hundo.Gblock(gblock.row, gblock.col, gblock.groupId);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
+     // Add sand
+    _.each(boardConfig.sand, function(sand) {
+        var piece = new hundo.Sand(sand.row, sand.col);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -2591,9 +2618,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
-
-    /*
-    var sandRadius = this.vizConfig.cellSize / 3;
+    
     this.boardSvg.selectAll()
         .data(this.board.getSand())
         .enter()
@@ -2609,7 +2634,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
 
         });
-    */
+    
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
     this.boardSvg.selectAll()
@@ -3641,7 +3666,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         bytes.shift();
     }
 
-    // Get the gblocks
+    // Get the sand
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
         sand = {
