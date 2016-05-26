@@ -903,4 +903,11 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
-// BUG: level-editor.html?level=fl00-----100110-11
+// Gblock exiting sand
+// level-editor.html?level=fl10-----200210-21
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":1,"col":0,"groupId":0},{"row":1,"col":1,"groupId":0}],"sand":[{"row":1,"col":1}],"ball":{"row":0,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":14,"col":0,"groupId":0},{"row":14,"col":1,"groupId":0}],"sand":[{"row":1,"col":1}],"ball":{"row":13,"col":0}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
