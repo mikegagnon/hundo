@@ -432,7 +432,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
-        }
+        };
 
         var [success, animations, moves] = board.messageDown(newMessage);
 
