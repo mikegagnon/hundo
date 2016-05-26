@@ -1742,6 +1742,8 @@ Object.compare = function (obj1, obj2) {
 
 hundo.Solver = function(board) {
 
+    this.maxEdges = 200;
+
     this.edges = [];
 
     this.winningEdges = [];
@@ -1757,10 +1759,13 @@ hundo.Solver = function(board) {
 
     this.winningEdges = this.explore(board);
 
-    // console.log("Edges");
-    // console.log(JSON.stringify(this.getCellEdges()));
-    // console.log("Winning edges")
-    // console.log(JSON.stringify(this.getCellWinningEdges()));
+    // used for generating test cases for solver
+    /*
+    console.log("Edges");
+    console.log(JSON.stringify(this.getCellEdges()));
+    console.log("Winning edges")
+    console.log(JSON.stringify(this.getCellWinningEdges()));
+    */
 
 }
 
@@ -1829,7 +1834,7 @@ hundo.Solver.prototype.getCellWinningEdges = function() {
 }
 
 hundo.Solver.prototype.explore = function(board) {
-    if (this.edges.length >= 100) {
+    if (this.edges.length >= this.maxEdges) {
         return [];
     }
 
