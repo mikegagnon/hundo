@@ -1448,17 +1448,68 @@ hundo.Board.prototype.getJson = function() {
  *        message, creating a cascade of messages.
  ******************************************************************************/
 
-// might be called by top piece or bottom piece
+
+/**
+ * When a top piece wants to move, it calls board.messageDown(message), where
+ * message describes the movement the top piece wants to make. In this case,
+ * board.messageDown(message) passes the message to the bottom piece of the same
+ * cell that the top piece is in. This way, the bottom piece can veto the
+ * movement if it would like.
+
+ * Also, the bottom piece may make a new call to messageDown, if the bottom
+ * peice would like more information before it decides whether or not to veto
+ * the movement.
+ *
+ * Also, the bottom piece can mutate the message.
+ *
+ * If there is no bottom piece, then board.message() passes the message up to
+ * the to the "newCell" where the top pieces wants to move.
+ *
+ * In this case, board.message() passes the message to newCell's bottom piece.
+ *
+ * But if there is no bottom piece, then board.message() passes the message to
+ * the newCell's top piece.
+ *
+ * And, finally, if there is no top piece, then board.message() returns true,
+ * since newCell has no pieces which might veto the movement.
+ *
+ * Illustation:
+ *
+ *  |  piece that wants to move          ^  destination top
+ *  V                                    | 
+ *  |                                    | 
+ *  | bottom                             ^  destination bottom
+ *  V                                    |
+ *   >-----------------------------------^
+ *
+ */
 hundo.Board.prototype.messageDown = function(message) {
 
-    var [top, bottom] = this.getTopBottom(message.forwarder.row, message.forwarder.col);
+    // get the top and bottom pieces for the cell where the "piece that wants
+    // to move" is.
+    var [top, bottom] = this.getTopBottom(message.sender.row,
+        message.sender.col);
 
-    // TODO: we we really need to keep track of the forwarder and/or sender?    
+    // TODO: we we really need to keep track of the forwarder and/or sender?
+
+    // If the sender is the piece that wants to move
     if (message.forwarder.layer == hundo.LayerEnum.TOP) {
+
+        // If there is a bottom piece, then forward the message to the bottom
+        // piece
         if (bottom) {
             return bottom.messageDown(this, message);
         }
     }
+
+    // If we are here, that means either:
+    //      (A) The message came from a bottom piece, which means the bottom
+    //          piece is forwarding the message from piece-that-wants-to-move
+    //      (B) The message came from the piece-that wants to move, but there
+    //          is not bottom piece.
+    //
+    // Either way, the thing to do is to pass the message to the "newCell."
+    // 
 
     // !((message.forwarder.layer == hundo.LayerEnum.TOP && !bottom) || 
         
@@ -1470,15 +1521,26 @@ hundo.Board.prototype.messageDown = function(message) {
     var newRow = message.newRow;
     var newCol = message.newCol;
 
+    // Get the top and bottom pieces for the newCell
     var [top, bottom] = this.getTopBottom(newRow, newCol);
     
+    // If there is a bottom piece in the newCell, forward the message up to that
+    // bottom piece
     if (bottom) {
         message.forwarder = undefined;
         return bottom.messageUp(this, message);
-    } else if (top) {
+    }
+
+    // If there is no bottom piece in the newCell, forward the message up to
+    // that top piece
+    else if (top) {
         message.forwarder = undefined;
         return top.messageUp(this, message)
-    } else {
+    }
+
+    // If the newCell is empty, then there are no pieces to veto the movement,
+    // so return true, which signifies that the movement is approved.
+    else {
         return [true, [], []];
     }
 
