@@ -310,11 +310,22 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
+
+    // includes gblocks and ice
     var neighbors = board.cluster.clusterMembers[this.groupId][message.dir];
     var totalSuccess = true;
     var totalAnimations = [];
+    var cluster = board.cluster.cluster[this.groupId][message.dir];
 
-    function pushNeighbor() {
+    // Two cases:
+    //      1. A non-gblock bumps into this gblock, which case we bump
+    //         all gblocks
+    //      2. A gbock (from the same group) bumps into this gblock, in which
+    //         case we do the recursive bumps as usual, except we memoize
+    //         results.
+
+    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+        cluster.has(String(message.sender.groupId)))) {
 
         // clear out memoization
         _.each(neighbors, function(neighbor) {
@@ -343,24 +354,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         });
 
         return [totalSuccess, totalAnimations];
-
-    }
-
-    var cluster = board.cluster.cluster[this.groupId][message.dir];
-
-    // Two cases:
-    //      1. A non-gblock bumps into this gblock, which case we bump
-    //         all gblocks
-    //      2. A gbock (from the same group) bumps into this gblock, in which
-    //         case we do the recursive bumps as usual, except we memoize
-    //         results.
-
-    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        cluster.has(String(message.sender.groupId)))) {
-        //message.sender.groupId == this.groupId)) {
-
-        // TODO: put pushNeighbor code here
-        return pushNeighbor();
 
     } else {
 
