@@ -433,17 +433,20 @@ hundo.Cluster = function(board) {
     // groupIds is an array containing every groupId for every set of gblocks
     var groupIds = _.keysIn(board.gblocks);
 
-    // iceGroups[dir][N] = the Nth ice group for direction dir, where an ice
-    // group is an array of ice pieces, such that the pieces form a contiguous
-    // line of adjacent ice pieces in direction dir
-    this.iceGroups = hundo.Cluster.getIceGroups(board, groupIds);
+    // iceMembers[dir][groupId] = the ice group for direction dir (associated
+    // with groupId), where an ice  group is an array of ice pieces, such that
+    // the pieces form a contiguous line of adjacent ice pieces in direction dir
+
+    var [iceGroupIds, iceMembers] = hundo.Cluster.getIceGroups(board);
+
+    groupIds = _.concat(groupIds, iceGroupIds);
 
     // this.depends[groupId][dir] == the set of groupIds that groupId
     // __directly__ depends upon in direction dir.
     //
     // For example if A would bump into B in direction LEFT, then
     // this.dependsp[A][LEFT] = Set(B)
-    this.depends = hundo.Cluster.directDepends(board, groupIds);
+    this.depends = hundo.Cluster.directDepends(board, groupIds, iceMembers);
 
     // this.depends[groupId][dir] == the transitive closure of depends.
     // E.g. if A depends on B, and B depends on C, in direction LEFT, then
@@ -467,11 +470,19 @@ hundo.Cluster = function(board) {
         board, this.cluster);
 }
 
-hundo.Cluster.getIceGroups = function(board, groupIds) {
+hundo.Cluster.getIceGroups = function(board) {
 
     var pieces = board.getIce();
 
-    var groupId = 0;
+    var groupNum = 0;
+
+    var groupIds = [];
+
+    var iceMembers = {}
+
+    _.each(hundo.FourDirections, function(dir) {
+        iceMembers[dir] = {};
+    });
 
     // reset ice groups
     _.each(hundo.FourDirections, function(dir) {
@@ -492,16 +503,24 @@ hundo.Cluster.getIceGroups = function(board, groupIds) {
 
             if (!top || top.type != hundo.PieceTypeEnum.ICE) {
                 hundo.Cluster.markIceGroup(board, ice.row, ice.col, dir,
-                    groupId);
-                groupId++;
+                    groupNum, iceMembers);
+                groupIds.push("iceGroup" + groupNum);
+                groupNum++;
             }
         });
     });
+
+    return [groupIds, iceMembers];
 }
 
 // TODO: is setting ice.groupId necessary?
 // TODO: .groupId[dir ]
-hundo.Cluster.markIceGroup = function(board, row, col, dir, groupId) {
+hundo.Cluster.markIceGroup = function(board, row, col, dir, groupNum,
+        iceMembers) {
+
+    var groupId = "iceGroup" + groupNum;
+
+    iceMembers[dir][groupId] = [];
 
     var [top, bottom] = board.getTopBottom(row, col);
 
@@ -510,6 +529,8 @@ hundo.Cluster.markIceGroup = function(board, row, col, dir, groupId) {
         if (!top.groupId) {
             top.groupId = {};
         }
+
+        iceMembers[dir][groupId].push(top);
         top.groupId[dir] = groupId;
         [row, col] = hundo.Board.dirRowCol(dir, row, col);
         var [top, bottom] = board.getTopBottom(row, col);
@@ -520,21 +541,25 @@ hundo.Cluster.markIceGroup = function(board, row, col, dir, groupId) {
 
 // depends[groupIdA][Dir] == an array of groupIdB's, for which groupIdA
 // directly depends on groupIdB for direction Dir
-hundo.Cluster.directDepends = function(board, groupIds) {
+hundo.Cluster.directDepends = function(board, groupIds, iceMembers) {
 
-    depends = {}
+    depends = {};
 
-    // compute the "direct" depends
-    // todo: comment more
     _.each(groupIds, function(a) {
 
-        depends[a] = {}
+        depends[a] = {};
 
         _.each(hundo.FourDirections, function(dir){
 
             depends[a][dir] = new Set([]);
 
-            var aMembers = board.gblocks[a];
+            var aMembers;
+
+            if (a.startsWith("iceGroup")) {
+                aMembers = iceMembers[dir][a];
+            } else {
+                aMembers = board.gblocks[a];
+            }
 
             _.each(aMembers, function(aMember) {
 
@@ -545,15 +570,21 @@ hundo.Cluster.directDepends = function(board, groupIds) {
 
                     var top = board.matrix[bRow][bCol][hundo.LayerEnum.TOP];
 
-                    if (top && top.type == hundo.PieceTypeEnum.GBLOCK &&
-                        top.groupId != a) {
+                    if (top) {
 
-                        depends[a][dir].add(String(top.groupId));
+                        if (top.type == hundo.PieceTypeEnum.GBLOCK &&
+                            top.groupId != a) {
+                            depends[a][dir].add(String(top.groupId));
+                        }
+
+                        else if (top.type == hundo.PieceTypeEnum.ICE &&
+                            top.groupId[dir] != a) {
+                            depends[a][dir].add(String(top.groupId[dir]));
+                        }
 
                     }
+
                 }
-
-
             });
 
         });
@@ -2051,6 +2082,7 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
     var piece = this.getPieceFromPalette(row, col);
 
     if (this.board.addPiece(piece)) {
+        this.board.cluster = new hundo.Cluster(this.board);
         this.animateSolvedQuick();
         this.drawBoardQuick();
         this.removeHighlight();
