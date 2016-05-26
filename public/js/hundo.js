@@ -1635,7 +1635,6 @@ hundo.Board.prototype.step = function() {
         // collision
         var recipients = [];
 
-
         // select all members of a cluster to have an animated collision
         var [top, bottom] = this.getTopBottom(newRow, newCol);
         if (top && top.type == hundo.PieceTypeEnum.GBLOCK) {
