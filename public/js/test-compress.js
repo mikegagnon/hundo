@@ -13,7 +13,7 @@ function testBase64Digit(number) {
 
 _.range(0, 62)
     .map(function(i){
-        assert(i, testBase64Digit(i));
+        assert(testBase64Digit(i));
     })
 
 TEST = "compress/decompress levels"
@@ -287,8 +287,8 @@ function testCompress(level) {
     return result;
 }
 
-_.each(testLevels, function(level, i){
-    assert(i, testCompress(level));
+_.each(testLevels, function(level){
+    assert(testCompress(level));
 });
 
 

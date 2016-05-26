@@ -7,14 +7,14 @@
 
 var TEST;
 
-function assertEquals(x, a, b) {
+function assertEquals(a, b) {
     if (a != b) {
-        console.error(TEST + ", " + x + ": " + a + " != " + b);
+        console.error(TEST + ": " + a + " != " + b);
     }
 }
 
-function assert(x, a) {
+function assert(a) {
     if (!a) {
-        console.error(TEST + ", " + x + ": false");
+        console.error(TEST + ": false");
     }
 }
