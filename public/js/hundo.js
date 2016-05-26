@@ -506,8 +506,16 @@ hundo.Sand = function(row, col) {
     this.origCol = col;
 }
 
+hundo.Sand.prototype.messageDown = function(board, message) {
+
+    //board.stopBall();
+
+    return [true, [], []];
+}
+
 hundo.Sand.prototype.messageUp = function(board, message) {
-    return [false, [], []];
+
+    return [true, [], ["stopBall"]];
 }
 
 hundo.Sand.prototype.eq = function(piece) {
@@ -1065,6 +1073,8 @@ hundo.Board.prototype.getOnePiece = function(row, col) {
 
 }
 
+
+// BUG: multiple balls allowed to be added
 hundo.Board.prototype.canAddPiece = function(piece) {
 
     var numPieces = this.numPieces(piece.row, piece.col);
@@ -1527,7 +1537,12 @@ hundo.Board.prototype.step = function() {
         var THIS = this;
 
         _.each(moves, function(move){
-            THIS.movePiece(move.piece, move.newRow, move.newCol);
+
+            if (move == "stopBall") {
+                THIS.stopBall();
+            } else {
+                THIS.movePiece(move.piece, move.newRow, move.newCol);
+            }
         });
 
         if (this.checkSolved()) {
