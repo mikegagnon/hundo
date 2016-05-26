@@ -1639,7 +1639,7 @@ hundo.Board.prototype.step = function() {
         // select all members of a cluster to have an animated collision
         var [top, bottom] = this.getTopBottom(newRow, newCol);
         if (top && top.type == hundo.PieceTypeEnum.GBLOCK) {
-            var glock = top;
+            var gblock = top;
             var group = this.cluster.clusterMembers[gblock.groupId];
             if (group) {
                 var members = group[this.ball.dir];
