@@ -1748,7 +1748,7 @@ hundo.Solver = function(board) {
 
     this.winningEdges = [];
 
-    // vertices
+    // TODO: rename to vertices
     this.boards = [];
 
     if (typeof board.ball == "undefined" ||
