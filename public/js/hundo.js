@@ -333,17 +333,14 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             return [this.result[0], []];
         }
 
-        var [dr, dc] = hundo.Board.drdc(message.dir);
-
-        var newRow = this.row + dr;
-        var newCol = this.col + dc;
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
 
         if (!board.inBounds(newRow, newCol)) {
             return [false, []];
         }
 
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
+
 
         // TODO: factor out code common to this and ice, etc.
         var newMessage = {
