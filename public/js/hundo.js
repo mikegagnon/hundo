@@ -1513,13 +1513,6 @@ hundo.Board.prototype.messageDown = function(message) {
     // Either way, the thing to do is to pass the message to the "newCell."
     // 
 
-    // !((message.forwarder.layer == hundo.LayerEnum.TOP && !bottom) || 
-        
-    /*if (message.forwarder.layer == hundo.LayerEnum.BOTTOM) {
-        console.error("This code should not be reachable");
-        return undefined;
-    }*/
-
     var newRow = message.newRow;
     var newCol = message.newCol;
 
@@ -1637,21 +1630,25 @@ hundo.Board.prototype.step = function() {
         }
         return animations;
     } else {
-        this.ball.dir = hundo.DirectionEnum.NODIR;
-        this.atRest = true;
-        
 
         // recipients is the array of pieces that will be animated in the
         // collision
         var recipients = [];
 
-        // TODO: factor this into Gblock code?
-        /*
-        var gblock = this.getPiece(newRow, newCol, hundo.PieceTypeEnum.GBLOCK);
-        if (gblock) {
-            recipients = _.concat(recipients, this.gblocks[gblock.groupId]);
-        }
-        */
+
+        // select all members of a cluster to have an animated collision
+        var [top, bottom] = this.getTopBottom(newRow, newCol);
+        if (top && top.type == hundo.PieceTypeEnum.GBLOCK) {
+            var glock = top;
+            var group = this.cluster.clusterMembers[gblock.groupId];
+            if (group) {
+                var members = group[this.ball.dir];
+                recipients = _.concat(recipients, members);
+            }
+        } 
+
+        this.ball.dir = hundo.DirectionEnum.NODIR;
+        this.atRest = true;
         
         var cell, top, bottom;
 
