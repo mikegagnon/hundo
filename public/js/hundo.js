@@ -279,8 +279,8 @@ hundo.Ice.prototype.messageUp = function(board, message) {
 
             moves.push({
                 piece: this,
-                newRow: newRow,
-                newCol: newCol
+                newRow: newMessage.newRow,
+                newCol: newMessage.newCol
             });
 
             animations.push(
@@ -554,6 +554,7 @@ hundo.Portal = function(row, col, groupId) {
     this.groupId = groupId;
     this.origRow = row;
     this.origCol = col;
+    this.receivingTeleportation = false;
 }
 
 hundo.Portal.prototype.messageDown = function(board, message) {
@@ -582,22 +583,43 @@ hundo.Portal.prototype.getPartner = function(board) {
 
 hundo.Portal.prototype.messageUp = function(board, message) {
 
-    var partner = this.getPartner(board);
+    // TODO: switch order of code so there's no negation here
+    if (!this.receivingTeleportation) {
 
-    message.newRow = partner.row;
-    message.newCol = partner.col;
+        var partner = this.getPartner(board);
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: partner.row,
-        newCol: partner.col,
-    };
+        message.newRow = partner.row;
+        message.newCol = partner.col;
 
-    var [success, animations, moves] = board.messageUp(newMessage);
+        var newMessage = {
+            sender: message.sender,
+            forwarder: this,
+            dir: message.dir,
+            newRow: partner.row,
+            newCol: partner.col,
+        };
 
-    return [success, animations, moves];
+        partner.receivingTeleportation = true;
+
+        var [success, animations, moves] = partner.messageUp(board, newMessage);
+
+        partner.receivingTeleportation = false;
+
+        return [success, animations, moves];
+    } else {
+
+        var newMessage = {
+            sender: message.sender,
+            forwarder: this,
+            dir: message.dir,
+            newRow: message.row,
+            newCol: message.col,
+        };
+
+        var [success, animations, moves] = board.messageUp(newMessage);
+
+        return [success, animations, moves];
+    }
 }
 
 hundo.Portal.prototype.eq = function(piece) {
