@@ -2730,7 +2730,7 @@ hundo.Viz.prototype.addShowSolution = function() {
 }
 
 hundo.Viz.prototype.addLevelUrlField = function() {
-    var contents = `<div>URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
+    var contents = `<div class="levelUrl">URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
     value=""></input></div>`
 
     var saveButton = $("<div/>").html(contents).contents();

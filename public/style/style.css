@@ -23,7 +23,11 @@ a {
 }
 
 .text {
-    font-size: 14px;
+    font-size: 16px;
+}
+
+.levelUrl {
+    font-size: 20px;
 }
 
 .button {
@@ -32,6 +36,13 @@ a {
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
+    border-radius: : 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    margin-right: 3px;
+    margin-top: 10px;
+    border: 1px;
+    background-color: #fff;
 }
 
 .palette {
