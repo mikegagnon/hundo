@@ -912,3 +912,35 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
+
+
+/**
+ * Portals
+ ******************************************************************************/
+
+// Ball going through portal
+// level-editor.html?level=fl00-12------010100
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":2}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":1,"groupId":0},{"row":1,"col":0,"groupId":0}],"ball":{"row":0,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":2}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":1,"groupId":0},{"row":1,"col":0,"groupId":0}],"ball":{"row":1,"col":1}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
+
+// Ball and ice going through portal
+// level-editor.html?level=fl00-14--01----020110
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[{"row":0,"col":1}],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":2,"groupId":0},{"row":1,"col":1,"groupId":0}],"ball":{"row":0,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[{"row":1,"col":3}],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":2,"groupId":0},{"row":1,"col":1,"groupId":0}],"ball":{"row":1,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
+
+// Ball and three ice cubes going through portal; ball gets rejected
+// level-editor.html?level=fl00-14--010203----040110
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[{"row":0,"col":1},{"row":0,"col":2},{"row":0,"col":3}],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":4,"groupId":0},{"row":1,"col":1,"groupId":0}],"ball":{"row":0,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[{"row":1,"col":1},{"row":1,"col":2},{"row":1,"col":3}],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":4,"groupId":0},{"row":1,"col":1,"groupId":0}],"ball":{"row":0,"col":3}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
