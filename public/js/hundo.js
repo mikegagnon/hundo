@@ -2390,7 +2390,15 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                         <rect x="0" y="0" width="26" height="26" style="fill:green" fill-opacity="0.3" />
                     </g>
                     <g id="portalTemplate-0" height="26" width="26">
-                        <rect x="0" y="0" width="26" height="26" fill="purple" />
+                        <rect x="0" y="0" width="26" height="26" fill="MediumVioletRed" />
+                        <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
+                    </g>
+                    <g id="portalTemplate-1" height="26" width="26">
+                        <rect x="0" y="0" width="26" height="26" fill="CornflowerBlue" />
+                        <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
+                    </g>
+                    <g id="portalTemplate-2" height="26" width="26">
+                        <rect x="0" y="0" width="26" height="26" fill="ForestGreen" />
                         <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
                     </g>
                 </defs>
@@ -2645,6 +2653,20 @@ hundo.Viz.prototype.addPalette = function() {
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
                 groupId: 0
+            }
+        },
+        {
+            image: "portal-1",
+            config: {
+                type: hundo.PieceTypeEnum.PORTAL,
+                groupId: 1
+            }
+        },
+        {
+            image: "portal-2",
+            config: {
+                type: hundo.PieceTypeEnum.PORTAL,
+                groupId: 2
             }
         },
         
@@ -2922,8 +2944,9 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .append("svg:use")
         .attr("class", "block")
         .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#portalTemplate-0")
-        .attr("transform", function(piece) {
+        .attr("xlink:href", function (piece) {
+            return "#portalTemplate-" + piece.groupId;
+        })        .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
     
