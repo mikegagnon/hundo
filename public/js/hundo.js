@@ -1395,9 +1395,7 @@ hundo.Board.prototype.reset = function() {
 
     // TODO: this.gblocks = {} ?
 
-    // Race condition?
     this.ball.dir = hundo.DirectionEnum.NODIR;
-    console.log(this.ball.dir);
 
     _.each(pieces, function(p) {
         p.row = p.origRow;
