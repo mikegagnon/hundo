@@ -7,7 +7,23 @@ body {
     background-color: #000;
     color: #eee;
     font-family: "Helvetica", sans-serif;
-    font-size: 20px;
+}
+
+a {
+    color: goldenrod;
+}
+
+.hundo {
+    display: inline-block;
+}
+
+.console {
+
+    float: left;
+}
+
+.text {
+    font-size: 14px;
 }
 
 .button {

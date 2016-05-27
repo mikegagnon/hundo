@@ -2415,7 +2415,7 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                 </text>
             </svg>
         </div>
-        <div id="${this.consoleId()}">
+        <div id="${this.consoleId()}" class="console">
         </div>`
 
     var svg = $('<div/>').html(svgContents).contents();
