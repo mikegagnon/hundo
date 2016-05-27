@@ -2305,6 +2305,10 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                           ${blockTemplate}
                         <rect x="0" y="0" width="26" height="26" style="fill:green" fill-opacity="0.3" />
                     </g>
+                    <g id="portalTemplate-0" height="26" width="26">
+                        <rect x="0" y="0" width="26" height="26" fill="purple" />
+                        <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
+                    </g>
                 </defs>
 
                 <rect id="background" x="0" y="0" style="fill:black" />
@@ -2831,14 +2835,10 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
     this.boardSvg.selectAll()
         .data(this.board.getPortals())
         .enter()
-        .append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", this.vizConfig.cellSize)
-        .attr("height", this.vizConfig.cellSize)
-        .attr("style", "fill:purple; fill-opacity: 0.5; stroke: #bbb; stroke-width: 2")
-        .attr("class", "portal")
+        .append("svg:use")
+        .attr("class", "block")
         .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", "#portalTemplate-0")
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
