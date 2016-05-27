@@ -957,5 +957,3 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
-
-// FAILS test case: level-editor.html?level=fl00-14----012--020120
