@@ -225,7 +225,6 @@ new Hundo({
     viz: {
         playButton: false,
         levelSelect: true,
-        resetButton: false
     },
     maker: false
 });
