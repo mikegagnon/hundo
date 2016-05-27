@@ -2193,6 +2193,10 @@ hundo.Viz = function(config) {
 
     this.drawSvgGrid();
 
+    var width = config.viz.numCols * config.viz.cellSize;
+
+    $("#" + this.consoleId()).css("width", width);
+
     if (config.viz.playButton) {
         this.addPlayButton();
     }
