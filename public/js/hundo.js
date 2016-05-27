@@ -545,10 +545,6 @@ hundo.Sand.prototype.eq = function(piece) {
 
 
 
-
-
-
-
 hundo.Portal = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.PORTAL;
@@ -573,15 +569,28 @@ hundo.Portal.prototype.messageDown = function(board, message) {
     return board.messageDown(newMessage);
 }
 
+hundo.Portal.prototype.getPartner = function(board) {
+
+    var THIS = this;
+
+    var index = _.findIndex(board.portals[this.groupId], function(portal) {
+        return portal.id != THIS.id;
+    });
+
+    return board.portals[this.groupId][index];
+}
+
 hundo.Portal.prototype.messageUp = function(board, message) {
+
+    var partner = this.getPartner(board);
 
     var newMessage = {
         sender: message.sender,
         forwarder: this,
         dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
-    }
+        newRow: partner.row,
+        newCol: partner.col,
+    };
 
     var [success, animations, moves] = board.messageUp(newMessage);
 
@@ -1352,6 +1361,10 @@ hundo.Board.prototype.moveDir = function(piece, dir) {
 hundo.Board.prototype.reset = function() {
 
     var pieces = this.getPieces();
+
+    this.portals = {};
+
+    // TODO: this.gblocks = {} ?
 
     _.each(pieces, function(p) {
         p.row = p.origRow;
