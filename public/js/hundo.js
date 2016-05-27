@@ -156,8 +156,8 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
         moves.push({
             piece: this,
-            newRow: newRow,
-            newCol: newCol
+            newRow: newMessage.newRow,
+            newCol: newMessage.newCol
         });
 
         // TODO: remove quotes from all keys
@@ -558,12 +558,17 @@ hundo.Portal = function(row, col, groupId) {
 
 hundo.Portal.prototype.messageDown = function(board, message) {
 
+    var partner = this.getPartner(board);
+
+    message.newRow = partner.row;
+    message.newCol = partner.col;
+
     var newMessage = {
         sender: message.sender,
         forwarder: this,
         dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
+        newRow: partner.row,
+        newCol: partner.col,
     }
 
     return board.messageDown(newMessage);
@@ -582,14 +587,13 @@ hundo.Portal.prototype.getPartner = function(board) {
 
 hundo.Portal.prototype.messageUp = function(board, message) {
 
-    var partner = this.getPartner(board);
 
     var newMessage = {
         sender: message.sender,
         forwarder: this,
         dir: message.dir,
-        newRow: partner.row,
-        newCol: partner.col,
+        newRow: message.newRow,
+        newCol: message.newCol,
     };
 
     var [success, animations, moves] = board.messageUp(newMessage);
