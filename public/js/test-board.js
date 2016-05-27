@@ -6,6 +6,8 @@
 var TOP = hundo.LayerEnum.TOP;
 var BOTTOM = hundo.LayerEnum.BOTTOM;
 
+// TODO: Use TEST for every test case;
+
 /**
  * Board configs
  ******************************************************************************/
@@ -918,6 +920,8 @@ assert(board1.eq(board2));
  * Portals
  ******************************************************************************/
 
+TEST = "Portals"
+
 // Ball going through portal
 // level-editor.html?level=fl00-12------010100
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":2}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":1,"groupId":0},{"row":1,"col":0,"groupId":0}],"ball":{"row":0,"col":0}};
@@ -944,3 +948,14 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
+
+// gblock pushing into portal
+// level-editor.html?level=fl00-14----012--020120
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":0,"col":1,"groupId":2}],"sand":[],"portals":[{"row":0,"col":2,"groupId":0},{"row":1,"col":2,"groupId":0}],"ball":{"row":0,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":4}],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":0,"col":1,"groupId":2}],"sand":[],"portals":[{"row":0,"col":2,"groupId":0},{"row":1,"col":2,"groupId":0}],"ball":{"row":0,"col":0}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.RIGHT);
+assert(board1.eq(board2));
+
+// FAILS test case: level-editor.html?level=fl00-14----012--020120

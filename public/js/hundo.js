@@ -583,6 +583,10 @@ hundo.Portal.prototype.getPartner = function(board) {
 
 hundo.Portal.prototype.messageUp = function(board, message) {
 
+    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK) {
+        return [false, [], []];
+    }
+
     // TODO: switch order of code so there's no negation here
     if (!this.receivingTeleportation) {
 
