@@ -893,7 +893,10 @@ hundo.Board = function(boardConfig) {
     this.oob = [];
 
     // this.gblocks[gblock.groupId] == the set of gblocks in that group
-    this.gblocks = {}
+    this.gblocks = {};
+
+    // this.portals[portal.groupId] == the set of portals in that group
+    this.portals = {};
 
     var THIS = this;
 
@@ -1074,8 +1077,25 @@ hundo.Board.prototype.clearCell = function(row, col) {
 
     var cell = this.matrix[row][col];
 
+    var bottom = cell[hundo.LayerEnum.BOTTOM]
+
+    if (bottom && bottom.type == hundo.PieceTypeEnum.PORTAL) {
+
+        var i = _.findIndex(this.portals[bottom.groupId], function(portal) {
+            return portal.id == bottom.id;
+        });
+
+        if (i < 0) {
+            console.error("Could not find portal in board.portals");
+        } else {
+            this.portals[bottom.groupId].splice(i, 1);
+        }
+
+    }
+
     cell[hundo.LayerEnum.TOP] = undefined;
     cell[hundo.LayerEnum.BOTTOM] = undefined;
+
 
 }
 
@@ -1168,6 +1188,13 @@ hundo.Board.prototype.canAddPiece = function(piece) {
 
     var numPieces = this.numPieces(piece.row, piece.col);
 
+    if (piece.type == hundo.PieceTypeEnum.PORTAL) {
+        var portals = this.portals[piece.groupId];
+        if (portals && portals.length == 2) {
+            return false;
+        }
+    }
+
     if (numPieces == 0) {
         return true;
     } else if (numPieces == 2) {
@@ -1195,8 +1222,8 @@ hundo.Board.prototype.addPiece = function(piece) {
         if (piece.type == hundo.PieceTypeEnum.BALL) {
             this.ball = piece;
         }
-
         
+        // TODO: refactor out common code?
         else if (piece.type == hundo.PieceTypeEnum.GBLOCK) {
 
             if (!(piece.groupId in this.gblocks)){
@@ -1209,6 +1236,21 @@ hundo.Board.prototype.addPiece = function(piece) {
             
             if (i < 0) {
                 this.gblocks[piece.groupId].push(piece);
+            }
+        }
+
+        else if (piece.type == hundo.PieceTypeEnum.PORTAL) {
+
+            if (!(piece.groupId in this.portals)) {
+                this.portals[piece.groupId] = [];
+            }
+
+            var i = _.findIndex(this.portals[piece.groupId], function(p) {
+                return p.eq(piece);
+            })
+
+            if (i < 0) {
+                this.portals[piece.groupId].push(piece);
             }
         }
 
