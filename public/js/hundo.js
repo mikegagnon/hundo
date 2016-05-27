@@ -3110,44 +3110,10 @@ hundo.Viz.prototype.drawBoard = function() {
 
 }
 
-// TODO
 hundo.Viz.prototype.reset = function() {
-
-    var pieces = this.board.getPieces(function(piece) {
-        return (piece.row != piece.origRow) || (piece.col != piece.origCol);
-    })
-
     this.board.reset();
-
-    var THIS = this;
-
-    _.each(pieces, function(piece, i){
-        var piece = pieces[i];
-
-        if (piece.type == hundo.PieceTypeEnum.BALL) {
-            THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
-                .transition()
-                .ease("linear")
-
-                // undo the ball squish
-                .attr("rx", THIS.vizConfig.cellSize / 2)
-                .attr("ry", THIS.vizConfig.cellSize / 2)
-
-                .attr("transform", function() {
-                    return THIS.transform(piece);
-                })
-                .duration(0);
-        } else {
-            THIS.boardSvg.select("#" + hundo.Viz.pieceId(piece))
-                .transition()
-                .ease("linear")
-                .attr("transform", function() {
-                    return THIS.transform(piece);
-                })
-                .duration(0);
-        }
-    });
-
+    this.animateSolvedQuick();
+    this.drawBoardQuick();
 }
 
 hundo.Viz.dxdy = function(dir) {
@@ -3352,11 +3318,12 @@ hundo.Viz.prototype.animateBall = function(animation) {
 
     var dx;
     var dy;
-    if (ball.dir != hundo.DirectionEnum.NODIR) {
-        [dx, dy] = hundo.Viz.dxdy(ball.dir);
-    } else {
+
+    if (ball.dir == hundo.DirectionEnum.NODIR) {
         dx = 0;
         dy = 0;
+    } else {
+        [dx, dy] = hundo.Viz.dxdy(ball.dir);
     }
 
     var THIS = this;
@@ -3619,12 +3586,9 @@ hundo.clickPlay = function(id) {
     hundo.vizz.clickPlay();
 }
 
-// BUG: level-editor.html?level=fl68-------670690
-// sometimes ball.dir != "NODIR" on reset
 hundo.Viz.prototype.clickReset = function() {
-    console.log("reset");
     clearInterval(this.animateInterval);
-    this.reset(this.board);
+    this.reset();
 }
 
 hundo.clickReset = function(id) {
