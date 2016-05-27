@@ -2704,6 +2704,8 @@ hundo.Viz.prototype.addPalette = function() {
         })
         .join("")
 
+    var contents = "<div class='palette'>" + contents + "</div>"
+
     var palette = $("<div/>").html(contents).contents();
 
     $("#" + this.consoleId()).append(palette);
