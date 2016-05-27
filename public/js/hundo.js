@@ -18,6 +18,7 @@ hundo.PieceTypeEnum = {
     ARROW: "ARROW",
     GBLOCK: "GBLOCK",
     SAND: "SAND",
+    PORTAL: "PORTAL"
 }
 
 hundo.DirectionEnum = {
@@ -386,7 +387,7 @@ hundo.Gblock = function(row, col, groupId) {
 
 hundo.Gblock.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece) &&
-        this.dir == piece.dir;
+        this.groupId == piece.groupId;
 }
 
 
@@ -541,6 +542,58 @@ hundo.Sand.prototype.messageUp = function(board, message) {
 hundo.Sand.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece);
 }
+
+
+
+
+
+
+
+hundo.Portal = function(row, col, groupId) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.PORTAL;
+    this.layer = hundo.LayerEnum.BOTTOM;
+    this.row = row;
+    this.col = col;
+    this.groupId = groupId;
+    this.origRow = row;
+    this.origCol = col;
+}
+
+hundo.Portal.prototype.messageDown = function(board, message) {
+
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
+
+    return board.messageDown(newMessage);
+}
+
+hundo.Portal.prototype.messageUp = function(board, message) {
+
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
+
+    var [success, animations, moves] = board.messageUp(newMessage);
+
+    return [success, animations, moves];
+}
+
+hundo.Portal.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.groupId == piece.groupId;
+}
+
+
 
 /**
  * Cluster provides functionality for dealing with interdependencies
@@ -909,9 +962,17 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-     // Add sand
+    // Add sand
     _.each(boardConfig.sand, function(sand) {
         var piece = new hundo.Sand(sand.row, sand.col);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
+    // Add portals
+    _.each(boardConfig.portals, function(portal) {
+        var piece = new hundo.Portal(portal.row, portal.col, portal.groupId);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -1027,7 +1088,8 @@ hundo.Board.compatible = {}
 hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
-    hundo.PieceTypeEnum.GOAL
+    hundo.PieceTypeEnum.GOAL,
+    hundo.PieceTypeEnum.PORTAL
 ]
 
 hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
@@ -1035,7 +1097,8 @@ hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
 hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
-    hundo.PieceTypeEnum.GOAL
+    hundo.PieceTypeEnum.GOAL,
+    hundo.PieceTypeEnum.PORTAL
 ],
 
 hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
@@ -1057,6 +1120,12 @@ hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
     hundo.PieceTypeEnum.ICE,
     hundo.PieceTypeEnum.GBLOCK
 ]
+
+hundo.Board.compatible[hundo.PieceTypeEnum.PORTAL] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+]
+
 
 // Returns true iff piece1 and piece2 are compatible
 hundo.Board.isCompatible = function(piece1, piece2) {
@@ -1319,6 +1388,12 @@ hundo.Board.prototype.getSand = function() {
     });
 };
 
+hundo.Board.prototype.getPortals = function() {
+    return this.getPieces(function(piece){
+        return piece.type == hundo.PieceTypeEnum.PORTAL;
+    });
+};
+
 hundo.Board.prototype.getJson = function() {
 
     var j = {
@@ -1361,6 +1436,13 @@ hundo.Board.prototype.getJson = function() {
                 return {
                     row: sand.row,
                     col: sand.col,
+                }
+            }),
+        portals: _.map(this.getPortals(), function(portal) {
+                return {
+                    row: portal.row,
+                    col: portal.col,
+                    groupId: portal.groupId
                 }
             }),
     }
@@ -2269,7 +2351,8 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
         return new hundo.Gblock(row, col, this.paletteSelection.groupId);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.SAND) {
         return new hundo.Sand(row, col);
-        
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.PORTAL) {
+        return new hundo.Portal(row, col, this.paletteSelection.groupId);
     } else {
         console.error("Unrecognized piece type")
     }
@@ -2469,6 +2552,15 @@ hundo.Viz.prototype.addPalette = function() {
                 type: hundo.PieceTypeEnum.SAND
             }
         },
+        {
+            image: "portal-0",
+            config: {
+                type: hundo.PieceTypeEnum.PORTAL,
+                groupId: 0
+            }
+        },
+        
+
 
     ]
 
@@ -2639,7 +2731,8 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
         piece.type == hundo.PieceTypeEnum.BLOCK ||
         piece.type == hundo.PieceTypeEnum.ICE ||
         piece.type == hundo.PieceTypeEnum.GBLOCK ||
-        piece.type == hundo.PieceTypeEnum.SAND) {
+        piece.type == hundo.PieceTypeEnum.SAND ||
+        piece.type == hundo.PieceTypeEnum.PORTAL) {
         return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL ||
         piece.type == hundo.PieceTypeEnum.ARROW) {
@@ -2733,7 +2826,21 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
+        });
 
+    this.boardSvg.selectAll()
+        .data(this.board.getPortals())
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", this.vizConfig.cellSize)
+        .attr("height", this.vizConfig.cellSize)
+        .attr("style", "fill:purple; fill-opacity: 0.5; stroke: #bbb; stroke-width: 2")
+        .attr("class", "portal")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
         });
     
 
@@ -2751,7 +2858,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
-
         });
 
     this.boardSvg.selectAll()
@@ -2782,7 +2888,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
-
         });
 
     this.boardSvg.selectAll()
@@ -3611,6 +3716,16 @@ hundo.Compress.compressLevel = function(level) {
         levelArray.push(hundo.Compress.toBase64Digit(sand.col));
     });
 
+    // separator
+    levelArray.push(hundo.Compress.sep);
+
+    // Encode the portals
+    _.each(level.portals, function(portal){
+        levelArray.push(hundo.Compress.toBase64Digit(portal.row));
+        levelArray.push(hundo.Compress.toBase64Digit(portal.col));
+        levelArray.push(hundo.Compress.toBase64Digit(portal.groupId));
+    });
+
     return _.join(levelArray, "");
 }
 
@@ -3636,7 +3751,8 @@ hundo.Compress.decompressLevel = function(byteString) {
         ice: [],
         arrows: [],
         gblocks: [],
-        sand: []
+        sand: [],
+        portals: []
     };
 
     var bytes = _.split(byteString, "")
@@ -3775,6 +3891,28 @@ hundo.Compress.decompressLevel = function(byteString) {
             col: c,
         }
         level.sand.push(sand);
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
+    // Get the portals
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        portal = {
+            row: r,
+            col: c,
+            groupId: groupId
+        }
+        level.portals.push(portal);
     }
 
     return level;

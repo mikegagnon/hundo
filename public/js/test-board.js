@@ -523,11 +523,12 @@ assert(board1.eq(board2));
 
 // Ice going out of bounds
 // level-editor.html?level=fl9a---3a5a7a---
-var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":3,"col":10},{"row":5,"col":10},{"row":7,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":9,"col":10}};
-var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":-1,"col":10},{"row":-1,"col":10},{"row":-1,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":-1,"col":10}};
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":3,"col":10},{"row":5,"col":10},{"row":7,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":9,"col":10},portals:[]};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":-1,"col":10},{"row":-1,"col":10},{"row":-1,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":-1,"col":10},portals:[]};
 var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
-assert(Object.compare(board1.getJson(), config2));
+assert(board1.eq(board2));
 
 /**
  * Passing through arrows, and exiting clogged arrow
