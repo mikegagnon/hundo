@@ -2198,6 +2198,10 @@ hundo.Viz = function(config) {
         this.addLevelSelect();
     }
 
+    if (config.viz.resetButton) {
+        this.addResetButton();
+    }
+
     if (this.maker.on) {
         this.addSave();
         this.addShowSolution();
@@ -2522,6 +2526,15 @@ hundo.Viz.prototype.addLevelSelect = function() {
     $("#" + this.consoleId()).append(levelSelect);
 }
 
+hundo.Viz.prototype.addResetButton = function() {
+    var contents = `<button id="${this.resetButtonId()}" onclick="hundo.clickReset(${this.id})" type="button"
+     class="button">Reset puzzle</button>`
+
+    var resetButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(resetButton);
+}
+
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
         <img src="img/${image}.png"
@@ -2730,6 +2743,10 @@ hundo.Viz.prototype.highlightId = function() {
 
 hundo.Viz.prototype.playButtonId = function() {
     return "playButton" + this.id;
+}
+
+hundo.Viz.prototype.resetButtonId = function() {
+    return "resetButton" + this.id;
 }
 
 hundo.Viz.prototype.saveButtonId = function() {
@@ -3595,6 +3612,15 @@ hundo.clickPlay = function(id) {
     hundo.vizz.clickPlay();
 }
 
+hundo.Viz.prototype.clickReset = function() {
+    console.log("reset");
+}
+
+hundo.clickReset = function(id) {
+    hundo.vizz = hundo.instances[id];
+    hundo.vizz.clickReset();
+}
+
 hundo.Viz.prototype.clickSave = function() {
     console.log("save");
 
@@ -4038,6 +4064,7 @@ hundo.defaultVizConfig = {
     numRows: 15,
     numCols: 21,
     playButton: false,
+    resetButton: true,
     levelSelect: true,
     levelMax: 0,
     allLevels: true
