@@ -1395,6 +1395,10 @@ hundo.Board.prototype.reset = function() {
 
     // TODO: this.gblocks = {} ?
 
+    // Race condition?
+    this.ball.dir = hundo.DirectionEnum.NODIR;
+    console.log(this.ball.dir);
+
     _.each(pieces, function(p) {
         p.row = p.origRow;
         p.col = p.origCol;
@@ -1415,6 +1419,7 @@ hundo.Board.prototype.reset = function() {
         THIS.addPiece(p);
     })
 
+    this.atRest = true;
     this.done = false;
     this.solved = false;
 }
@@ -3581,7 +3586,9 @@ hundo.Viz.prototype.checkKey = function(e) {
     if (!this.board.atRest) {
         this.animateInterval =
             setInterval(
-                function(){THIS.stepAnimate();},
+                function(){
+                    THIS.stepAnimate();
+                },
                 this.vizConfig.stepDuration);
     }
 }
@@ -3612,8 +3619,12 @@ hundo.clickPlay = function(id) {
     hundo.vizz.clickPlay();
 }
 
+// BUG: level-editor.html?level=fl68-------670690
+// sometimes ball.dir != "NODIR" on reset
 hundo.Viz.prototype.clickReset = function() {
     console.log("reset");
+    clearInterval(this.animateInterval);
+    this.reset(this.board);
 }
 
 hundo.clickReset = function(id) {
