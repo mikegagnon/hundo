@@ -1069,8 +1069,6 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-    console.log(boardConfig)
-
     // Add Pips
     _.each(boardConfig.pips, function(pip) {
         var piece = new hundo.Pip(pip.row, pip.col, pip.up, pip.down, pip.left,
@@ -4220,8 +4218,6 @@ hundo.Compress.decompressLevel = function(byteString) {
         var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
 
-        console.log(up);
-
         pip = {
             row: r,
             col: c,
@@ -4232,8 +4228,6 @@ hundo.Compress.decompressLevel = function(byteString) {
         }
         level.pips.push(pip);
     }
-
-    console.log(level);
 
     return level;
 }
