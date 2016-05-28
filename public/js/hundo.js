@@ -18,7 +18,8 @@ hundo.PieceTypeEnum = {
     ARROW: "ARROW",
     GBLOCK: "GBLOCK",
     SAND: "SAND",
-    PORTAL: "PORTAL"
+    PORTAL: "PORTAL",
+    PIP: "PIP"
 }
 
 hundo.DirectionEnum = {
@@ -633,6 +634,55 @@ hundo.Portal.prototype.eq = function(piece) {
 
 
 
+hundo.Pip = function(row, col, up, down, left, right) {
+    this.id = hundo.idGenerator.next();
+    this.type = hundo.PieceTypeEnum.PIP;
+    this.layer = hundo.LayerEnum.BOTTOM;
+    this.row = row;
+    this.col = col;
+    this.origRow = row;
+    this.origCol = col;
+    this.up = up;
+    this.down = down;
+    this.left = left;
+    this.right = right;
+}
+
+hundo.Pip.prototype.messageDown = function(board, message) {
+
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
+
+    return board.messageDown(newMessage);
+}
+
+hundo.Pip.prototype.messageUp = function(board, message) {
+
+    var newMessage = {
+        sender: message.sender,
+        forwarder: this,
+        dir: message.dir,
+        newRow: message.newRow,
+        newCol: message.newCol,
+    }
+
+    return board.messageUp(newMessage);
+}
+
+hundo.Pip.prototype.eq = function(piece) {
+    return hundo.equalsTypeRowCol(this, piece) &&
+        this.up == piece.up &&
+        this.down == piece.down &&
+        this.left == piece.left &&
+        this.right == piece.right;
+}
+
+
 /**
  * Cluster provides functionality for dealing with interdependencies
  * between gblock groups during step
@@ -1019,6 +1069,15 @@ hundo.Board = function(boardConfig) {
         }
     });
 
+    // Add Pips
+    _.each(boardConfig.pips, function(pip) {
+        var piece = new hundo.Pip(pip.row, pip.col, pip.up, pip.down, pip.left,
+            pip.right);
+        if (!THIS.addPiece(piece)) {
+            console.error("Could not add piece: ", piece);
+        }
+    });
+
     this.cluster = new hundo.Cluster(this);
 }
 
@@ -1147,7 +1206,8 @@ hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
     hundo.PieceTypeEnum.GOAL,
-    hundo.PieceTypeEnum.PORTAL
+    hundo.PieceTypeEnum.PORTAL,
+    hundo.PieceTypeEnum.PIP
 ]
 
 hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
@@ -1156,7 +1216,8 @@ hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
     hundo.PieceTypeEnum.GOAL,
-    hundo.PieceTypeEnum.PORTAL
+    hundo.PieceTypeEnum.PORTAL,
+    hundo.PieceTypeEnum.PIP
 ],
 
 hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
@@ -1184,6 +1245,10 @@ hundo.Board.compatible[hundo.PieceTypeEnum.PORTAL] = [
     hundo.PieceTypeEnum.ICE,
 ]
 
+hundo.Board.compatible[hundo.PieceTypeEnum.PIP] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+]
 
 // Returns true iff piece1 and piece2 are compatible
 hundo.Board.isCompatible = function(piece1, piece2) {
@@ -1481,6 +1546,12 @@ hundo.Board.prototype.getPortals = function() {
     });
 };
 
+hundo.Board.prototype.getPips = function() {
+    return this.getPieces(function(piece){
+        return piece.type == hundo.PieceTypeEnum.PIP;
+    });
+};
+
 hundo.Board.prototype.getJson = function() {
 
     var j = {
@@ -1530,6 +1601,16 @@ hundo.Board.prototype.getJson = function() {
                     row: portal.row,
                     col: portal.col,
                     groupId: portal.groupId
+                }
+            }),
+        pips: _.map(this.getPips(), function(pip) {
+                return {
+                    row: pip.row,
+                    col: pip.col,
+                    up: pip.up,
+                    down: pip.down,
+                    left: pip.left,
+                    right: pip.right
                 }
             }),
     }
@@ -2464,7 +2545,11 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
         return new hundo.Sand(row, col);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.PORTAL) {
         return new hundo.Portal(row, col, this.paletteSelection.groupId);
-    } else {
+    } else if (this.paletteSelection.type == hundo.PieceTypeEnum.PIP) {
+        return new hundo.Pip(row, col, this.paletteSelection.up,
+            this.paletteSelection.down, this.paletteSelection.left,
+            this.paletteSelection.right);
+    }else {
         console.error("Unrecognized piece type")
     }
 
@@ -2700,9 +2785,16 @@ hundo.Viz.prototype.addPalette = function() {
                 groupId: 3
             }
         },
-        
-
-
+        {
+            image: "pip-1001",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: false,
+                left: false,
+                right: true
+            }
+        },
     ]
 
     var THIS = this;
@@ -2879,7 +2971,8 @@ hundo.Viz.prototype.transform = function(piece, transformation) {
         piece.type == hundo.PieceTypeEnum.ICE ||
         piece.type == hundo.PieceTypeEnum.GBLOCK ||
         piece.type == hundo.PieceTypeEnum.SAND ||
-        piece.type == hundo.PieceTypeEnum.PORTAL) {
+        piece.type == hundo.PieceTypeEnum.PORTAL ||
+        piece.type == hundo.PieceTypeEnum.PIP) {
         return _.join(t, ",");
     } else if (piece.type == hundo.PieceTypeEnum.GOAL ||
         piece.type == hundo.PieceTypeEnum.ARROW) {
@@ -2987,6 +3080,21 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
     
+
+    this.boardSvg.selectAll()
+        .data(this.board.getPips())
+        .enter()
+        .append("ellipse")
+        .attr("cx", this.vizConfig.cellSize / 2)
+        .attr("cy", this.vizConfig.cellSize / 2)
+        .attr("rx", this.vizConfig.cellSize / 4)
+        .attr("ry", this.vizConfig.cellSize / 4)
+        .attr("style", "fill:#0F0")
+        .attr("class", "pip")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+        });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
     this.boardSvg.selectAll()
@@ -3849,6 +3957,22 @@ hundo.Compress.compressLevel = function(level) {
         levelArray.push(hundo.Compress.toBase64Digit(portal.groupId));
     });
 
+    // separator
+    levelArray.push(hundo.Compress.sep);
+
+    // TODO: fancier compression for pips?
+
+    // Encode the pips
+    _.each(level.pips, function(pip){
+        levelArray.push(hundo.Compress.toBase64Digit(pip.row));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.col));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.up));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.down));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.left));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.right));
+
+    });
+
     return _.join(levelArray, "");
 }
 
@@ -3875,7 +3999,8 @@ hundo.Compress.decompressLevel = function(byteString) {
         arrows: [],
         gblocks: [],
         sand: [],
-        portals: []
+        portals: [],
+        pips: []
     };
 
     var bytes = _.split(byteString, "")
@@ -4036,6 +4161,38 @@ hundo.Compress.decompressLevel = function(byteString) {
             groupId: groupId
         }
         level.portals.push(portal);
+    }
+
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+
+    // Get the pips
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        [r, c] = hundo.Compress.getRowCol(bytes);
+        var up = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        var down = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        var left = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        var right = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+
+        pip = {
+            row: r,
+            col: c,
+            up: up,
+            down: down,
+            left: left,
+            right: right
+        }
+        level.pips.push(pip);
     }
 
     return level;
