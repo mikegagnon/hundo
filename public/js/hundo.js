@@ -1069,6 +1069,8 @@ hundo.Board = function(boardConfig) {
         }
     });
 
+    console.log(boardConfig)
+
     // Add Pips
     _.each(boardConfig.pips, function(pip) {
         var piece = new hundo.Pip(pip.row, pip.col, pip.up, pip.down, pip.left,
@@ -3089,9 +3091,43 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("cy", this.vizConfig.cellSize / 2)
         .attr("rx", this.vizConfig.cellSize / 4)
         .attr("ry", this.vizConfig.cellSize / 4)
-        .attr("style", "fill:#0F0")
+        .attr("style", "fill:#0a0")
         .attr("class", "pip")
         .attr("id", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getPieces(function(piece) {
+            return piece.type == hundo.PieceTypeEnum.PIP && piece.up
+        }))
+        .enter()
+        .append("rect")
+        .attr("x", this.vizConfig.cellSize / 4)
+        .attr("y", 0)
+        .attr("width", this.vizConfig.cellSize / 2)
+        .attr("height", this.vizConfig.cellSize / 2)
+        .attr("style", "fill:#0a0;")
+        .attr("class", "pip-up")
+        .attr("id-pip-up", hundo.Viz.pieceId)
+        .attr("transform", function(piece) {
+            return THIS.transform(piece, transformation);
+        });
+
+    this.boardSvg.selectAll()
+        .data(this.board.getPieces(function(piece) {
+            return piece.type == hundo.PieceTypeEnum.PIP && piece.right
+        }))
+        .enter()
+        .append("rect")
+        .attr("x", this.vizConfig.cellSize / 2)
+        .attr("y", this.vizConfig.cellSize / 4)
+        .attr("width", this.vizConfig.cellSize / 2)
+        .attr("height", this.vizConfig.cellSize / 2)
+        .attr("style", "fill:#0a0;")
+        .attr("class", "pip-right")
+        .attr("id-pip-up", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
@@ -3966,10 +4002,10 @@ hundo.Compress.compressLevel = function(level) {
     _.each(level.pips, function(pip){
         levelArray.push(hundo.Compress.toBase64Digit(pip.row));
         levelArray.push(hundo.Compress.toBase64Digit(pip.col));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.up));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.down));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.left));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.right));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.up ? 1 : 0));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.down ? 1 : 0));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.left ? 1 : 0));
+        levelArray.push(hundo.Compress.toBase64Digit(pip.right ? 1 : 0));
 
     });
 
@@ -4175,14 +4211,16 @@ hundo.Compress.decompressLevel = function(byteString) {
     // Get the pips
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
-        var up = hundo.Compress.fromBase64Digit(bytes[0]);
+        var up = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
-        var down = hundo.Compress.fromBase64Digit(bytes[0]);
+        var down = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
-        var left = hundo.Compress.fromBase64Digit(bytes[0]);
+        var left = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
-        var right = hundo.Compress.fromBase64Digit(bytes[0]);
+        var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
+
+        console.log(up);
 
         pip = {
             row: r,
@@ -4194,6 +4232,8 @@ hundo.Compress.decompressLevel = function(byteString) {
         }
         level.pips.push(pip);
     }
+
+    console.log(level);
 
     return level;
 }
