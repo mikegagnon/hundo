@@ -3097,8 +3097,8 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
 
     this.boardSvg.selectAll()
-        .data(this.board.getPips(function(pip) {
-            return pip.up;
+        .data(this.board.getPieces(function(piece) {
+            return piece.type == hundo.PieceTypeEnum.PIP && piece.up
         }))
         .enter()
         .append("rect")
@@ -3114,8 +3114,8 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
 
     this.boardSvg.selectAll()
-        .data(this.board.getPips(function(pip) {
-            return pip.right;
+        .data(this.board.getPieces(function(piece) {
+            return piece.type == hundo.PieceTypeEnum.PIP && piece.right
         }))
         .enter()
         .append("rect")
