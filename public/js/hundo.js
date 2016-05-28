@@ -1546,6 +1546,7 @@ hundo.Board.prototype.getPortals = function() {
     });
 };
 
+// TODO: is this up, down, left, right functionality unnecessary?
 hundo.Board.prototype.getPips = function(up, down, left, right) {
 
     if (typeof up == "undefined") {
@@ -2511,16 +2512,81 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
 
 
-
-
-                    <g id="pipTemplate-1001" height="26" width="26">
+                    <!-- PIP four dirs -->
+                    <g id="pipTemplate-1111" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
-
                     </g>
+
+                    <!-- three dirs -->
+                    <g id="pipTemplate-0111" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-1011" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-1101" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-1110" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <!-- two dirs -->
+                    <g id="pipTemplate-1100" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-1010" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-1001" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-0110" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-0101" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
+                    <g id="pipTemplate-0011" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                    </g>
+
 
 
 
@@ -2815,6 +2881,29 @@ hundo.Viz.prototype.addPalette = function() {
                 groupId: 3
             }
         },
+
+
+        {
+            image: "pip-0011",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: false,
+                down: false,
+                left: true,
+                right: true
+            }
+        },
+        {
+            image: "pip-1100",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: true,
+                left: false,
+                right: false
+            }
+        },
+
         {
             image: "pip-1001",
             config: {
@@ -2825,6 +2914,95 @@ hundo.Viz.prototype.addPalette = function() {
                 right: true
             }
         },
+        {
+            image: "pip-0101",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: false,
+                down: true,
+                left: false,
+                right: true
+            }
+        },
+        {
+            image: "pip-0110",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: false,
+                down: true,
+                left: true,
+                right: false
+            }
+        },
+        {
+            image: "pip-1010",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: false,
+                left: true,
+                right: false
+            }
+        },
+
+        {
+            image: "pip-1101",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: true,
+                left: false,
+                right: true
+            }
+        },
+        {
+            image: "pip-0111",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: false,
+                down: true,
+                left: true,
+                right: true
+            }
+        },
+        {
+            image: "pip-1110",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: true,
+                left: true,
+                right: false
+            }
+        },
+        {
+            image: "pip-1011",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: false,
+                left: true,
+                right: true
+            }
+        },
+        {
+            image: "pip-1111",
+            config: {
+                type: hundo.PieceTypeEnum.PIP,
+                up: true,
+                down: true,
+                left: true,
+                right: true
+            }
+        },
+
+
+
+
+
+
+
+
     ]
 
     var THIS = this;
@@ -3128,12 +3306,24 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });*/
 
 
+    function pipTemplate(pip) {
+        
+        var connections = [pip.up, pip.down, pip.left, pip.right];
+
+        var connectionString = _.map(connections, function(bool) {
+                return bool ? "1" : "0";
+            })
+            .join("")
+        return "#pipTemplate-" + connectionString;
+
+    }
+
     this.boardSvg.selectAll()
-        .data(this.board.getPips(true, false, false, true))
+        .data(this.board.getPips())
         .enter()
         .append("svg:use")
         .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", "#pipTemplate-1001")
+        .attr("xlink:href", pipTemplate)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
