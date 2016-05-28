@@ -2515,8 +2515,10 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
 
                     <g id="pipTemplate-1001" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
-                        <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
-                        <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+                        <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
+                        <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
+                        <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
 
                     </g>
 
