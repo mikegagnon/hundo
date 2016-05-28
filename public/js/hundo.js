@@ -2311,6 +2311,7 @@ hundo.Viz = function(config) {
         .attr("width", this.vizConfig.numCols * this.vizConfig.cellSize)
         .attr("height", this.vizConfig.numRows * this.vizConfig.cellSize)
 
+    // TODO: drawGrid vs drawSvgGrid?
     this.drawGrid();
 
     var boardConfig = this.levels[0];
