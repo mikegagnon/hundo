@@ -2412,6 +2412,10 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                         <rect x="0" y="0" width="26" height="26" fill="ForestGreen" />
                         <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
                     </g>
+                    <g id="portalTemplate-3" height="26" width="26">
+                        <rect x="0" y="0" width="26" height="26" fill="yellow" />
+                        <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
+                    </g>
                 </defs>
 
                 <rect id="background" x="0" y="0" style="fill:black" />
@@ -2687,6 +2691,13 @@ hundo.Viz.prototype.addPalette = function() {
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
                 groupId: 2
+            }
+        },
+        {
+            image: "portal-3",
+            config: {
+                type: hundo.PieceTypeEnum.PORTAL,
+                groupId: 3
             }
         },
         
