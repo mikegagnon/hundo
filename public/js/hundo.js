@@ -1546,10 +1546,21 @@ hundo.Board.prototype.getPortals = function() {
     });
 };
 
-hundo.Board.prototype.getPips = function() {
-    return this.getPieces(function(piece){
-        return piece.type == hundo.PieceTypeEnum.PIP;
-    });
+hundo.Board.prototype.getPips = function(up, down, left, right) {
+
+    if (typeof up == "undefined") {
+        return this.getPieces(function(piece){
+            return piece.type == hundo.PieceTypeEnum.PIP;
+        });
+    } else {
+        return this.getPieces(function(piece){
+            return piece.type == hundo.PieceTypeEnum.PIP &&
+                piece.up == up &&
+                piece.down == down &&
+                piece.left == left &&
+                piece.right == right;
+        });
+    }
 };
 
 hundo.Board.prototype.getJson = function() {
@@ -2498,6 +2509,22 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                         <rect x="0" y="0" width="26" height="26" fill="yellow" />
                         <ellipse cx="13" cy="13" rx="12" ry="12" style="fill:black" />
                     </g>
+
+
+
+
+                    <g id="pipTemplate-1001" height="26" width="26">
+                        <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
+                        <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
+                        <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
+
+                    </g>
+
+
+
+
+
+
                 </defs>
 
                 <rect id="background" x="0" y="0" style="fill:black" />
@@ -3082,6 +3109,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         });
     
 
+    /*
     this.boardSvg.selectAll()
         .data(this.board.getPips())
         .enter()
@@ -3095,41 +3123,19 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
-        });
+        });*/
+
 
     this.boardSvg.selectAll()
-        .data(this.board.getPieces(function(piece) {
-            return piece.type == hundo.PieceTypeEnum.PIP && piece.up
-        }))
+        .data(this.board.getPips(true, false, false, true))
         .enter()
-        .append("rect")
-        .attr("x", this.vizConfig.cellSize / 4)
-        .attr("y", 0)
-        .attr("width", this.vizConfig.cellSize / 2)
-        .attr("height", this.vizConfig.cellSize / 2)
-        .attr("style", "fill:#0a0;")
-        .attr("class", "pip-up")
-        .attr("id-pip-up", hundo.Viz.pieceId)
+        .append("svg:use")
+        .attr("id", hundo.Viz.pieceId)
+        .attr("xlink:href", "#pipTemplate-1001")
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
 
-    this.boardSvg.selectAll()
-        .data(this.board.getPieces(function(piece) {
-            return piece.type == hundo.PieceTypeEnum.PIP && piece.right
-        }))
-        .enter()
-        .append("rect")
-        .attr("x", this.vizConfig.cellSize / 2)
-        .attr("y", this.vizConfig.cellSize / 4)
-        .attr("width", this.vizConfig.cellSize / 2)
-        .attr("height", this.vizConfig.cellSize / 2)
-        .attr("style", "fill:#0a0;")
-        .attr("class", "pip-right")
-        .attr("id-pip-up", hundo.Viz.pieceId)
-        .attr("transform", function(piece) {
-            return THIS.transform(piece, transformation);
-        });
 
     // <ellipse cx="10" cy="10" rx="10" ry="10" style="fill:#eee" />
     this.boardSvg.selectAll()
