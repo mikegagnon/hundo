@@ -153,8 +153,6 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
     if (success) {
 
-        var [newRow , newCol] = hundo.Board.dirRowCol(this.dir, newMessage.newRow, newMessage.newCol);
-
         moves.push({
             piece: this,
             newRow: newMessage.newRow,
@@ -653,14 +651,8 @@ hundo.Pip = function(row, col, up, down, left, right) {
 hundo.Pip.prototype.messageDown = function(board, message) {
 
     if (this.open[message.dir]) {
-        var newMessage = {
-            sender: message.sender,
-            forwarder: this,
-            dir: message.dir,
-            newRow: message.newRow,
-            newCol: message.newCol,
-        }
-        return board.messageDown(newMessage);
+        message.forwarder = this;
+        return board.messageDown(message);
     } else if (this.elbow) {
         var newDir = this.elbow[message.dir];
 
@@ -668,15 +660,9 @@ hundo.Pip.prototype.messageDown = function(board, message) {
         [message.newRow, message.newCol] = hundo.Board.dirRowCol(newDir,
             this.row, this.col);
 
-        var newMessage = {
-            sender: message.sender,
-            forwarder: this,
-            dir: message.dir,
-            newRow: message.newRow,
-            newCol: message.newCol,
-        }
+        message.forwarder = this;
 
-        return board.messageDown(newMessage);
+        return board.messageDown(message);
 
     } else {
         return [false, []];
@@ -689,15 +675,9 @@ hundo.Pip.prototype.messageUp = function(board, message) {
     var oppositeDir = hundo.oppositeDir(message.dir)
 
     if (this.open[oppositeDir]) {
-        var newMessage = {
-            sender: message.sender,
-            forwarder: this,
-            dir: message.dir,
-            newRow: message.newRow,
-            newCol: message.newCol,
-        }
+        message.forwarder = this;
 
-        return board.messageUp(newMessage);
+        return board.messageUp(message);
     } else {
         return [false, []];
     }
@@ -1880,6 +1860,7 @@ hundo.Board.prototype.step = function() {
     var newCol = this.ball.col + dc;
 
     // Check for out of bounds
+    // BUG: a pipe might save the ball from going out of bounds
     if (!this.inBounds(newRow, newCol)) {
 
         this.atRest = true;

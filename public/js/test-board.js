@@ -1094,3 +1094,5 @@ board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
 
+// BUG: level-editor.html?level=fl23-33-------200101301001
+
