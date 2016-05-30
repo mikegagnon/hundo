@@ -524,7 +524,7 @@ board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
 // Ice going out of bounds
-// level-editor.html?level=fl9a---3a5a7a---
+// level-editor.html?level=fl9a---3a5a7a-----
 var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":3,"col":10},{"row":5,"col":10},{"row":7,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":9,"col":10},portals:[]};
 var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":-1,"col":10},{"row":-1,"col":10},{"row":-1,"col":10}],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":-1,"col":10},portals:[]};
 var board1 = new hundo.Board(config1, idGen);

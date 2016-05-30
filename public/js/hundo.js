@@ -1859,15 +1859,21 @@ hundo.Board.prototype.step = function() {
     var newRow = this.ball.row + dr;
     var newCol = this.ball.col + dc;
 
+    var [success, animations, moves] = this.ball.messageUp(this, {
+            dir: direction,
+            newRow: this.ball.row,
+            newCol: this.ball.col,
+        })
+
     // Check for out of bounds
     // BUG: a pipe might save the ball from going out of bounds
-    if (!this.inBounds(newRow, newCol)) {
+    if (!this.inBounds(this.ball.row, this.ball.col)) {
 
         this.atRest = true;
         this.done = true;
         this.ball.dir = hundo.DirectionEnum.NODIR;
 
-        this.movePiece(this.ball, newRow, newCol);
+        this.movePiece(this.ball, this.ball.row, this.ball.col);
 
         return [{
             "move": {
@@ -1877,12 +1883,6 @@ hundo.Board.prototype.step = function() {
             },
         }];
     }
-
-    var [success, animations, moves] = this.ball.messageUp(this, {
-            dir: direction,
-            newRow: this.ball.row,
-            newCol: this.ball.col,
-        })
 
     if (success) {
 
