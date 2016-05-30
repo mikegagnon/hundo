@@ -3774,10 +3774,10 @@ hundo.Viz.prototype.animateBall = function(animation) {
         .enter()
         .append("circle")
         .attr("cx", ball.col * this.vizConfig.cellSize +
-                this.vizConfig.cellSize / 2 - (dx * this.vizConfig.cellSize * 1.5)
+                this.vizConfig.cellSize / 2
         )
         .attr("cy", ball.row * this.vizConfig.cellSize +
-                this.vizConfig.cellSize / 2 - (dy * this.vizConfig.cellSize * 1.5)
+                this.vizConfig.cellSize / 2
         )
         .attr("r", this.vizConfig.cellSize / 2 -
                 this.vizConfig.cellSize / 8)
