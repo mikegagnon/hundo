@@ -161,6 +161,8 @@ hundo.Ball.prototype.messageUp = function(board, message) {
             newCol: newMessage.newCol
         });
 
+        this.dir = newMessage.dir;
+
         // TODO: remove quotes from all keys
         animations.push(
             {
@@ -652,7 +654,30 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.open[hundo.DirectionEnum.LEFT] = left;
     this.open[hundo.DirectionEnum.RIGHT] = right;
 
-
+    // If this pip is not and elbow, then this.elbow = false
+    // If this pip is an elbow, then this.elbow[x] = y, where
+    // x == the direction the top piece is moving in, and
+    // y == the new direction the top piece (because the pip modifies the
+    // direction of the top piece)
+    if (up && right && !down && !left) {
+        this.elbow = {};
+        this.elbow[hundo.DirectionEnum.LEFT] = hundo.DirectionEnum.UP;
+        this.elbow[hundo.DirectionEnum.DOWN] = hundo.DirectionEnum.RIGHT;
+    } else if (up && left && !down && !right) {
+        this.elbow = {};
+        this.elbow[hundo.DirectionEnum.RIGHT] = hundo.DirectionEnum.UP;
+        this.elbow[hundo.DirectionEnum.DOWN] = hundo.DirectionEnum.LEFT;
+    } else if (down && left && !up && !right) {
+        this.elbow = {};
+        this.elbow[hundo.DirectionEnum.RIGHT] = hundo.DirectionEnum.DOWN;
+        this.elbow[hundo.DirectionEnum.UP] = hundo.DirectionEnum.LEFT;
+    } else if (down && right && !up && !left) {
+        this.elbow = {};
+        this.elbow[hundo.DirectionEnum.LEFT] = hundo.DirectionEnum.DOWN;
+        this.elbow[hundo.DirectionEnum.UP] = hundo.DirectionEnum.RIGHT;
+    } else {
+        this.elbow = false;
+    }
 }
 
 hundo.Pip.prototype.messageDown = function(board, message) {
@@ -666,6 +691,23 @@ hundo.Pip.prototype.messageDown = function(board, message) {
             newCol: message.newCol,
         }
         return board.messageDown(newMessage);
+    } else if (this.elbow) {
+        var newDir = this.elbow[message.dir];
+
+        message.dir = newDir;
+        [message.newRow, message.newCol] = hundo.Board.dirRowCol(newDir,
+            this.row, this.col);
+
+        var newMessage = {
+            sender: message.sender,
+            forwarder: this,
+            dir: message.dir,
+            newRow: message.newRow,
+            newCol: message.newCol,
+        }
+
+        return board.messageDown(newMessage);
+
     } else {
         return [false, []];
     }
