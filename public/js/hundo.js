@@ -616,8 +616,8 @@ hundo.Portal.prototype.messageUp = function(board, message) {
             sender: message.sender,
             forwarder: this,
             dir: message.dir,
-            newRow: message.row,
-            newCol: message.col,
+            newRow: message.newRow,
+            newCol: message.newCol,
         };
 
         var [success, animations, moves] = board.messageUp(newMessage);
