@@ -922,8 +922,6 @@ assert(board1.eq(board2));
 
 TEST = "Portals"
 
-// BUG: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fl22-828384-----22-323343-
-
 // Ball going through portal
 // level-editor.html?level=fl00-12------010100
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":2}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":1,"groupId":0},{"row":1,"col":0,"groupId":0}],"ball":{"row":0,"col":0}};
@@ -959,3 +957,13 @@ var board1 = new hundo.Board(config1, idGen);
 var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.RIGHT);
 assert(board1.eq(board2));
+
+// sand-ball adjacent to portal
+// level-editor.html?level=fl22-626364-----22-323343
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":6,"col":2},{"row":6,"col":3},{"row":6,"col":4}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":2,"col":2}],"portals":[{"row":3,"col":2,"groupId":3},{"row":3,"col":4,"groupId":3}],"ball":{"row":2,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":6,"col":2},{"row":6,"col":3},{"row":6,"col":4}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[{"row":2,"col":2}],"portals":[{"row":3,"col":2,"groupId":3},{"row":3,"col":4,"groupId":3}],"ball":{"row":5,"col":4}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
+

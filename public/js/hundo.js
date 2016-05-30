@@ -152,7 +152,7 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
     if (success) {
 
-        var [newRow , newCol] = hundo.Board.dirRowCol(this.dir, this.row, this.col);
+        var [newRow , newCol] = hundo.Board.dirRowCol(this.dir, newMessage.newRow, newMessage.newCol);
 
         moves.push({
             piece: this,
@@ -511,28 +511,16 @@ hundo.Sand = function(row, col) {
 
 hundo.Sand.prototype.messageDown = function(board, message) {
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
-    }
+    message.forwarder = this;
 
-    return board.messageDown(newMessage);
+    return board.messageDown(message);
 }
 
 hundo.Sand.prototype.messageUp = function(board, message) {
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
-    }
+    message.forwarder = this;
 
-    var [success, animations, moves] = board.messageUp(newMessage);
+    var [success, animations, moves] = board.messageUp(message);
 
     moves.push("stopBall");
 
