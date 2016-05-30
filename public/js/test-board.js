@@ -922,6 +922,8 @@ assert(board1.eq(board2));
 
 TEST = "Portals"
 
+// BUG: file:///Users/xyz/workspace/hundo/public/level-editor.html?level=fl22-828384-----22-323343-
+
 // Ball going through portal
 // level-editor.html?level=fl00-12------010100
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":2}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":0,"col":1,"groupId":0},{"row":1,"col":0,"groupId":0}],"ball":{"row":0,"col":0}};
