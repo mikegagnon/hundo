@@ -583,32 +583,20 @@ hundo.Portal.prototype.messageUp = function(board, message) {
         message.newRow = partner.row;
         message.newCol = partner.col;
 
-        var newMessage = {
-            sender: message.sender,
-            forwarder: this,
-            dir: message.dir,
-            newRow: partner.row,
-            newCol: partner.col,
-        };
+        message.forwarder = this;
 
         partner.receivingTeleportation = true;
 
-        var [success, animations, moves] = partner.messageUp(board, newMessage);
+        var [success, animations, moves] = partner.messageUp(board, message);
 
         partner.receivingTeleportation = false;
 
         return [success, animations, moves];
     } else {
 
-        var newMessage = {
-            sender: message.sender,
-            forwarder: this,
-            dir: message.dir,
-            newRow: message.newRow,
-            newCol: message.newCol,
-        };
+        message.forwarder = this;
 
-        var [success, animations, moves] = board.messageUp(newMessage);
+        var [success, animations, moves] = board.messageUp(message);
 
         return [success, animations, moves];
     }
