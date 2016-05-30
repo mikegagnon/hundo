@@ -651,19 +651,25 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.open[hundo.DirectionEnum.DOWN] = down;
     this.open[hundo.DirectionEnum.LEFT] = left;
     this.open[hundo.DirectionEnum.RIGHT] = right;
+
+
 }
 
 hundo.Pip.prototype.messageDown = function(board, message) {
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
+    if (this.open[message.dir]) {
+        var newMessage = {
+            sender: message.sender,
+            forwarder: this,
+            dir: message.dir,
+            newRow: message.newRow,
+            newCol: message.newCol,
+        }
+        return board.messageDown(newMessage);
+    } else {
+        return [false, []];
     }
 
-    return board.messageDown(newMessage);
 }
 
 hundo.Pip.prototype.messageUp = function(board, message) {
