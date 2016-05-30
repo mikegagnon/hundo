@@ -967,6 +967,15 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+// adjacent portals of different colors
+// level-editor.html?level=fl45-0010203040------120133420433
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":0},{"row":1,"col":0},{"row":2,"col":0},{"row":3,"col":0},{"row":4,"col":0}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":1,"col":2,"groupId":0},{"row":1,"col":3,"groupId":3},{"row":4,"col":2,"groupId":0},{"row":4,"col":3,"groupId":3}],"ball":{"row":4,"col":5}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":0,"col":0},{"row":1,"col":0},{"row":2,"col":0},{"row":3,"col":0},{"row":4,"col":0}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[{"row":1,"col":2,"groupId":0},{"row":1,"col":3,"groupId":3},{"row":4,"col":2,"groupId":0},{"row":4,"col":3,"groupId":3}],"ball":{"row":4,"col":1}};;
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(board1.eq(board2));
+
 /**
  * Pips
  ******************************************************************************/
