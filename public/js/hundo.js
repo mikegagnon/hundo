@@ -547,15 +547,9 @@ hundo.Portal = function(row, col, groupId) {
 
 hundo.Portal.prototype.messageDown = function(board, message) {
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
-    }
+    message.forwarder = this;
 
-    return board.messageDown(newMessage);
+    return board.messageDown(message);
 }
 
 hundo.Portal.prototype.getPartner = function(board) {
