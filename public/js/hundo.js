@@ -633,7 +633,7 @@ hundo.Portal.prototype.eq = function(piece) {
 }
 
 
-
+// TODO: do we really need to store this.up, etc.?
 hundo.Pip = function(row, col, up, down, left, right) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.PIP;
@@ -646,6 +646,11 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.down = down;
     this.left = left;
     this.right = right;
+    this.open = {}
+    this.open[hundo.DirectionEnum.UP] = up;
+    this.open[hundo.DirectionEnum.DOWN] = down;
+    this.open[hundo.DirectionEnum.LEFT] = left;
+    this.open[hundo.DirectionEnum.RIGHT] = right;
 }
 
 hundo.Pip.prototype.messageDown = function(board, message) {
@@ -663,15 +668,23 @@ hundo.Pip.prototype.messageDown = function(board, message) {
 
 hundo.Pip.prototype.messageUp = function(board, message) {
 
-    var newMessage = {
-        sender: message.sender,
-        forwarder: this,
-        dir: message.dir,
-        newRow: message.newRow,
-        newCol: message.newCol,
+    var oppositeDir = hundo.oppositeDir(message.dir)
+
+    if (this.open[oppositeDir]) {
+        var newMessage = {
+            sender: message.sender,
+            forwarder: this,
+            dir: message.dir,
+            newRow: message.newRow,
+            newCol: message.newCol,
+        }
+
+        return board.messageUp(newMessage);
+    } else {
+        return [false, []];
     }
 
-    return board.messageUp(newMessage);
+
 }
 
 hundo.Pip.prototype.eq = function(piece) {
