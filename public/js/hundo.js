@@ -159,6 +159,7 @@ hundo.Ball.prototype.messageUp = function(board, message) {
             newCol: newMessage.newCol
         });
 
+        // TODO: change the dir only upon success, like moves
         this.dir = newMessage.dir;
 
         // TODO: remove quotes from all keys
@@ -228,108 +229,38 @@ hundo.Ice.prototype.eq = function(piece) {
 
 hundo.Ice.prototype.messageUp = function(board, message) {
 
-    var THIS = this;
+    var [newRow, newCol] = hundo.Board.dirRowCol(
+        message.dir, this.row, this.col);
 
-    var groupId = this.groupId[message.dir];
+    var newMessage = {
+        sender: this,
+        forwarder: this,
+        dir: message.dir,
+        newRow: newRow,
+        newCol: newCol,
+    }
 
-    // includes gblocks and ice
-    var neighbors = board.cluster.clusterMembers[groupId][message.dir];
-    var totalSuccess = true;
-    var totalAnimations = [];
-    var totalMoves = [];
-    var cluster = board.cluster.cluster[groupId][message.dir];
+    var [success, animations, moves] = board.messageDown(newMessage);
 
-    // If a neighbor has pushed into this gblock, then do the push and memoize
-    // the result
-    if ((message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-         cluster.has(String(message.sender.groupId)))
+    if (success) {
 
-        ||
+        moves.push({
+            piece: this,
+            newRow: newMessage.newRow,
+            newCol: newMessage.newCol
+        });
 
-        (message.sender.type == hundo.PieceTypeEnum.ICE &&
-         cluster.has(String(message.sender.groupId[message.dir])))
-
-        ) {
-
-        if (this.result) {
-
-            // IS returning emprty moves the right thing to do?
-            return [this.result[0], [], []];
-        }
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
-
-        // TODO: factor out code common to this and ice, etc.
-        var newMessage = {
-            sender: this,
-            forwarder: this,
-            dir: message.dir,
-            newRow: newRow,
-            newCol: newCol,
-        }
-
-        var [success, animations, moves] = board.messageDown(newMessage);
-
-        this.result = [success, animations, moves];
-
-        if (success) {
-
-            var [newRow , newCol] = hundo.Board.dirRowCol(message.dir, this.row,
-                this.col);
-
-            moves.push({
-                piece: this,
-                newRow: newMessage.newRow,
-                newCol: newMessage.newCol
+        animations.push(
+            {
+                "move": {
+                    "ice": this,
+                    "dir": message.dir,
+                }
             });
-
-            animations.push(
-                {
-                    "move": {
-                        "ice": this,
-                        "dir": message.dir,
-                    }
-                });
-        }
-
-        return [success, animations, moves];
-
     }
 
-    // If a foreign piece pushes into this gblock, then push all the members.
-    // of this gblock's cluster 
-    else {
-
-        // clear out memoization
-        _.each(neighbors, function(neighbor) {
-            neighbor.result = undefined;
-        });
-
-        // push every member of this gblock's group
-        _.each(neighbors, function(neighbor) {
-
-            var newMessage = {
-                sender: THIS,
-                forwarder: THIS,
-                dir: message.dir,
-                newRow: neighbor.row,
-                newCol: neighbor.col,
-            };
-
-            [success, animations, moves] = board.messageDown(newMessage);
-
-            totalAnimations = _.concat(totalAnimations, animations);
-            totalMoves = _.concat(totalMoves, moves);
-            if (!success) {
-                totalSuccess = false;
-            }
-        });
-
-        return [totalSuccess, totalAnimations, totalMoves];
-    }
+    return [success, animations, moves];
 }
-
 /**
  * Arrow board pieces
  ******************************************************************************/
