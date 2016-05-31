@@ -982,6 +982,10 @@ assert(board1.eq(board2));
 
 TEST = "Pips"
 
+/**
+ * Ball going straight through pips
+ ******************************************************************************/
+
 // Ball going left through LR-pip
 // level-editor.html?level=fl14-1016-------120011
 var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":0},{"row":1,"col":6}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":1,"col":2,"up":false,"down":false,"left":true,"right":true}],"ball":{"row":1,"col":4}};
@@ -1018,6 +1022,10 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+
+/**
+ * Ball bumping into straight-through pips
+ ******************************************************************************/
 
 // Ball bumping into left side of UD-pip
 // level-editor.html?level=fl11--------131100
@@ -1056,6 +1064,9 @@ board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
 
+/**
+ * Going through and bumping into DR elbow
+ ******************************************************************************/
 
 // Up through DR elbow
 // level-editor.html?level=fl31-1441-------110101
@@ -1093,6 +1104,75 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+/**
+ * Going through and bumping into UDR-tri-pip
+ ******************************************************************************/
 
-// BUG: level-editor.html?level=fl23-33-------200101301001
+// Ball going down through UDR-tri-pip
+// level-editor.html?level=fl11-71-------411101
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":7,"col":1}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":1,"col":1}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":7,"col":1}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":6,"col":1}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
+
+// Ball going up through UDR-tri-pip
+// level-editor.html?level=fl11-71-------411101
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":1},{"row":7,"col":1}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":6,"col":1}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":1,"col":1},{"row":7,"col":1}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":2,"col":1}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(board1.eq(board2));
+
+// Ball going inside UDR-tri-pip, then bumping into side
+// level-editor.html?level=fl15--------131101
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":1,"col":3,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":1,"col":5}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":1,"col":3,"up":true,"down":true,"left":false,"right":true}],"ball":{"row":1,"col":3}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(board1.eq(board2));
+
+/**
+ *  Multi-pip tests
+ ******************************************************************************/
+
+// Going through quad, UR, UL, DL, DR, tri,
+// level-editor.html?level=fl58--------450101460110540101551111561010641001651011660011670011681111690110781001791010
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":5,"col":8}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":6,"col":5}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
+
+// Same as above, but in reverse
+// level-editor.html?level=fl65-38-------450101460110540101551111561010641001651011660011670011681111690110781001791010
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":8}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":6,"col":5}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":8}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":4,"col":8}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(board1.eq(board2));
+
+
+/**
+ * Misc pip tests
+ ******************************************************************************/
+
+
+// Ball goes through DR elbow, then UR elbow
+// level-editor.html?level=fl23-33-------200101301001
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":2,"col":0,"up":false,"down":true,"left":false,"right":true},{"row":3,"col":0,"up":true,"down":false,"left":false,"right":true}],"ball":{"row":2,"col":3}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":3}],"goals":[],"ice":[],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":2,"col":0,"up":false,"down":true,"left":false,"right":true},{"row":3,"col":0,"up":true,"down":false,"left":false,"right":true}],"ball":{"row":3,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.LEFT);
+assert(board1.eq(board2));
+
+// TODO: Ice and pips
+// TODO: Gblocks and pips
+
 
