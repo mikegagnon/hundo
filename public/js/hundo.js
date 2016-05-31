@@ -318,7 +318,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 /**
  * Gblock board pieces
  ******************************************************************************/
-hundo.Gblock = function(row, col, groupNum) {
+hundo.Gblock = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
     this.layer = hundo.LayerEnum.TOP;
@@ -326,7 +326,7 @@ hundo.Gblock = function(row, col, groupNum) {
     this.col = col;
     this.origRow = row;
     this.origCol = col;
-    this.groupNum = groupNum;
+    this.groupId = groupId;
 }
 
 hundo.Gblock.prototype.eq = function(piece) {
@@ -337,7 +337,7 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.gblocks[this.groupNum];
+    var neighbors = board.gblocks[this.groupId];
     var totalSuccess = true;
     var totalAnimations = [];
     var totalMoves = [];
@@ -383,7 +383,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     //         results.
 
     if (message.sender.type != hundo.PieceTypeEnum.GBLOCK ||
-        message.sender.groupNum != this.groupNum) {
+        message.sender.groupId != this.groupId) {
 
         // TODO: put pushNeighbor code here
         return pushNeighbor();
