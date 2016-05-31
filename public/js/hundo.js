@@ -229,35 +229,48 @@ hundo.Ice.prototype.eq = function(piece) {
 
 hundo.Ice.prototype.messageUp = function(board, message) {
 
-    var [newRow, newCol] = hundo.Board.dirRowCol(
-        message.dir, this.row, this.col);
+    var animations = [];
+    var moves = [];
 
-    var newMessage = {
-        sender: this,
-        forwarder: this,
-        dir: message.dir,
-        newRow: newRow,
-        newCol: newCol,
-    }
+    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
 
-    var [success, animations, moves] = board.messageDown(newMessage);
+        var newMessage = {
+            sender: this,
+            forwarder: this,
+            dir: message.dir,
+            newRow: newRow,
+            newCol: newCol,
+        }
 
-    if (success) {
+        this.pushingDir = message.dir;
 
-        moves.push({
-            piece: this,
-            newRow: newMessage.newRow,
-            newCol: newMessage.newCol
-        });
+        var [success, animations, moves] = board.messageDown(newMessage);
 
-        animations.push(
-            {
-                "move": {
-                    "ice": this,
-                    "dir": message.dir,
-                }
+        if (success) {
+
+            moves.push({
+                piece: this,
+                newRow: newMessage.newRow,
+                newCol: newMessage.newCol
             });
+
+            animations.push(
+                {
+                    "move": {
+                        "ice": this,
+                        "dir": message.dir,
+                    }
+                });
+        }
+    } else if (this.pushingDir == message.dir) {
+        success = true;
+    } else {
+        success = false;
     }
+
+
 
     return [success, animations, moves];
 }
@@ -1775,6 +1788,10 @@ hundo.Board.prototype.checkSolved = function() {
 // else, returns an animation object, which describes how the
 // the step should be animated
 hundo.Board.prototype.step = function() {
+
+    _.each(this.getIce(), function(ice) {
+        ice.pushingDir = hundo.DirectionEnum.NODIR;
+    });
 
     this.cluster = new hundo.Cluster(this);
 
