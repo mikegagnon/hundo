@@ -609,12 +609,16 @@ hundo.Pip.prototype.messageDown = function(board, message) {
         return board.messageDown(message);
 
     } else {
-        return [false, []];
+        return [false, [], []];
     }
 
 }
 
 hundo.Pip.prototype.messageUp = function(board, message) {
+
+    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK) {
+        return [false, [], []];
+    }
 
     var oppositeDir = hundo.oppositeDir(message.dir)
 
@@ -623,7 +627,7 @@ hundo.Pip.prototype.messageUp = function(board, message) {
 
         return board.messageUp(message);
     } else {
-        return [false, []];
+        return [false, [], []];
     }
 
 

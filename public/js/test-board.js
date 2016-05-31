@@ -1157,8 +1157,8 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
-// Same as above, but clogging the pipes with ice
-// /level-editor.html?level=fl08---1828384858-----450101460110540101551111561010641001651011660011670011681111690110781001791010
+// Same as above, but clogging the pips with ice
+// level-editor.html?level=fl08---1828384858-----450101460110540101551111561010641001651011660011670011681111690110781001791010
 var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":1,"col":8},{"row":2,"col":8},{"row":3,"col":8},{"row":4,"col":8},{"row":5,"col":8}],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":0,"col":8}};
 var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":5,"col":8},{"row":6,"col":8},{"row":6,"col":9},{"row":7,"col":8},{"row":7,"col":9}],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":4,"col":8}};
 var board1 = new hundo.Board(config1, idGen);
@@ -1166,7 +1166,27 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+// Same as above, but running ice through the pips without clogging
+// level-editor.html?level=fl08-b5--4858-----450101460110540101551111561010641001651011660011670011681111690110781001791010
+var config1 = {"numRows":15,"numCols":21,"blocks":[{"row":11,"col":5}],"goals":[],"ice":[{"row":4,"col":8},{"row":5,"col":8}],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":0,"col":8}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[{"row":11,"col":5}],"goals":[],"ice":[{"row":5,"col":5},{"row":6,"col":5}],"arrows":[],"gblocks":[],"sand":[],"portals":[],"pips":[{"row":4,"col":5,"up":false,"down":true,"left":false,"right":true},{"row":4,"col":6,"up":false,"down":true,"left":true,"right":false},{"row":5,"col":4,"up":false,"down":true,"left":false,"right":true},{"row":5,"col":5,"up":true,"down":true,"left":true,"right":true},{"row":5,"col":6,"up":true,"down":false,"left":true,"right":false},{"row":6,"col":4,"up":true,"down":false,"left":false,"right":true},{"row":6,"col":5,"up":true,"down":false,"left":true,"right":true},{"row":6,"col":6,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":7,"up":false,"down":false,"left":true,"right":true},{"row":6,"col":8,"up":true,"down":true,"left":true,"right":true},{"row":6,"col":9,"up":false,"down":true,"left":true,"right":false},{"row":7,"col":8,"up":true,"down":false,"left":false,"right":true},{"row":7,"col":9,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":4,"col":5}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
 
+/**
+ * Gblock tests
+ ******************************************************************************/
+
+// Pip rejecting gblock
+// level-editor.html?level=fl01-----210---411100
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":2,"col":1,"groupId":0}],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":false}],"ball":{"row":0,"col":1}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":3,"col":1,"groupId":0}],"sand":[],"portals":[],"pips":[{"row":4,"col":1,"up":true,"down":true,"left":false,"right":false}],"ball":{"row":2,"col":1}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
 
 /**
  * Misc pip tests
@@ -1182,7 +1202,6 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.LEFT);
 assert(board1.eq(board2));
 
-// TODO: Ice and pips
 // TODO: Gblocks and pips
 
 
