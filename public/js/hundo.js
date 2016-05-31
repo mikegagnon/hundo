@@ -342,11 +342,13 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var totalAnimations = [];
     var totalMoves = [];
 
-    function pushNeighbor() {
+    // TODO: s/neighbor/member/g
+    function pushNeighbors() {
 
         // clear out memoization
         _.each(neighbors, function(neighbor) {
             neighbor.result = undefined;
+            neighbor.pushingDir = message.dir;
         });
 
         // push every member of this gblock's group
@@ -382,11 +384,17 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     //         case we do the recursive bumps as usual, except we memoize
     //         results.
 
-    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK ||
-        message.sender.groupId != this.groupId) {
 
-        // TODO: put pushNeighbor code here
-        return pushNeighbor();
+    // TODO: reorder if statement to get rid of negation
+    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+        message.sender.groupId == this.groupId)) {
+
+        // TODO: put pushNeighbors code here
+        if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+            return pushNeighbors();
+        } else {
+            return [true, [], []];
+        }
 
     } else {
 
@@ -1791,6 +1799,10 @@ hundo.Board.prototype.step = function() {
         ice.pushingDir = hundo.DirectionEnum.NODIR;
     });
 
+    _.each(this.getGblocks(), function(gblock) {
+        gblock.pushingDir = hundo.DirectionEnum.NODIR;
+    });
+
     this.cluster = new hundo.Cluster(this);
 
     var direction = this.ball.dir;
@@ -1833,8 +1845,14 @@ hundo.Board.prototype.step = function() {
 
         var THIS = this;
 
+        // TODO: explain
         _.each(moves, function(move){
+            if (move != "stopBall") {
+                THIS.movePiece(move.piece, -1, -1);
+            } 
+        });
 
+        _.each(moves, function(move){
             if (move == "stopBall") {
                 THIS.stopBall();
             } else {
