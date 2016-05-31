@@ -318,8 +318,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 /**
  * Gblock board pieces
  ******************************************************************************/
-
-hundo.Gblock = function(row, col, groupId) {
+hundo.Gblock = function(row, col, groupNum) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
     this.layer = hundo.LayerEnum.TOP;
@@ -327,89 +326,23 @@ hundo.Gblock = function(row, col, groupId) {
     this.col = col;
     this.origRow = row;
     this.origCol = col;
-    this.groupId = groupId;
+    this.groupNum = groupNum;
 }
 
 hundo.Gblock.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece) &&
-        this.groupId == piece.groupId;
+        this.dir == piece.dir;
 }
 
-
-// TODO: BUG: level-editor.html?level=fl9e-----870881890970981990a70a80a90-
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-
-    // includes gblocks and ice
-    var neighbors = board.cluster.clusterMembers[this.groupId][message.dir];
+    var neighbors = board.gblocks[this.groupNum];
     var totalSuccess = true;
     var totalAnimations = [];
     var totalMoves = [];
-    var cluster = board.cluster.cluster[this.groupId][message.dir];
 
-    // If a neighbor has pushed into this gblock, then do the push and memoize
-    // the result
-    if ((message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-         cluster.has(String(message.sender.groupId)))
-
-        ||
-
-        (message.sender.type == hundo.PieceTypeEnum.ICE &&
-         cluster.has(String(message.sender.groupId[message.dir])))
-
-        ) {
-
-        if (this.result) {
-            return [this.result[0], [], []];
-        }
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
-
-        if (!board.inBounds(newRow, newCol)) {
-            return [false, [], []];
-        }
-
-        // TODO: factor out code common to this and ice, etc.
-        var newMessage = {
-            sender: this,
-            forwarder: this,
-            dir: message.dir,
-            newRow: newRow,
-            newCol: newCol,
-        };
-
-        var [success, animations, moves] = board.messageDown(newMessage);
-
-        this.result = [success, animations, moves];
-
-        if (success) {
-            var [newRow , newCol] = hundo.Board.dirRowCol(message.dir, this.row,
-                this.col);
-
-            moves.push({
-                piece: this,
-                newRow: newRow,
-                newCol: newCol
-            });
-
-            animations.push(
-                {
-                    move: {
-                        gblock: this,
-                        dir: message.dir,
-                }
-            });
-        }
-
-        return [success, animations, moves];
-
-    }
-
-    // If a foreign piece pushes into this gblock, then push all the members.
-    // of this gblock's cluster 
-    else {
+    function pushNeighbor() {
 
         // clear out memoization
         _.each(neighbors, function(neighbor) {
@@ -425,11 +358,10 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 newRow: neighbor.row,
                 newCol: neighbor.col,
+                commit: message.commit
             }
 
-            // Send message directly to neighbor; otherwise, the message
-            // will go down and up, which would be incorrect
-            var [success, animations, moves] = neighbor.messageUp(board, newMessage);
+            var [success, animations, moves] = board.messageDown(newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
             totalMoves = _.concat(totalMoves, moves);
@@ -440,6 +372,74 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         });
 
         return [totalSuccess, totalAnimations, totalMoves];
+
+    }
+
+    // Two cases:
+    //      1. A non-gblock bumps into this gblock, which case we bump
+    //         all gblocks
+    //      2. A gbock (from the same group) bumps into this gblock, in which
+    //         case we do the recursive bumps as usual, except we memoize
+    //         results.
+
+    if (message.sender.type != hundo.PieceTypeEnum.GBLOCK ||
+        message.sender.groupNum != this.groupNum) {
+
+        // TODO: put pushNeighbor code here
+        return pushNeighbor();
+
+    } else {
+
+
+        if (this.result) {
+            return [this.result[0], [], []];
+        }
+
+
+        var [dr, dc] = hundo.Board.drdc(message.dir);
+
+        var newRow = this.row + dr;
+        var newCol = this.col + dc;
+
+        if (!board.inBounds(newRow, newCol)) {
+            return [false, [], []];
+        }
+
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
+
+        // TODO: factor out code common to this and ice, etc.
+        var newMessage = {
+            sender: this,
+            forwarder: this,
+            dir: message.dir,
+            newRow: newRow,
+            newCol: newCol,
+            commit: message.commit
+        }
+
+        var [success, animations, moves] = board.messageDown(newMessage);
+
+        this.result = [success, animations, moves];
+
+        if (success) {
+
+            moves.push({
+                piece: this,
+                newRow: newMessage.newRow,
+                newCol: newMessage.newCol
+            });
+
+            animations.push(
+                {
+                    "move": {
+                        "gblock": this,
+                        "dir": message.dir,
+                    }
+                });
+        }
+
+        return [success, animations, moves];
     }
 }
 
@@ -3250,24 +3250,6 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         })        .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
-    
-
-    /*
-    this.boardSvg.selectAll()
-        .data(this.board.getPips())
-        .enter()
-        .append("ellipse")
-        .attr("cx", this.vizConfig.cellSize / 2)
-        .attr("cy", this.vizConfig.cellSize / 2)
-        .attr("rx", this.vizConfig.cellSize / 4)
-        .attr("ry", this.vizConfig.cellSize / 4)
-        .attr("style", "fill:#0a0")
-        .attr("class", "pip")
-        .attr("id", hundo.Viz.pieceId)
-        .attr("transform", function(piece) {
-            return THIS.transform(piece, transformation);
-        });*/
-
 
     function pipTemplate(pip) {
         
