@@ -352,13 +352,13 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         // push every member of this gblock's group
         _.each(neighbors, function(neighbor) {
 
+            // TODO: shouldn't this be neighbor.row + dr, etc.?
             var newMessage = {
                 sender: THIS,
                 forwarder: THIS,
                 dir: message.dir,
                 newRow: neighbor.row,
                 newCol: neighbor.col,
-                commit: message.commit
             }
 
             var [success, animations, moves] = board.messageDown(newMessage);
@@ -396,17 +396,12 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         }
 
 
-        var [dr, dc] = hundo.Board.drdc(message.dir);
-
-        var newRow = this.row + dr;
-        var newCol = this.col + dc;
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
 
         if (!board.inBounds(newRow, newCol)) {
             return [false, [], []];
         }
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
 
         // TODO: factor out code common to this and ice, etc.
         var newMessage = {
@@ -415,7 +410,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
-            commit: message.commit
         }
 
         var [success, animations, moves] = board.messageDown(newMessage);
