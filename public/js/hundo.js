@@ -330,6 +330,8 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 /**
  * Gblock board pieces
  ******************************************************************************/
+
+// BUG: level-editor.html?level=fl99-----792890-6979--
 hundo.Gblock = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
