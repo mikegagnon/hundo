@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Unless otherwise noted, the contents of this file are free and unencumbered
  * software released into the public domain.
@@ -1988,7 +1990,7 @@ hundo.Solver.prototype.explore = function(board) {
  * The Hundo class is what clients use to create a Hundo game
  ******************************************************************************/
 
-Hundo = function(config) {
+var Hundo = function(config) {
 
     // clone hundo.defaultVizConfig so it doesn't get clobbered by extend
     var defaultVizConfig = jQuery.extend(true, {}, hundo.defaultVizConfig);
@@ -1999,7 +2001,7 @@ Hundo = function(config) {
 
     config.viz = $.extend(defaultVizConfig, config.viz);
 
-    viz = new hundo.Viz(config);
+    var viz = new hundo.Viz(config);
 
     hundo.instances[config.id] = viz;
 
@@ -3466,8 +3468,8 @@ hundo.Viz.prototype.updateLevelSelect = function() {
 
 hundo.Viz.prototype.animateBall = function(animation) {
 
-    ball = animation.move.ball;
-    ballId = "#" + hundo.Viz.pieceId(ball);
+    var ball = animation.move.ball;
+    var ballId = "#" + hundo.Viz.pieceId(ball);
 
     var dx;
     var dy;
@@ -3577,8 +3579,8 @@ hundo.Viz.prototype.animateIce = function(animation) {
 
 hundo.Viz.prototype.animateGblock = function(animation) {
 
-    gblock = animation.move.gblock;
-    gblockId = "#" + hundo.Viz.pieceId(gblock);
+    var gblock = animation.move.gblock;
+    var gblockId = "#" + hundo.Viz.pieceId(gblock);
     
     var THIS = this;
 
@@ -4112,7 +4114,7 @@ hundo.Compress.decompressLevel = function(byteString) {
     // Get the blocks
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
-        block = {
+        var block = {
             row: r,
             col: c
         }
@@ -4133,7 +4135,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         [r, c] = hundo.Compress.getRowCol(bytes);
         var dir = hundo.Compress.numToDir(bytes[0]);
         bytes.shift();
-        goal = {
+        var goal = {
             row: r,
             col: c,
             dir: dir
@@ -4152,7 +4154,7 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
-        ice = {
+        var ice = {
             row: r,
             col: c
         }
@@ -4173,7 +4175,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         [r, c] = hundo.Compress.getRowCol(bytes);
         var dir = hundo.Compress.numToDir(bytes[0]);
         bytes.shift();
-        arrow = {
+        var arrow = {
             row: r,
             col: c,
             dir: dir
@@ -4195,7 +4197,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         [r, c] = hundo.Compress.getRowCol(bytes);
         var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
         bytes.shift();
-        gblock = {
+        var gblock = {
             row: r,
             col: c,
             groupId: groupId
@@ -4215,7 +4217,7 @@ hundo.Compress.decompressLevel = function(byteString) {
     // Get the sand
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
-        sand = {
+        var sand = {
             row: r,
             col: c,
         }
@@ -4236,7 +4238,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         [r, c] = hundo.Compress.getRowCol(bytes);
         var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
         bytes.shift();
-        portal = {
+        var portal = {
             row: r,
             col: c,
             groupId: groupId
