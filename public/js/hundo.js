@@ -1856,10 +1856,12 @@ hundo.Solver = function(board) {
     this.cellWinningEdges = this.explore(board);
 
     // used for generating test cases for solver
+    /*
     console.log("Edges");
     console.log(JSON.stringify(this.getCellEdges()));
     console.log("Winning edges")
     console.log(JSON.stringify(this.getCellWinningEdges()));
+    */
 
 }
 
