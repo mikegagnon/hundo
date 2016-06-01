@@ -1693,7 +1693,12 @@ hundo.Board.prototype.move = function(dir, returnEdges) {
 
     if (!(r1 == r2 && c1 == c2) &&
         !(r1 != r2 && c1 != c2)) {
-        var edge = [[r1, c1], [r2, c2]];
+        var edge = {
+            row1: r1,
+            col1: c1,
+            row2: r2,
+            col2: c2
+        };
         edges.push(edge);
     }
 
@@ -1707,7 +1712,12 @@ hundo.Board.prototype.move = function(dir, returnEdges) {
 
         if (!(r1 == r2 && c1 == c2) &&
             !(r1 != r2 && c1 != c2)) {
-            var edge = [[r1, c1], [r2, c2]];
+            var edge = {
+                row1: r1,
+                col1: c1,
+                row2: r2,
+                col2: c2
+            };
             edges.push(edge);
         }
 
@@ -1893,29 +1903,11 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 }
 
 hundo.Solver.prototype.getCellEdges = function() {
-
-    // TODO: haveCellEdges be in this format already
-    return _.map(this.cellEdges, function(edge) {
-        return {
-            row1: edge[0][0],
-            col1: edge[0][1],
-            row2: edge[1][0],
-            col2: edge[1][1]
-        }
-    });
+    return this.cellEdges;
 }
 
 hundo.Solver.prototype.getCellWinningEdges = function() {
-
-    return _.map(this.cellWinningEdges, function(edge) {
-        return {
-            row1: edge[0][0],
-            col1: edge[0][1],
-            row2: edge[1][0],
-            col2: edge[1][1]
-        }
-    });
-
+    return this.cellWinningEdges;
 }
 
 // BUG: file:///Users/xyz/workspace/hundo/public/index.html?level=fl22--7b3-2c--bd0cb0cc0cd0dd0-2425262i3i4i595a5f6f7fa7b7c7ci--
@@ -3773,7 +3765,7 @@ hundo.Viz.prototype.getBoardUrl = function() {
 
 hundo.cheat = function() {
     hundo.vizz.maker.showSolution = !hundo.vizz.maker.showSolution;
-    hundo.vizz.maker.showGraph = false;
+    hundo.vizz.maker.showGraph = true;
 
     if (hundo.vizz.maker.showSolution) {
         hundo.vizz.drawSolution();
