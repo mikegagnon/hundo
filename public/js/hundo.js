@@ -331,7 +331,6 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
  * Gblock board pieces
  ******************************************************************************/
 
-// BUG: level-editor.html?level=fl99-----772782792870880890-6979--
 hundo.Gblock = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
@@ -1534,13 +1533,19 @@ hundo.Board.prototype.checkSolved = function() {
 // movesClobber detects such collisions, returning true iff there is a collision
 hundo.Board.movesClobber = function(moves) {
 
-    var destinations = _.map(moves, function(move){
+    var movesWithoutStopBall = _.clone(moves);
+
+    _.remove(movesWithoutStopBall, function(move) {
+        return move == "stopBall";
+    })
+
+    var destinations = _.map(movesWithoutStopBall, function(move){
         return move.newRow + "," + move.newCol;
     });
 
     var destinationSet = new Set(destinations);
 
-    return destinationSet.size != moves.length;
+    return destinationSet.size != movesWithoutStopBall.length;
 }
 
 // returns null on fatal error

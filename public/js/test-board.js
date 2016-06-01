@@ -950,6 +950,15 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+// Gblocks moving into two sand cells
+// level-editor.html?level=fl40-----202300-1020--
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":2,"col":0,"groupId":2},{"row":3,"col":0,"groupId":0}],"sand":[{"row":1,"col":0},{"row":2,"col":0}],"portals":[],"pips":[],"ball":{"row":4,"col":0}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":1,"col":0,"groupId":2},{"row":2,"col":0,"groupId":0}],"sand":[{"row":1,"col":0},{"row":2,"col":0}],"portals":[],"pips":[],"ball":{"row":3,"col":0}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.UP);
+assert(board1.eq(board2));
+
 
 /**
  * Portals
