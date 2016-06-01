@@ -2028,11 +2028,6 @@ hundo.Viz = function(config) {
 
         config.viz.levelSelect = false;
 
-        this.paletteSelection = {
-            type: hundo.PieceTypeEnum.BLOCK
-        };
-
-
     } else {
         this.levels = config.levels;
     }
@@ -2807,6 +2802,10 @@ hundo.Viz.prototype.addPalette = function() {
     var palette = $("<div/>").html(contents).contents();
 
     $("#" + this.consoleId()).append(palette);
+
+    this.paletteSelection = {
+        type: hundo.PieceTypeEnum.BLOCK
+    };
 
     this.clickPalette(buttons[2].config);
 
