@@ -2486,11 +2486,12 @@ hundo.Viz.prototype.addResetButton = function() {
 // TODO: id incorpoates viz id
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
-        <img src="img/${image}.png" id="${hundo.Viz.getPalettePieceId(config.id)}"
+        <img src="img/${image}.png"
+            id="${this.getPalettePieceId(config.id)}"
             onclick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
-                height: ${this.vizConfig.cellSize}px" />`
+                height: ${this.vizConfig.cellSize}px; padding: 8px" />`
 }
 
 hundo.Viz.prototype.addPalette = function() {
@@ -3775,23 +3776,25 @@ hundo.clickLevelBack = function(id) {
     hundo.vizz.prevLevel();
 }
 
-hundo.Viz.getPalettePieceId = function(id) {
-    return "palette-" + id;
+hundo.Viz.prototype.getPalettePieceId = function(id) {
+    return "palette-" + this.id + "-" + id;
 }
 
 hundo.Viz.prototype.clickPalette = function(config) {
 
-    $("#" + hundo.Viz.getPalettePieceId(this.paletteSelection.id))
+    $("#" + this.getPalettePieceId(this.paletteSelection.id))
         .css("border-style", "")
         .css("border-width", "")
-        .css("border-color", "");
+        .css("border-color", "")
+        .css("padding", "8px");
 
     this.paletteSelection = config;
 
-    $("#" + hundo.Viz.getPalettePieceId(config.id))
+    $("#" + this.getPalettePieceId(config.id))
         .css("border-style", "double")
         .css("border-width", "5px")
-        .css("border-color", "#0F0");
+        .css("border-color", "#0F0")
+        .css("padding", "3px");
 }
 
 hundo.clickPalette = function(id, config) {
