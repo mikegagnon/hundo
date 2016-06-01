@@ -2162,9 +2162,9 @@ hundo.Viz.prototype.mousemove = function(x, y) {
     } else {
         var piece = this.getPieceFromPalette(row, col);
 
-        if (!this.board.canAddPiece(piece)) {
+        /*if (!this.board.canAddPiece(piece)) {
             return;
-        }
+        }*/
     }
 
     this.maker.mouseRow = row;
@@ -2431,7 +2431,16 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
         this.removeHighlight();
 
     } else {
-        console.log("Could not add: " + piece);
+
+        this.animateSolvedQuick();
+
+        this.board.clearCell(row, col);
+        if (!this.board.addPiece(piece)) {
+            console.error("This code shouldn't be reachable");
+        }
+
+        this.drawBoardQuick();
+        this.removeHighlight();
     }
 
 }
