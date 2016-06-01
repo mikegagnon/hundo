@@ -65,57 +65,57 @@ hundo.LayerEnum = {
 
 
 // Two pieces are compatible iff they may occupy the same cell at the same time
-// hundo.board.compatible[pieceType] == a list containing all the pieces
+// hundo.compatible[pieceType] == a list containing all the pieces
 // that are compatible with pieceType
-hundo.Board.compatible = {}
+hundo.compatible = {};
 
-hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
+hundo.compatible[hundo.PieceTypeEnum.BALL] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
     hundo.PieceTypeEnum.GOAL,
     hundo.PieceTypeEnum.PORTAL,
     hundo.PieceTypeEnum.PIP
-]
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
+hundo.compatible[hundo.PieceTypeEnum.BLOCK] = [];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
+hundo.compatible[hundo.PieceTypeEnum.ICE] = [
     hundo.PieceTypeEnum.ARROW,
     hundo.PieceTypeEnum.SAND,
     hundo.PieceTypeEnum.GOAL,
     hundo.PieceTypeEnum.PORTAL,
     hundo.PieceTypeEnum.PIP
-],
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
+hundo.compatible[hundo.PieceTypeEnum.GOAL] = [
     hundo.PieceTypeEnum.BALL,
     hundo.PieceTypeEnum.ICE
-],
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.ARROW] = [
+hundo.compatible[hundo.PieceTypeEnum.ARROW] = [
     hundo.PieceTypeEnum.BALL,
     hundo.PieceTypeEnum.ICE
-],
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.GBLOCK] = [
+hundo.compatible[hundo.PieceTypeEnum.GBLOCK] = [
     hundo.PieceTypeEnum.SAND
-],
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
+hundo.compatible[hundo.PieceTypeEnum.SAND] = [
     hundo.PieceTypeEnum.BALL,
     hundo.PieceTypeEnum.ICE,
     hundo.PieceTypeEnum.GBLOCK
-]
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.PORTAL] = [
+hundo.compatible[hundo.PieceTypeEnum.PORTAL] = [
     hundo.PieceTypeEnum.BALL,
     hundo.PieceTypeEnum.ICE,
-]
+];
 
-hundo.Board.compatible[hundo.PieceTypeEnum.PIP] = [
+hundo.compatible[hundo.PieceTypeEnum.PIP] = [
     hundo.PieceTypeEnum.BALL,
     hundo.PieceTypeEnum.ICE,
-]
+];
 
 /**
  * Functionality common to all pieces
@@ -422,35 +422,35 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     var THIS = this;
-    var neighbors = board.gblocks[this.groupId];
+    var members = board.gblocks[this.groupId];
     var totalSuccess = true;
     var totalAnimations = [];
     var totalMoves = [];
 
     // TODO: s/neighbor/member/g
-    function pushNeighbors() {
+    function pushMembers() {
 
         // clear out memoization
-        _.each(neighbors, function(neighbor) {
-            neighbor.result = undefined;
-            neighbor.pushingDir = message.dir;
+        _.each(members, function(member) {
+            member.result = undefined;
+            member.pushingDir = message.dir;
         });
 
         // push every member of this gblock's group
-        _.each(neighbors, function(neighbor) {
+        _.each(members, function(member) {
 
-            // TODO: shouldn't this be neighbor.row + dr, etc.?
+            // TODO: shouldn't this be member.row + dr, etc.?
             var newMessage = {
                 sender: THIS,
                 forwarder: THIS,
                 dir: message.dir,
-                newRow: neighbor.row,
-                newCol: neighbor.col,
+                newRow: member.row,
+                newCol: member.col,
             }
 
-            // Send message directly to neighbor; otherwise, the message
+            // Send message directly to member; otherwise, the message
             // will go down and up, which would be incorrect
-            var [success, animations, moves] = neighbor.messageUp(board, newMessage);
+            var [success, animations, moves] = member.messageUp(board, newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
             totalMoves = _.concat(totalMoves, moves);
@@ -477,9 +477,9 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
         message.sender.groupId == this.groupId)) {
 
-        // TODO: put pushNeighbors code here
+        // TODO: put pushMembers code here
         if (this.pushingDir == hundo.DirectionEnum.NODIR) {
-            return pushNeighbors();
+            return pushMembers();
         } else {
             return [true, [], []];
         }
@@ -977,14 +977,14 @@ hundo.Board.prototype.clearCell = function(row, col) {
 
 }
 
-// hundo.Board.compatible[piece.type] == the array of pieces that are
+// hundo.compatible[piece.type] == the array of pieces that are
 // compatible with the piece. Compatibility means two pieces can occupy the
 // same cell.
 
 // Returns true iff piece1 and piece2 are compatible
 hundo.Board.isCompatible = function(piece1, piece2) {
 
-    var compatible = hundo.Board.compatible[piece1.type];
+    var compatible = hundo.compatible[piece1.type];
 
     var i = _.findIndex(compatible, function(p) {
         return piece2.type == p;
