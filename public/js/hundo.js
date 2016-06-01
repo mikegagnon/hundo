@@ -2161,10 +2161,6 @@ hundo.Viz.prototype.mousemove = function(x, y) {
         }
     } else {
         var piece = this.getPieceFromPalette(row, col);
-
-        /*if (!this.board.canAddPiece(piece)) {
-            return;
-        }*/
     }
 
     this.maker.mouseRow = row;
