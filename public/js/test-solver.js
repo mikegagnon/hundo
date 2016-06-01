@@ -7,7 +7,7 @@ TEST = "Solver"
 
 // These tests are slow, so comment them out unless testing Solver specifically
 
-
+/*
 
 // level-editor.html?level=fl7a-393a3b666e767e868eb9babb-271----
 var config = {"numRows":15,"numCols":21,"blocks":[{"row":3,"col":9},{"row":3,"col":10},{"row":3,"col":11},{"row":6,"col":6},{"row":6,"col":14},{"row":7,"col":6},{"row":7,"col":14},{"row":8,"col":6},{"row":8,"col":14},{"row":11,"col":9},{"row":11,"col":10},{"row":11,"col":11}],"goals":[{"row":2,"col":7,"dir":"DOWN"}],"ice":[],"arrows":[],"gblocks":[],"sand":[],"ball":{"row":7,"col":10}};
@@ -80,3 +80,4 @@ var solver = new hundo.Solver(board);
 assert(Object.compare(edges, solver.getCellEdges()))
 assert(Object.compare(winningEdges, solver.getCellWinningEdges()))
 
+*/

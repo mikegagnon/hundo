@@ -1668,23 +1668,30 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
+
+// TODO: remove duplicate edges
 hundo.Board.prototype.move = function(dir, returnEdges) {
 
     var edges = [];
 
     this.setDir(dir);
 
+    var [r1, c1] = [this.ball.row, this.ball.col];
+
     this.step();
 
     while (!this.done && !this.solved && !this.atRest) {
-        var [r1, c1] = [this.ball.row, this.ball.col];
         this.step();
         var [r2, c2] = [this.ball.row, this.ball.col];
 
-        if (!(r1 == r2 && c1 == c2)) {
+        if (!(r1 == r2 && c1 == c2) &&
+            !(r1 != r2 && c1 != c2)) {
             var edge = [[r1, c1], [r2, c2]];
             edges.push(edge);
         }
+
+        var [r1, c1] = [this.ball.row, this.ball.col];
+
     }
 
     if (returnEdges) {
@@ -1802,6 +1809,8 @@ hundo.Solver = function(board) {
 
     this.edges = [];
 
+    this.cellEdges = [];
+
     this.winningEdges = [];
 
     // TODO: rename to vertices
@@ -1863,13 +1872,14 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 }
 
 hundo.Solver.prototype.getCellEdges = function() {
-    return _.map(this.edges, function(edge) {
-        var [b1, b2] = edge;
+
+    // TODO: haveCellEdges be in this format already
+    return _.map(this.cellEdges, function(edge) {
         return {
-            row1: b1.ball.row,
-            col1: b1.ball.col,
-            row2: b2.ball.row,
-            col2: b2.ball.col
+            row1: edge[0][0],
+            col1: edge[0][1],
+            row2: edge[1][0],
+            col2: edge[1][1]
         }
     });
 }
@@ -1913,13 +1923,15 @@ hundo.Solver.prototype.explore = function(board) {
 
     _.each(boards, function(newBoard, i) {
 
-        var edge = [board, newBoard]
+        var edge = [board, newBoard];
 
         if (!THIS.hasExploredEdge(edge)) { 
 
             if (!THIS.hasExploredVertex(newBoard)) {
 
                 THIS.edges.push(edge);
+
+                THIS.cellEdges = _.concat(THIS.cellEdges, edges[i]);
 
                 var w = THIS.explore(newBoard) 
 
