@@ -1813,6 +1813,8 @@ hundo.Solver = function(board) {
 
     this.winningEdges = [];
 
+    this.cellWinningEdges = [];
+
     // TODO: rename to vertices
     this.boards = [];
 
@@ -1822,7 +1824,7 @@ hundo.Solver = function(board) {
         return;
     }
 
-    this.winningEdges = this.explore(board);
+    this.cellWinningEdges = this.explore(board);
 
     // used for generating test cases for solver
     console.log("Edges");
@@ -1885,18 +1887,18 @@ hundo.Solver.prototype.getCellEdges = function() {
 }
 
 hundo.Solver.prototype.getCellWinningEdges = function() {
-    return _.map(this.winningEdges, function(edge) {
-        var [b1, b2] = edge;
+    return _.map(this.cellWinningEdges, function(edge) {
         return {
-            row1: b1.ball.row,
-            col1: b1.ball.col,
-            row2: b2.ball.row,
-            col2: b2.ball.col
+            row1: edge[0][0],
+            col1: edge[0][1],
+            row2: edge[1][0],
+            col2: edge[1][1]
         }
     });
 
 }
 
+// BUG: file:///Users/xyz/workspace/hundo/public/index.html?level=fl22--7b3-2c--bd0cb0cc0cd0dd0-2425262i3i4i595a5f6f7fa7b7c7ci--
 hundo.Solver.prototype.explore = function(board) {
     if (this.edges.length >= this.maxEdges) {
         return [];
@@ -1919,7 +1921,7 @@ hundo.Solver.prototype.explore = function(board) {
 
     var THIS = this;
 
-    var winningEdges = [];
+    var cellWinningEdges = [];
 
     _.each(boards, function(newBoard, i) {
 
@@ -1935,16 +1937,16 @@ hundo.Solver.prototype.explore = function(board) {
 
                 var w = THIS.explore(newBoard) 
 
-                winningEdges = _.concat(winningEdges, w)
+                cellWinningEdges = _.concat(cellWinningEdges, w)
 
                 if (w.length > 0 || newBoard.solved) {
-                    winningEdges.push(edge);
+                    cellWinningEdges = _.concat(cellWinningEdges, edges[i]);
                 }
             }            
         }
     });
 
-    return winningEdges;
+    return cellWinningEdges;
 }
 
 
