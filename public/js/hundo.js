@@ -1830,10 +1830,12 @@ hundo.Solver = function(board) {
 
     this.edges = [];
 
+    this.cellEdgesSet = new Set();
     this.cellEdges = [];
 
     this.winningEdges = [];
 
+    this.cellWinningEdgesSet = new Set();
     this.cellWinningEdges = [];
 
     // TODO: rename to vertices
@@ -1954,7 +1956,17 @@ hundo.Solver.prototype.explore = function(board) {
 
                 THIS.edges.push(edge);
 
+                _.remove(edges[i], function(edge){
+                    return THIS.cellEdgesSet.has(String(edge));
+                });
+
                 THIS.cellEdges = _.concat(THIS.cellEdges, edges[i]);
+
+                _.each(edges[i], function(edge){
+                    THIS.cellEdgesSet.add(String(edge));
+                });
+
+
 
                 var w = THIS.explore(newBoard) 
 
