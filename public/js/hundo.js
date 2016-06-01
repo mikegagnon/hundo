@@ -1818,7 +1818,7 @@ Object.compare = function (obj1, obj2) {
 /**
  * Solver solves puzzles
  ******************************************************************************/
- 
+
 // Thank you Wikipedia!
 // https://en.wikipedia.org/wiki/Graph_traversal#Pseudocode
 
@@ -1894,20 +1894,8 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 
 hundo.Solver.prototype.getCellEdges = function() {
 
-    var edgesSet = new Set();
-
-    var edges = _.flatMap(this.cellEdges, function(edge){
-        if (edgesSet.has(String(edge))) {
-            return [];
-        } else {
-            edgesSet.add(String(edge));
-            return [edge];
-        }
-    });
-
-
     // TODO: haveCellEdges be in this format already
-    return _.map(edges, function(edge) {
+    return _.map(this.cellEdges, function(edge) {
         return {
             row1: edge[0][0],
             col1: edge[0][1],
@@ -1919,19 +1907,7 @@ hundo.Solver.prototype.getCellEdges = function() {
 
 hundo.Solver.prototype.getCellWinningEdges = function() {
 
-
-    var winningEdgesSet = new Set();
-
-    var winningEdges = _.flatMap(this.cellWinningEdges, function(edge){
-        if (winningEdgesSet.has(String(edge))) {
-            return [];
-        } else {
-            winningEdgesSet.add(String(edge));
-            return [edge];
-        }
-    });
-
-    return _.map(winningEdges, function(edge) {
+    return _.map(this.cellWinningEdges, function(edge) {
         return {
             row1: edge[0][0],
             col1: edge[0][1],
@@ -3027,7 +3003,7 @@ hundo.Viz.prototype.drawSolution = function() {
 
     if (this.maker.showGraph) {
         this.drawEdges(solver.getCellEdges(),
-            "stroke:#FFF;stroke-width:1;opacity:0.4");
+            "stroke:#888;stroke-width:1;opacity:1.0");
     }
 
     this.drawEdges(solver.getCellWinningEdges(),
