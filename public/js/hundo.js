@@ -997,6 +997,12 @@ hundo.Board.prototype.canAddPiece = function(piece) {
         }
     }
 
+    if (piece.type == hundo.PieceTypeEnum.BALL) {
+        if (this.getBalls().length > 0) {
+            return false;
+        }
+    }
+
     if (numPieces == 0) {
         return true;
     } else if (numPieces == 2) {
@@ -1010,6 +1016,8 @@ hundo.Board.prototype.canAddPiece = function(piece) {
     }
 }
 
+
+// TODO refactor
 hundo.Board.prototype.addPiece = function(piece) {
 
     if (this.canAddPiece(piece)) {
@@ -2431,7 +2439,7 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
         this.animateSolvedQuick();
 
         this.board.clearCell(row, col);
-        if (!this.board.addPiece(piece)) {
+        if (!this.board.addPiece(piece) && piece.type != hundo.PieceTypeEnum.BALL) {
             console.error("This code shouldn't be reachable");
         }
 
