@@ -1830,12 +1830,10 @@ hundo.Solver = function(board) {
 
     this.edges = [];
 
-    this.cellEdgesSet = new Set();
     this.cellEdges = [];
 
     this.winningEdges = [];
 
-    this.cellWinningEdgesSet = new Set();
     this.cellWinningEdges = [];
 
     // TODO: rename to vertices
@@ -1898,8 +1896,20 @@ hundo.Solver.prototype.hasExploredEdge = function(edge1) {
 
 hundo.Solver.prototype.getCellEdges = function() {
 
+    var edgesSet = new Set();
+
+    var edges = _.flatMap(this.cellEdges, function(edge){
+        if (edgesSet.has(String(edge))) {
+            return [];
+        } else {
+            edgesSet.add(String(edge));
+            return [edge];
+        }
+    });
+
+
     // TODO: haveCellEdges be in this format already
-    return _.map(this.cellEdges, function(edge) {
+    return _.map(edges, function(edge) {
         return {
             row1: edge[0][0],
             col1: edge[0][1],
@@ -1910,7 +1920,20 @@ hundo.Solver.prototype.getCellEdges = function() {
 }
 
 hundo.Solver.prototype.getCellWinningEdges = function() {
-    return _.map(this.cellWinningEdges, function(edge) {
+
+
+    var winningEdgesSet = new Set();
+
+    var winningEdges = _.flatMap(this.cellWinningEdges, function(edge){
+        if (winningEdgesSet.has(String(edge))) {
+            return [];
+        } else {
+            winningEdgesSet.add(String(edge));
+            return [edge];
+        }
+    });
+
+    return _.map(winningEdges, function(edge) {
         return {
             row1: edge[0][0],
             col1: edge[0][1],
@@ -1956,17 +1979,7 @@ hundo.Solver.prototype.explore = function(board) {
 
                 THIS.edges.push(edge);
 
-                _.remove(edges[i], function(edge){
-                    return THIS.cellEdgesSet.has(String(edge));
-                });
-
                 THIS.cellEdges = _.concat(THIS.cellEdges, edges[i]);
-
-                _.each(edges[i], function(edge){
-                    THIS.cellEdgesSet.add(String(edge));
-                });
-
-
 
                 var w = THIS.explore(newBoard) 
 
