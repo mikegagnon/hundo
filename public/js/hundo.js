@@ -645,282 +645,6 @@ hundo.Pip.prototype.eq = function(piece) {
         this.right == piece.right;
 }
 
-
-/**
- * Cluster provides functionality for dealing with interdependencies
- * between gblock groups during step
- *
- * A gblock group (A) depends on group (B), in direction (Dir), iff:
- * group (A) would bump into group (B) if pushed in direction (Dir)
- *
- * It is possible for (A) and (B) to be mutually dependent
- *
- * For example:
- *    B
- *   ABA   are mutually dependent for directions left and right
- *   AAA
- *
- * Mutually dependent groups form clusters.
- ******************************************************************************/
-hundo.Cluster = function(board) {
-
-    // groupIds is an array containing every groupId for every set of gblocks
-    var groupIds = _.keysIn(board.gblocks);
-
-    // iceMembers[dir][groupId] = the ice group for direction dir (associated
-    // with groupId), where an ice  group is an array of ice pieces, such that
-    // the pieces form a contiguous line of adjacent ice pieces in direction dir
-
-    var [iceGroupIds, iceMembers] = hundo.Cluster.getIceGroups(board);
-
-    groupIds = _.concat(groupIds, iceGroupIds);
-
-    // this.depends[groupId][dir] == the set of groupIds that groupId
-    // __directly__ depends upon in direction dir.
-    //
-    // For example if A would bump into B in direction LEFT, then
-    // this.dependsp[A][LEFT] = Set(B)
-    this.depends = hundo.Cluster.directDepends(board, groupIds, iceMembers);
-
-    // this.depends[groupId][dir] == the transitive closure of depends.
-    // E.g. if A depends on B, and B depends on C, in direction LEFT, then
-    // this.depends[A][LEFT] == Set(B, C)
-    this.depends = hundo.Cluster.transitiveClosure(board, groupIds,
-        this.depends);
-
-    // this.cluster[a][dir] == an array of groupIds that are in a's cluster for
-    // direction dir.
-    //
-    // A cluster is a collection of groupIds for which, every groupId
-    // in the cluster in dependent on every other groupId in the cluster
-    this.cluster = hundo.Cluster.cluster(groupIds, this.depends);
-
-    // this.clusterMembers[a][dir] == an array of glbock pieces such that
-    // every gblock piece for every group in this.cluster[a][dir] is included
-    // in this.clusterMembers[a][dir].
-    //
-    // In other words, all the gblock pieces in this.cluster[a][dir].
-    this.clusterMembers = hundo.Cluster.clusterMembers(groupIds,
-        board, this.cluster);
-}
-
-hundo.Cluster.getIceGroups = function(board) {
-
-    var pieces = board.getIce();
-
-    var groupNum = 0;
-
-    var groupIds = [];
-
-    var iceMembers = {}
-
-    _.each(hundo.FourDirections, function(dir) {
-        iceMembers[dir] = {};
-    });
-
-    // reset ice groups
-    _.each(hundo.FourDirections, function(dir) {
-        _.each(pieces, function(ice) {
-            ice.groupId = {};
-        });
-    });
-
-    _.each(hundo.FourDirections, function(dir) {
-        _.each(pieces, function(ice) {
-
-            // E.g., if dir == right, then oppositeRow, oppositeCol is the
-            // the coordinates for the cell to the left
-            var [oppositeRow, oppositeCol] = hundo.Board.dirRowCol(
-                hundo.oppositeDir(dir), ice.row, ice.col);
-
-            var [top, bottom] = board.getTopBottom(oppositeRow, oppositeCol);
-
-            if (!top || top.type != hundo.PieceTypeEnum.ICE) {
-                hundo.Cluster.markIceGroup(board, ice.row, ice.col, dir,
-                    groupNum, iceMembers);
-                groupIds.push("iceGroup" + groupNum);
-                groupNum++;
-            }
-        });
-    });
-
-    return [groupIds, iceMembers];
-}
-
-// TODO: is setting ice.groupId necessary?
-// TODO: .groupId[dir ]
-hundo.Cluster.markIceGroup = function(board, row, col, dir, groupNum,
-        iceMembers) {
-
-    var groupId = "iceGroup" + groupNum;
-
-    iceMembers[dir][groupId] = [];
-
-    var [top, bottom] = board.getTopBottom(row, col);
-
-    while (top && top.type == hundo.PieceTypeEnum.ICE) {
-
-        if (!top.groupId) {
-            top.groupId = {};
-        }
-
-        iceMembers[dir][groupId].push(top);
-        top.groupId[dir] = groupId;
-        [row, col] = hundo.Board.dirRowCol(dir, row, col);
-        var [top, bottom] = board.getTopBottom(row, col);
-
-    }
-
-}
-
-// depends[groupIdA][Dir] == an array of groupIdB's, for which groupIdA
-// directly depends on groupIdB for direction Dir
-hundo.Cluster.directDepends = function(board, groupIds, iceMembers) {
-
-    depends = {};
-
-    _.each(groupIds, function(a) {
-
-        depends[a] = {};
-
-        _.each(hundo.FourDirections, function(dir){
-
-            depends[a][dir] = new Set([]);
-
-            var aMembers;
-
-            if (a.startsWith("iceGroup")) {
-                aMembers = iceMembers[dir][a];
-            } else {
-                aMembers = board.gblocks[a];
-            }
-
-            _.each(aMembers, function(aMember) {
-
-                var [aRow, aCol] = [aMember.row, aMember.col];
-                var [bRow, bCol] = hundo.Board.dirRowCol(dir, aRow, aCol);
-
-                if (board.inBounds(bRow, bCol)) {
-
-                    var top = board.matrix[bRow][bCol][hundo.LayerEnum.TOP];
-
-                    if (top) {
-
-                        if (top.type == hundo.PieceTypeEnum.GBLOCK &&
-                            top.groupId != a) {
-                            depends[a][dir].add(String(top.groupId));
-                        }
-
-                        else if (top.type == hundo.PieceTypeEnum.ICE &&
-                            top.groupId[dir] != a) {
-                            depends[a][dir].add(String(top.groupId[dir]));
-                        }
-
-                    }
-
-                }
-            });
-
-        });
-    });
-
-    return depends;
-}
-
-// Compute the transitive closure for the dependencies.
-// In other words, if A depends on B, and B depends on C, then have A
-// depend on C as well.
-hundo.Cluster.transitiveClosure = function(board, groupIds, depends) {
-
-    _.each(groupIds, function(x) {
-        _.each(groupIds, function(a) {
-            _.each(groupIds, function(b) {
-                _.each(hundo.FourDirections, function(dir){
-    
-                    // If A depends on B
-                    if (depends[a][dir].has(String(b))) {
-
-                        // Then A depends on B's dependencies
-                        depends[b][dir].forEach(function(c) {
-                            depends[a][dir].add(String(c));
-                        });
-                    }
-
-                });
-            });
-        });
-    });
-
-    return depends;
-}
-
-// this.cluster[a] == an array of groupIds that are in a's cluster.
-hundo.Cluster.cluster = function(groupIds, depends) {
-
-    var cluster = {}
-
-    _.each(groupIds, function(a) {
-
-        cluster[a] = {};
-
-        _.each(hundo.FourDirections, function(dir){
-
-            cluster[a][dir] = new Set();
-            cluster[a][dir].add(String(a));
-
-            // If A depends on itself, then there is a cycle.
-            // Every group in the cycle is part of the same cluster
-            if (depends[a][dir].has(String(a))) {
-
-                // For each of a's dependencies
-                _.each(Array.from(depends[a][dir]), function(b) {
-
-                    // IF b depends on a
-                    if (depends[b][dir].has(String(b))) {
-
-                        cluster[a][dir].add(String(b))
-                    }
-                })
-            } 
-        });
-    });
-
-    return cluster;
-}
-
-// Computes this.clusterMembers
-// this.clusterMembers[a][dir] == an array containing every member
-// of every group in this.cluster[a][dir]
-hundo.Cluster.clusterMembers = function(groupIds, board, cluster) {
-
-    clusterMembers = {};
-
-    _.each(groupIds, function(a){
-        
-        clusterMembers[a] = {};
-        
-        _.each(hundo.FourDirections, function(dir){
-            var groups = cluster[a][dir];
-
-            clusterMembers[a][dir] = board.getPieces( function(piece) {
-                    return (
-
-                        (piece.type == hundo.PieceTypeEnum.GBLOCK &&
-                        groups.has(String(piece.groupId)))
-
-                        ||
-                        
-                        (piece.type == hundo.PieceTypeEnum.ICE &&
-                        groups.has(String(piece.groupId[dir])))
-
-                        );
-                });
-        });
-    });
-
-    return clusterMembers;
-}
-
 /**
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
@@ -1041,7 +765,6 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-    this.cluster = new hundo.Cluster(this);
 }
 
 hundo.Board.prototype.inBounds = function(row, col) {
@@ -1805,7 +1528,6 @@ hundo.Board.prototype.step = function() {
         gblock.pushingDir = hundo.DirectionEnum.NODIR;
     });
 
-    this.cluster = new hundo.Cluster(this);
 
     var direction = this.ball.dir;
 
@@ -1873,17 +1595,6 @@ hundo.Board.prototype.step = function() {
         // recipients is the array of pieces that will be animated in the
         // collision
         var recipients = [];
-
-        // select all members of a cluster to have an animated collision
-        var [top, bottom] = this.getTopBottom(newRow, newCol);
-        if (top && top.type == hundo.PieceTypeEnum.GBLOCK) {
-            var gblock = top;
-            var group = this.cluster.clusterMembers[gblock.groupId];
-            if (group) {
-                var members = group[this.ball.dir];
-                recipients = _.concat(recipients, members);
-            }
-        } 
 
         this.ball.dir = hundo.DirectionEnum.NODIR;
         this.atRest = true;
@@ -2646,7 +2357,6 @@ hundo.Viz.prototype.clickBoard = function(x, y) {
     var piece = this.getPieceFromPalette(row, col);
 
     if (this.board.addPiece(piece)) {
-        this.board.cluster = new hundo.Cluster(this.board);
         this.animateSolvedQuick();
         this.drawBoardQuick();
         this.removeHighlight();
