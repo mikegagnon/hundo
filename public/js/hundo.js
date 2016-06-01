@@ -130,49 +130,61 @@ hundo.Ball.prototype.eq = function(piece) {
 
 hundo.Ball.prototype.messageUp = function(board, message) {
 
-    // When a keypress leads to ball.pushInto, sender is empty.
-    // So, when there is a sender, it means another piece is pushing into the 
-    // ball.
-    if (message.sender) {
-        // TODO: implement version that allows pushes from other pieces
-        return [false, [], []];        
-    }
+    var success;
+    var animations = [];
+    var moves = [];
 
-    var [newRow, newCol] = hundo.Board.dirRowCol(
-        message.dir, this.row, this.col);
+    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
 
-    var newMessage = {
-        sender: this,
-        forwarder: this,
-        dir: message.dir,
-        newRow: newRow,
-        newCol: newCol
-    }
+        this.pushingDir = message.dir;
 
-    var [success, animations, moves] = board.messageDown(newMessage);
+        // When a keypress leads to ball.pushInto, sender is empty.
+        // So, when there is a sender, it means another piece is pushing into the 
+        // ball.
+        if (message.sender) {
+            // TODO: implement version that allows pushes from other pieces
+            return [false, [], []];        
+        }
 
-    if (success) {
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, this.row, this.col);
 
-        moves.push({
-            piece: this,
-            newRow: newMessage.newRow,
-            newCol: newMessage.newCol
-        });
+        var newMessage = {
+            sender: this,
+            forwarder: this,
+            dir: message.dir,
+            newRow: newRow,
+            newCol: newCol
+        }
 
-        // TODO: change the dir only upon success, like moves
-        this.dir = newMessage.dir;
+        var [success, animations, moves] = board.messageDown(newMessage);
 
-        // TODO: remove quotes from all keys
-        animations.push(
-            {
-                move: {
-                    ball: this,
-                    dir: this.dir,
-                }
+        if (success) {
+
+            moves.push({
+                piece: this,
+                newRow: newMessage.newRow,
+                newCol: newMessage.newCol
             });
 
-    }
+            // TODO: change the dir only upon success, like moves
+            this.dir = newMessage.dir;
 
+            // TODO: remove quotes from all keys
+            animations.push(
+                {
+                    move: {
+                        ball: this,
+                        dir: this.dir,
+                    }
+                });
+
+        }
+    } else if (this.pushingDir == message.dir) {
+        success = true;
+    } else {
+        success = false;
+    }
 
     return [success, animations, moves];
 }
@@ -1527,6 +1539,8 @@ hundo.Board.prototype.step = function() {
     _.each(this.getGblocks(), function(gblock) {
         gblock.pushingDir = hundo.DirectionEnum.NODIR;
     });
+
+    this.ball.pushingDir = hundo.DirectionEnum.NODIR;
 
 
     var direction = this.ball.dir;

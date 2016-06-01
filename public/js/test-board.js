@@ -798,6 +798,23 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.UP);
 assert(board1.eq(board2));
 
+// Ball mutually dependent with gblocks
+// level-editor.html?level=flaa----5a0-8a0-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":1,"col":2,"groupId":0},{"row":1,"col":3,"groupId":0},{"row":2,"col":3,"groupId":0},{"row":3,"col":2,"groupId":0},{"row":3,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[],"ball":{"row":2,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[],"arrows":[],"gblocks":[{"row":12,"col":2,"groupId":0},{"row":12,"col":3,"groupId":0},{"row":13,"col":3,"groupId":0},{"row":14,"col":2,"groupId":0},{"row":14,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[],"ball":{"row":13,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
+
+// Ball, ice, & gblocks mutually dependent with each other
+// level-editor.html?level=flaa----5a0-8a0-
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":1,"col":2},{"row":3,"col":2}],"arrows":[],"gblocks":[{"row":0,"col":2,"groupId":0},{"row":0,"col":3,"groupId":0},{"row":1,"col":3,"groupId":0},{"row":2,"col":3,"groupId":0},{"row":3,"col":3,"groupId":0},{"row":4,"col":2,"groupId":0},{"row":4,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[],"ball":{"row":2,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":11,"col":2},{"row":13,"col":2}],"arrows":[],"gblocks":[{"row":10,"col":2,"groupId":0},{"row":10,"col":3,"groupId":0},{"row":11,"col":3,"groupId":0},{"row":12,"col":3,"groupId":0},{"row":13,"col":3,"groupId":0},{"row":14,"col":2,"groupId":0},{"row":14,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[],"ball":{"row":12,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
 
 /**
  * Sand
