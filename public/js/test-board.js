@@ -816,6 +816,16 @@ var board2 = new hundo.Board(config2, idGen);
 board1.move(hundo.DirectionEnum.DOWN);
 assert(board1.eq(board2));
 
+// gblock and ice attempt to move into same square
+// level-editor.html?level=fl22---4252627282--320330---a21001a31010
+var config1 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":4,"col":2},{"row":5,"col":2},{"row":6,"col":2},{"row":7,"col":2},{"row":8,"col":2}],"arrows":[],"gblocks":[{"row":3,"col":2,"groupId":0},{"row":3,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[{"row":10,"col":2,"up":true,"down":false,"left":false,"right":true},{"row":10,"col":3,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":2,"col":2}};
+var config2 = {"numRows":15,"numCols":21,"blocks":[],"goals":[],"ice":[{"row":8,"col":2},{"row":9,"col":2},{"row":9,"col":3},{"row":10,"col":2},{"row":10,"col":3}],"arrows":[],"gblocks":[{"row":7,"col":2,"groupId":0},{"row":7,"col":3,"groupId":0}],"sand":[],"portals":[],"pips":[{"row":10,"col":2,"up":true,"down":false,"left":false,"right":true},{"row":10,"col":3,"up":true,"down":false,"left":true,"right":false}],"ball":{"row":6,"col":2}};
+var board1 = new hundo.Board(config1, idGen);
+var board2 = new hundo.Board(config2, idGen);
+board1.move(hundo.DirectionEnum.DOWN);
+assert(board1.eq(board2));
+
+
 /**
  * Sand
  **************************************************/

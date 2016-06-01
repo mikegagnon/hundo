@@ -1527,6 +1527,24 @@ hundo.Board.prototype.checkSolved = function() {
     }
 }
 
+// What if two pieces attempt to move into the same cell?
+// See for example level-editor.html?level=fl22---4252627282--320330---a21001a31010
+// movesClobber detects such collisions, returning true iff there is a collision
+hundo.Board.movesClobber = function(moves) {
+
+    var destinations = _.map(moves, function(move){
+        return move.newRow + "," + move.newCol;
+    });
+
+    var destinationSet = new Set(destinations);
+
+    if (destinationSet.size == moves.length) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 // returns null on fatal error
 // else, returns an animation object, which describes how the
 // the step should be animated
@@ -1560,6 +1578,10 @@ hundo.Board.prototype.step = function() {
             newRow: this.ball.row,
             newCol: this.ball.col,
         })
+
+    if (hundo.Board.movesClobber(moves)) {
+        success = false;
+    }
 
     // Check for out of bounds
     if (!this.inBounds(this.ball.row, this.ball.col)) {
