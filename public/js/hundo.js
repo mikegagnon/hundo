@@ -1538,11 +1538,7 @@ hundo.Board.movesClobber = function(moves) {
 
     var destinationSet = new Set(destinations);
 
-    if (destinationSet.size == moves.length) {
-        return false;
-    } else {
-        return true;
-    }
+    return destinationSet.size != moves.length;
 }
 
 // returns null on fatal error
