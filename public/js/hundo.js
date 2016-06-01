@@ -2032,6 +2032,7 @@ hundo.Viz = function(config) {
             type: hundo.PieceTypeEnum.BLOCK
         };
 
+
     } else {
         this.levels = config.levels;
     }
@@ -2487,9 +2488,10 @@ hundo.Viz.prototype.addResetButton = function() {
      $("#" + this.consoleId()).append(resetButton);
 }
 
+// TODO: id incorpoates viz id
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
-        <img src="img/${image}.png"
+        <img src="img/${image}.png" id="${hundo.Viz.getPalettePieceId(config.id)}"
             onclick='hundo.clickPalette(${this.id}, ${JSON.stringify(config)})'
             onmouseover=""
             style="cursor: pointer; width: ${this.vizConfig.cellSize}px;
@@ -2502,143 +2504,165 @@ hundo.Viz.prototype.addPalette = function() {
         {
             image: "delete",
             config: {
-                delete: true
-            }
+                delete: true,
+                id: 1
+
+            },
         },
         {
             image: "ball",
             config: {
-                type: hundo.PieceTypeEnum.BALL
-            }
+                type: hundo.PieceTypeEnum.BALL,
+                id: 2
+            },
         },
         {
             image: "block",
             config: {
-                type: hundo.PieceTypeEnum.BLOCK
-            }
+                type: hundo.PieceTypeEnum.BLOCK,
+                id: 3
+            },
         },
         {
             image: "goal-up",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
-                dir: hundo.DirectionEnum.UP
+                dir: hundo.DirectionEnum.UP,
+                id: 4
             }
         },
         {
             image: "goal-down",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
-                dir: hundo.DirectionEnum.DOWN
+                dir: hundo.DirectionEnum.DOWN,
+                id: 5
             }
         },
         {
             image: "goal-left",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
-                dir: hundo.DirectionEnum.LEFT
+                dir: hundo.DirectionEnum.LEFT,
+                id: 6
             }
         },
         {
             image: "goal-right",
             config: {
                 type: hundo.PieceTypeEnum.GOAL,
-                dir: hundo.DirectionEnum.RIGHT
+                dir: hundo.DirectionEnum.RIGHT,
+                id: 7
             }
         },
         {
             image: "ice",
             config: {
-                type: hundo.PieceTypeEnum.ICE
+                type: hundo.PieceTypeEnum.ICE,
+                id: 8
             }
         },
         {
             image: "arrow-up",
             config: {
                 type: hundo.PieceTypeEnum.ARROW,
-                dir: hundo.DirectionEnum.UP
+                dir: hundo.DirectionEnum.UP,
+                id: 9
             }
         },
         {
             image: "arrow-down",
             config: {
                 type: hundo.PieceTypeEnum.ARROW,
-                dir: hundo.DirectionEnum.DOWN
+                dir: hundo.DirectionEnum.DOWN,
+                id: 10
             }
         },
         {
             image: "arrow-left",
             config: {
                 type: hundo.PieceTypeEnum.ARROW,
-                dir: hundo.DirectionEnum.LEFT
+                dir: hundo.DirectionEnum.LEFT,
+                id: 11
             }
         },
         {
             image: "arrow-right",
             config: {
                 type: hundo.PieceTypeEnum.ARROW,
-                dir: hundo.DirectionEnum.RIGHT
+                dir: hundo.DirectionEnum.RIGHT,
+                id: 12
             }
         },
         {
             image: "gblock-0",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupId: 0
+                groupId: 0,
+                id: 13
             }
         },
         {
             image: "gblock-1",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupId: 1
+                groupId: 1,
+                id: 14
             }
         },
         {
             image: "gblock-2",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupId: 2
+                groupId: 2,
+                id: 15
             }
         },
         {
             image: "gblock-3",
             config: {
                 type: hundo.PieceTypeEnum.GBLOCK,
-                groupId: 3
+                groupId: 3,
+                id: 16
             }
         },
         {
             image: "sand",
             config: {
-                type: hundo.PieceTypeEnum.SAND
+                type: hundo.PieceTypeEnum.SAND,
+                id: 17
             }
         },
         {
             image: "portal-0",
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
-                groupId: 0
+                groupId: 0,
+                id: 18
             }
         },
         {
             image: "portal-1",
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
-                groupId: 1
+                groupId: 1,
+                id: 19
             }
         },
         {
             image: "portal-2",
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
-                groupId: 2
+                groupId: 2,
+                id: 20
             }
         },
         {
             image: "portal-3",
             config: {
                 type: hundo.PieceTypeEnum.PORTAL,
-                groupId: 3
+                groupId: 3,
+                id: 21
             }
         },
 
@@ -2650,7 +2674,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: false,
                 down: false,
                 left: true,
-                right: true
+                right: true,
+                id: 22
             }
         },
         {
@@ -2660,7 +2685,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: true,
                 left: false,
-                right: false
+                right: false,
+                id: 23
             }
         },
 
@@ -2671,7 +2697,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: false,
                 left: false,
-                right: true
+                right: true,
+                id: 24
             }
         },
         {
@@ -2681,7 +2708,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: false,
                 down: true,
                 left: false,
-                right: true
+                right: true,
+                id: 25
             }
         },
         {
@@ -2691,7 +2719,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: false,
                 down: true,
                 left: true,
-                right: false
+                right: false,
+                id: 26
             }
         },
         {
@@ -2701,7 +2730,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: false,
                 left: true,
-                right: false
+                right: false,
+                id: 27
             }
         },
 
@@ -2712,7 +2742,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: true,
                 left: false,
-                right: true
+                right: true,
+                id: 28
             }
         },
         {
@@ -2722,7 +2753,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: false,
                 down: true,
                 left: true,
-                right: true
+                right: true,
+                id: 29
             }
         },
         {
@@ -2732,7 +2764,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: true,
                 left: true,
-                right: false
+                right: false,
+                id: 30
             }
         },
         {
@@ -2742,7 +2775,8 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: false,
                 left: true,
-                right: true
+                right: true,
+                id: 31
             }
         },
         {
@@ -2752,17 +2786,10 @@ hundo.Viz.prototype.addPalette = function() {
                 up: true,
                 down: true,
                 left: true,
-                right: true
+                right: true,
+                id: 32
             }
         },
-
-
-
-
-
-
-
-
     ]
 
     var THIS = this;
@@ -2780,6 +2807,9 @@ hundo.Viz.prototype.addPalette = function() {
     var palette = $("<div/>").html(contents).contents();
 
     $("#" + this.consoleId()).append(palette);
+
+    this.clickPalette(buttons[2].config);
+
 }
 
 hundo.Viz.prototype.addSave = function() {
@@ -3746,8 +3776,23 @@ hundo.clickLevelBack = function(id) {
     hundo.vizz.prevLevel();
 }
 
+hundo.Viz.getPalettePieceId = function(id) {
+    return "palette-" + id;
+}
+
 hundo.Viz.prototype.clickPalette = function(config) {
+
+    $("#" + hundo.Viz.getPalettePieceId(this.paletteSelection.id))
+        .css("border-style", "")
+        .css("border-width", "")
+        .css("border-color", "");
+
     this.paletteSelection = config;
+
+    $("#" + hundo.Viz.getPalettePieceId(config.id))
+        .css("border-style", "double")
+        .css("border-width", "5px")
+        .css("border-color", "#0F0");
 }
 
 hundo.clickPalette = function(id, config) {
