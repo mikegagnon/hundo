@@ -3155,7 +3155,7 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
         .attr("cy", this.vizConfig.cellSize / 2)
         .attr("rx", this.vizConfig.cellSize / 2)
         .attr("ry", this.vizConfig.cellSize / 2)
-        .attr("style", "fill:#eee")
+        .attr("style", "fill:#eee; stroke-width: 1px; stroke: #000")
         .attr("class", "ball")
         .attr("id", hundo.Viz.pieceId)
         .attr("transform", function(piece) {
