@@ -1668,16 +1668,30 @@ hundo.Board.prototype.step = function() {
     } 
 }
 
-hundo.Board.prototype.move = function(dir) {
+hundo.Board.prototype.move = function(dir, returnEdges) {
+
+    var edges = [];
+
     this.setDir(dir);
 
     this.step();
 
     while (!this.done && !this.solved && !this.atRest) {
+        var [r1, c1] = [this.ball.row, this.ball.col];
         this.step();
+        var [r2, c2] = [this.ball.row, this.ball.col];
+
+        if (!(r1 == r2 && c1 == c2)) {
+            var edge = [[r1, c1], [r2, c2]];
+            edges.push(edge);
+        }
     }
 
-    return this;
+    if (returnEdges) {
+        return [this, edges];
+    } else {
+        return this;
+    }
 }
 
 // Deep copy the board
@@ -1802,12 +1816,10 @@ hundo.Solver = function(board) {
     this.winningEdges = this.explore(board);
 
     // used for generating test cases for solver
-    /*
     console.log("Edges");
     console.log(JSON.stringify(this.getCellEdges()));
     console.log("Winning edges")
     console.log(JSON.stringify(this.getCellWinningEdges()));
-    */
 
 }
 
@@ -1888,11 +1900,12 @@ hundo.Solver.prototype.explore = function(board) {
     }
 
     var boards = [];
+    var edges = [];
 
-    boards[0] = board.clone().move(hundo.DirectionEnum.UP);
-    boards[1] = board.clone().move(hundo.DirectionEnum.DOWN);
-    boards[2] = board.clone().move(hundo.DirectionEnum.LEFT);
-    boards[3] = board.clone().move(hundo.DirectionEnum.RIGHT);
+    [boards[0], edges[0]] = board.clone().move(hundo.DirectionEnum.UP, true);
+    [boards[1], edges[1]] = board.clone().move(hundo.DirectionEnum.DOWN, true);
+    [boards[2], edges[2]] = board.clone().move(hundo.DirectionEnum.LEFT, true);
+    [boards[3], edges[3]] = board.clone().move(hundo.DirectionEnum.RIGHT, true);
 
     var THIS = this;
 
