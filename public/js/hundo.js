@@ -212,7 +212,6 @@ hundo.Ball.prototype.messageUp = function(board, message) {
         // So, when there is a sender, it means another piece is pushing into the 
         // ball.
         if (message.sender) {
-            // TODO: implement version that allows pushes from other pieces
             return [false, [], []];        
         }
 
@@ -237,10 +236,8 @@ hundo.Ball.prototype.messageUp = function(board, message) {
                 newCol: newMessage.newCol
             });
 
-            // TODO: change the dir only upon success, like moves
             this.dir = newMessage.dir;
 
-            // TODO: remove quotes from all keys
             animations.push(
                 {
                     move: {
@@ -345,9 +342,9 @@ hundo.Ice.prototype.messageUp = function(board, message) {
 
             animations.push(
                 {
-                    "move": {
-                        "ice": this,
-                        "dir": message.dir,
+                    move: {
+                        ice: this,
+                        dir: message.dir,
                     }
                 });
         }
@@ -525,9 +522,9 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
             animations.push(
                 {
-                    "move": {
-                        "gblock": this,
-                        "dir": message.dir,
+                    move: {
+                        gblock: this,
+                        dir: message.dir,
                     }
                 });
         }
@@ -1639,10 +1636,10 @@ hundo.Board.prototype.step = function() {
         this.movePiece(this.ball, this.ball.row, this.ball.col);
 
         return [{
-            "move": {
-                "ball": this.ball,
-                "dir": direction,
-                "solved": false
+            move: {
+                ball: this.ball,
+                dir: direction,
+                solved: false
             },
         }];
     }
@@ -1710,9 +1707,9 @@ hundo.Board.prototype.step = function() {
         }
 
         return [{
-            "collide": {
-                "dir": direction,
-                "recipients": recipients
+            collide: {
+                dir: direction,
+                recipients: recipients
             }
         }];
     } 
@@ -3462,7 +3459,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
         $("#" + this.levelBackButtonId())
             .css({
                 color: "#000",
-                "cursor": "pointer"
+                cursor: "pointer"
             });
     } else {
         $("#" + this.levelBackButtonId())
@@ -3476,7 +3473,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
         $("#" + this.levelForwardButtonId())
             .css({
                 color: "#000",
-                "cursor": "pointer"
+                cursor: "pointer"
             });
     } else {
         $("#" + this.levelForwardButtonId())
