@@ -51,6 +51,7 @@ hundo.FourDirections = [
     hundo.DirectionEnum.LEFT,
     hundo.DirectionEnum.RIGHT];
 
+
 hundo.oppositeDir = {}
 hundo.oppositeDir[hundo.DirectionEnum.UP] = hundo.DirectionEnum.DOWN;
 hundo.oppositeDir[hundo.DirectionEnum.DOWN] = hundo.DirectionEnum.UP;
@@ -61,6 +62,60 @@ hundo.LayerEnum = {
     TOP: "TOP",
     BOTTOM: "BOTTOM"
 }
+
+
+// Two pieces are compatible iff they may occupy the same cell at the same time
+// hundo.board.compatible[pieceType] == a list containing all the pieces
+// that are compatible with pieceType
+hundo.Board.compatible = {}
+
+hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
+    hundo.PieceTypeEnum.ARROW,
+    hundo.PieceTypeEnum.SAND,
+    hundo.PieceTypeEnum.GOAL,
+    hundo.PieceTypeEnum.PORTAL,
+    hundo.PieceTypeEnum.PIP
+]
+
+hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
+
+hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
+    hundo.PieceTypeEnum.ARROW,
+    hundo.PieceTypeEnum.SAND,
+    hundo.PieceTypeEnum.GOAL,
+    hundo.PieceTypeEnum.PORTAL,
+    hundo.PieceTypeEnum.PIP
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.ARROW] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.GBLOCK] = [
+    hundo.PieceTypeEnum.SAND
+],
+
+hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+    hundo.PieceTypeEnum.GBLOCK
+]
+
+hundo.Board.compatible[hundo.PieceTypeEnum.PORTAL] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+]
+
+hundo.Board.compatible[hundo.PieceTypeEnum.PIP] = [
+    hundo.PieceTypeEnum.BALL,
+    hundo.PieceTypeEnum.ICE,
+]
 
 /**
  * Functionality common to all pieces
@@ -88,6 +143,7 @@ hundo.equalsTypeRowCol = function(a, b) {
  * Block board pieces
  ******************************************************************************/
 
+// TODO: where to but this commentary
 // There are two types of pieces: bottom pieces and top pieces.
 //
 //      - Bottom pieces are stationary. For example: sand, pips, and goals
@@ -97,6 +153,11 @@ hundo.equalsTypeRowCol = function(a, b) {
 // say that the top piece and the bottom piece may occupy the same cell
 // at the same time.
 
+
+
+/**
+ * Block piece
+ ******************************************************************************/
 
 // id is a uuid relative to board pieces
 hundo.Block = function(row, col) {
@@ -118,7 +179,7 @@ hundo.Block.prototype.eq = function(piece) {
 }
 
 /**
- * Ball board piece
+ * Ball piece
  ******************************************************************************/
 
 hundo.Ball = function(row, col, dir) {
@@ -199,7 +260,7 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 }
 
 /**
- * Goal board pieces
+ * Goal piece
  ******************************************************************************/
 
 hundo.Goal = function(row, col, dir) {
@@ -236,7 +297,7 @@ hundo.Goal.prototype.messageUp = function(board, message) {
 }
 
 /**
- * Ice board piece
+ * Ice piece
  ******************************************************************************/
 
 hundo.Ice = function(row, col) {
@@ -301,7 +362,7 @@ hundo.Ice.prototype.messageUp = function(board, message) {
     return [success, animations, moves];
 }
 /**
- * Arrow board pieces
+ * Arrow piece
  ******************************************************************************/
 
 hundo.Arrow = function(row, col, dir) {
@@ -342,7 +403,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 }
 
 /**
- * Gblock board pieces
+ * Gblock piece
  ******************************************************************************/
 
 hundo.Gblock = function(row, col, groupId) {
@@ -406,6 +467,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     }
 
+    // TODO: eval this commentary
     // Two cases:
     //      1. A non-gblock bumps into this gblock, which case we bump
     //         all gblocks
@@ -474,7 +536,10 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     }
 }
 
-// id is a uuid relative to board pieces
+/**
+ * Sand piece
+ ******************************************************************************/
+
 hundo.Sand = function(row, col) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.SAND;
@@ -507,7 +572,9 @@ hundo.Sand.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece);
 }
 
-
+/**
+ * Portal piece
+ ******************************************************************************/
 
 hundo.Portal = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
@@ -577,6 +644,10 @@ hundo.Portal.prototype.eq = function(piece) {
         this.groupId == piece.groupId;
 }
 
+
+/**
+ * Pip piece
+ ******************************************************************************/
 
 // TODO: do we really need to store this.up, etc.?
 hundo.Pip = function(row, col, up, down, left, right) {
@@ -912,56 +983,6 @@ hundo.Board.prototype.clearCell = function(row, col) {
 // hundo.Board.compatible[piece.type] == the array of pieces that are
 // compatible with the piece. Compatibility means two pieces can occupy the
 // same cell.
-
-hundo.Board.compatible = {}
-
-hundo.Board.compatible[hundo.PieceTypeEnum.BALL] = [
-    hundo.PieceTypeEnum.ARROW,
-    hundo.PieceTypeEnum.SAND,
-    hundo.PieceTypeEnum.GOAL,
-    hundo.PieceTypeEnum.PORTAL,
-    hundo.PieceTypeEnum.PIP
-]
-
-hundo.Board.compatible[hundo.PieceTypeEnum.BLOCK] = []
-
-hundo.Board.compatible[hundo.PieceTypeEnum.ICE] = [
-    hundo.PieceTypeEnum.ARROW,
-    hundo.PieceTypeEnum.SAND,
-    hundo.PieceTypeEnum.GOAL,
-    hundo.PieceTypeEnum.PORTAL,
-    hundo.PieceTypeEnum.PIP
-],
-
-hundo.Board.compatible[hundo.PieceTypeEnum.GOAL] = [
-    hundo.PieceTypeEnum.BALL,
-    hundo.PieceTypeEnum.ICE
-],
-
-hundo.Board.compatible[hundo.PieceTypeEnum.ARROW] = [
-    hundo.PieceTypeEnum.BALL,
-    hundo.PieceTypeEnum.ICE
-],
-
-hundo.Board.compatible[hundo.PieceTypeEnum.GBLOCK] = [
-    hundo.PieceTypeEnum.SAND
-],
-
-hundo.Board.compatible[hundo.PieceTypeEnum.SAND] = [
-    hundo.PieceTypeEnum.BALL,
-    hundo.PieceTypeEnum.ICE,
-    hundo.PieceTypeEnum.GBLOCK
-]
-
-hundo.Board.compatible[hundo.PieceTypeEnum.PORTAL] = [
-    hundo.PieceTypeEnum.BALL,
-    hundo.PieceTypeEnum.ICE,
-]
-
-hundo.Board.compatible[hundo.PieceTypeEnum.PIP] = [
-    hundo.PieceTypeEnum.BALL,
-    hundo.PieceTypeEnum.ICE,
-]
 
 // Returns true iff piece1 and piece2 are compatible
 hundo.Board.isCompatible = function(piece1, piece2) {
