@@ -49,6 +49,12 @@ hundo.FourDirections = [
     hundo.DirectionEnum.LEFT,
     hundo.DirectionEnum.RIGHT];
 
+hundo.oppositeDir = {}
+hundo.oppositeDir[hundo.DirectionEnum.UP] = hundo.DirectionEnum.DOWN;
+hundo.oppositeDir[hundo.DirectionEnum.DOWN] = hundo.DirectionEnum.UP;
+hundo.oppositeDir[hundo.DirectionEnum.LEFT] = hundo.DirectionEnum.RIGHT;
+hundo.oppositeDir[hundo.DirectionEnum.RIGHT] = hundo.DirectionEnum.LEFT;
+
 hundo.LayerEnum = {
     TOP: "TOP",
     BOTTOM: "BOTTOM"
@@ -74,22 +80,6 @@ hundo.equalsTypeRowCol = function(a, b) {
     return a.type == b.type &&
         a.row == b.row &&
         a.col == b.col;
-}
-
-// TODO: where to put this function?
-hundo.oppositeDir = function(dir) {
-
-    if (dir == hundo.DirectionEnum.UP) {
-        return hundo.DirectionEnum.DOWN;
-    } else if (dir == hundo.DirectionEnum.DOWN) {
-        return hundo.DirectionEnum.UP;
-    } else if (dir == hundo.DirectionEnum.LEFT) {
-        return hundo.DirectionEnum.RIGHT;
-    } else if (dir == hundo.DirectionEnum.RIGHT) {
-        return hundo.DirectionEnum.LEFT;
-    } else {
-        console.error("Bad direction: " + dir)
-    }
 }
 
 /**
@@ -231,7 +221,7 @@ hundo.Goal.prototype.messageUp = function(board, message) {
     var [top, bottom] = board.getTopBottom(this.row, this.col);
 
     if (hundo.Board.isCompatible(this, message.sender) &&
-        this.dir == hundo.oppositeDir(message.dir) &&
+        this.dir == hundo.oppositeDir[message.dir] &&
         !top) {
 
         var animation = {
@@ -341,7 +331,7 @@ hundo.Arrow.prototype.messageUp = function(board, message) {
 
 hundo.Arrow.prototype.messageDown = function(board, message) {
     if (this.dir == message.dir ||
-        this.dir == hundo.oppositeDir(message.dir)) {
+        this.dir == hundo.oppositeDir[message.dir]) {
         message.forwarder = this;
         return board.messageDown(message) 
     } else {
@@ -659,7 +649,7 @@ hundo.Pip.prototype.messageUp = function(board, message) {
         return [false, [], []];
     }
 
-    var oppositeDir = hundo.oppositeDir(message.dir)
+    var oppositeDir = hundo.oppositeDir[message.dir];
 
     if (this.open[oppositeDir]) {
         message.forwarder = this;

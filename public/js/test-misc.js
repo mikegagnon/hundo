@@ -41,11 +41,11 @@ assertEquals(3, array[1])
  TEST = "hundo.oppositeDir"
 
  assertEquals(hundo.DirectionEnum.UP,
-    hundo.oppositeDir(hundo.DirectionEnum.DOWN));
+    hundo.oppositeDir[hundo.DirectionEnum.DOWN]);
  assertEquals(hundo.DirectionEnum.DOWN,
-    hundo.oppositeDir(hundo.DirectionEnum.UP));
+    hundo.oppositeDir[hundo.DirectionEnum.UP]);
  assertEquals(hundo.DirectionEnum.LEFT,
-    hundo.oppositeDir(hundo.DirectionEnum.RIGHT));
+    hundo.oppositeDir[hundo.DirectionEnum.RIGHT]);
  assertEquals(hundo.DirectionEnum.RIGHT,
-    hundo.oppositeDir(hundo.DirectionEnum.LEFT));
+    hundo.oppositeDir[hundo.DirectionEnum.LEFT]);
 
