@@ -4,6 +4,19 @@
  * See UNLICENSE.txt
  */
 
+
+/**
+ * Overview of code
+ * =================
+ *
+ * - The Board class, in conjunction with the various "piece" classes,
+ *   encapsulates all game logic.
+ * - The Solver class attempts to solve puzzles using the standard graph-
+ *   traversal algorithm
+ * - The Viz class encapsulates all visualiztion logic, as well as receiving
+ *   input from the user.
+ ******************************************************************************/
+
 var hundo = {}
 
 /**
@@ -30,8 +43,11 @@ hundo.DirectionEnum = {
     NODIR: "NODIR"
 }
 
-hundo.FourDirections = [hundo.DirectionEnum.UP, hundo.DirectionEnum.DOWN,
-    hundo.DirectionEnum.LEFT, hundo.DirectionEnum.RIGHT];
+hundo.FourDirections = [
+    hundo.DirectionEnum.UP,
+    hundo.DirectionEnum.DOWN,
+    hundo.DirectionEnum.LEFT,
+    hundo.DirectionEnum.RIGHT];
 
 hundo.LayerEnum = {
     TOP: "TOP",
@@ -60,6 +76,7 @@ hundo.equalsTypeRowCol = function(a, b) {
         a.col == b.col;
 }
 
+// TODO: where to put this function?
 hundo.oppositeDir = function(dir) {
 
     if (dir == hundo.DirectionEnum.UP) {
@@ -79,10 +96,10 @@ hundo.oppositeDir = function(dir) {
  * Block board pieces
  ******************************************************************************/
 
-// There are two classes of pieces: bottom pieces and top pieces.
+// There are two types of pieces: bottom pieces and top pieces.
 //
-//      - Bottom pieces are stationary
-//      - Top pieces are mobile
+//      - Bottom pieces are stationary. For example: sand, pips, and goals
+//      - Top pieces are mobile: For example: the ball, gblocks, and ice
 //
 // Certain top pieces are "compatible" with certain bottom pieces, which is to
 // say that the top piece and the bottom piece may occupy the same cell
