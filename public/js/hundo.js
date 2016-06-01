@@ -216,7 +216,12 @@ hundo.Goal.prototype.messageUp = function(board, message) {
     if (hundo.Board.isCompatible(this, message.sender) &&
         this.dir == hundo.oppositeDir(message.dir) &&
         !top) {
-        return [true, [], []]
+
+        var animation = {
+            goal: this
+        };
+
+        return [true, [animation], []];
     }
     return [false, [], []];
 }
@@ -3513,11 +3518,43 @@ hundo.Viz.prototype.animateBall = function(animation) {
 
 }
 
+hundo.Viz.prototype.animateGoal = function(animation) {
+
+    var goal = animation.goal;
+    var circles = _.range(0, 4);
+
+    var delayMultiplier = 40;
+    var duration = 400;
+    var maxRadius = this.vizConfig.cellSize * 5;
+
+    this.boardSvg.selectAll()
+        .data(circles)
+        .enter()
+        .append("circle")
+        .attr("cx", goal.col * this.vizConfig.cellSize +
+            this.vizConfig.cellSize / 2)
+        .attr("cy", goal.row * this.vizConfig.cellSize +
+            this.vizConfig.cellSize / 2)
+        .attr("r", 0)
+        .attr("stroke", "#F00")
+        .attr("stroke-width", 5)
+        .attr("fill", "#F00")
+        .attr("fill-opacity", 0)
+        .transition()
+        .delay(function(circleNum) {
+            return circleNum * delayMultiplier;
+        })
+        .duration(duration)
+        .attr("r", maxRadius)
+        .attr("stroke", "#000")
+        .remove();
+}
+
 // TODO: move common code (in animateBall) into seperate function
 hundo.Viz.prototype.animateIce = function(animation) {
 
-    ice = animation.move.ice;
-    iceId = "#" + hundo.Viz.pieceId(ice);
+    var ice = animation.move.ice;
+    var iceId = "#" + hundo.Viz.pieceId(ice);
     
     var THIS = this;
 
@@ -3638,6 +3675,8 @@ hundo.Viz.prototype.stepAnimate = function() {
             THIS.animateGblock(animation);
         } else if ("collide" in animation) {
             THIS.animateCollide(animation);
+        } else if ("goal" in animation) {
+            THIS.animateGoal(animation);
         }
     })
 
