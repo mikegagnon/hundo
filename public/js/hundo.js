@@ -330,6 +330,8 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 /**
  * Gblock board pieces
  ******************************************************************************/
+
+// BUG: level-editor.html?level=fl99-----772782792870880890-6979--
 hundo.Gblock = function(row, col, groupId) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.GBLOCK;
@@ -1676,10 +1678,24 @@ hundo.Board.prototype.move = function(dir, returnEdges) {
 
     this.setDir(dir);
 
+    // TODO: factor out common code
+
     var [r1, c1] = [this.ball.row, this.ball.col];
 
     this.step();
 
+    var [r2, c2] = [this.ball.row, this.ball.col];
+
+    if (!(r1 == r2 && c1 == c2) &&
+        !(r1 != r2 && c1 != c2)) {
+        var edge = [[r1, c1], [r2, c2]];
+        edges.push(edge);
+    }
+
+    var [r1, c1] = [this.ball.row, this.ball.col];
+
+
+    // TODO: can we get rid of this.solved and this.atRest?
     while (!this.done && !this.solved && !this.atRest) {
         this.step();
         var [r2, c2] = [this.ball.row, this.ball.col];
