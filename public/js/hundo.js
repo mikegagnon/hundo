@@ -3991,19 +3991,29 @@ hundo.Compress.sep = "-";
 
 hundo.Compress.versioningSentinel = 61;
 
+hundo.Compress.versionNumber = 1;
+
+hundo.Compress.pushDigit64 = function(levelArray, num) {
+    levelArray.push(hundo.Compress.toBase64Digit(num));    
+}
+
+hundo.Compress.addVersion = function(levelArray) {
+    hundo.Compress.pushDigit64(levelArray, hundo.Compress.versioningSentinel);
+    hundo.Compress.pushDigit64(levelArray, hundo.Compress.versionNumber);
+}
+
+hundo.Compress.addDimensions = function(level, levelArray) {
+
+    levelArray.push(hundo.Compress.toBase64Digit(level.numRows));
+    levelArray.push(hundo.Compress.toBase64Digit(level.numCols));
+}
+
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level) {
     var levelArray = [];
 
-    // The first two bytes specify the  version number of the compression
-    // algorithm
-    levelArray.push(hundo.Compress.toBase64Digit(
-        hundo.Compress.versioningSentinel));
-    levelArray.push(hundo.Compress.toBase64Digit(1));
-
-    // The first two bytes encode numRows, numCols
-    levelArray.push(hundo.Compress.toBase64Digit(level.numRows));
-    levelArray.push(hundo.Compress.toBase64Digit(level.numCols));
+    hundo.Compress.addVersion(levelArray);
+    hundo.Compress.addDimensions(level, levelArray);
 
     // The next two bytes encode ball.row, ball.col
     if (typeof level.ball != "undefined") {
