@@ -394,6 +394,10 @@ hundo.Goal.prototype.messageUp = function(board, message) {
 
 /**
  * Ice piece
+ * =========
+ *
+ * Ice uses this.pushingDir to deal with cases where other pices push into the
+ * ice into the ice, after it's already been pushed. See documentation for Ball.
  ******************************************************************************/
 
 hundo.Ice = function(row, col) {
@@ -412,10 +416,14 @@ hundo.Ice.prototype.eq = function(piece) {
 
 hundo.Ice.prototype.messageUp = function(board, message) {
 
+    var success;
     var animations = [];
     var moves = [];
 
     if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+
+        this.pushingDir = message.dir;
+
         var [newRow, newCol] = hundo.Board.dirRowCol(
             message.dir, this.row, this.col);
 
@@ -425,11 +433,9 @@ hundo.Ice.prototype.messageUp = function(board, message) {
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
-        }
+        };
 
-        this.pushingDir = message.dir;
-
-        var [success, animations, moves] = board.messageDown(newMessage);
+        [success, animations, moves] = board.messageDown(newMessage);
 
         if (success) {
 
@@ -439,21 +445,18 @@ hundo.Ice.prototype.messageUp = function(board, message) {
                 newCol: newMessage.newCol
             });
 
-            animations.push(
-                {
-                    move: {
-                        ice: this,
-                        dir: message.dir,
-                    }
-                });
+            animations.push({
+                move: {
+                    ice: this,
+                    dir: message.dir,
+                }
+            });
         }
     } else if (this.pushingDir == message.dir) {
         success = true;
     } else {
         success = false;
     }
-
-
 
     return [success, animations, moves];
 }
