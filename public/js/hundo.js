@@ -378,11 +378,15 @@ hundo.Goal.prototype.messageUp = function(board, message) {
         this.dir == hundo.oppositeDir[message.dir] &&
         !top) {
 
-        var animation = {
-            goal: this
-        };
+        if (message.sender.type == hundo.PieceTypeEnum.BALL) {
+            var animation = {
+                goal: this
+            };
 
-        return [true, [animation], []];
+            return [true, [animation], []];
+        } else {
+            return [true, [], []];
+        }
     }
     return [false, [], []];
 }
