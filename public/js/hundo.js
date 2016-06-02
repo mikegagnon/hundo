@@ -784,7 +784,6 @@ hundo.Pip.prototype.messageUp = function(board, message) {
         return [false, [], []];
     }
 
-
 }
 
 hundo.Pip.prototype.eq = function(piece) {
@@ -799,7 +798,6 @@ hundo.Pip.prototype.eq = function(piece) {
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
-// TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
     // is the ball at rest?
@@ -825,8 +823,9 @@ hundo.Board = function(boardConfig) {
 
     var THIS = this;
 
-    // this.matrix[row][col][true] == the top piece, or undefined
-    // this.matrix[row][col][false] == the bottom piece, or undefined
+    // this.matrix[row][col][hundo.LayerEnum.TOP] == the top piece, or undefined
+    // this.matrix[row][col][hundo.LayerEnum.BOTTOM] == the bottom piece, or
+    // undefined
     this.matrix = new Array();
     _.each(_.range(0, this.numRows), function(r){
         THIS.matrix[r] = new Array();
