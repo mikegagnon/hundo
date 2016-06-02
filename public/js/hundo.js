@@ -518,6 +518,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 dir: message.dir,
                 newRow: member.row,
                 newCol: member.col,
+                pushFromMember: true,
             }
 
             // Send message directly to member; otherwise, the message
@@ -584,8 +585,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     }
 
     // TODO: reorder if statement to get rid of negation
-    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        message.sender.groupId == this.groupId) {
+    if (message.pushFromMember) {
 
         return pushSelf(this);
 
