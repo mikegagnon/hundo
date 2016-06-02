@@ -1995,10 +1995,6 @@ hundo.Viz = function(config) {
 
     var levelFromUrl = hundo.Viz.levelFromUrl();
 
-    if (levelFromUrl) {
-        this.maker.on = true;
-    }
-
     if (this.maker.on) {
 
         if (levelFromUrl) {
@@ -2014,6 +2010,8 @@ hundo.Viz = function(config) {
 
         config.viz.levelSelect = false;
 
+    } else if (levelFromUrl) {
+        this.levels = [levelFromUrl];
     } else {
         this.levels = config.levels;
     }
@@ -2050,6 +2048,7 @@ hundo.Viz = function(config) {
         this.addShowSolution();
         this.addPalette();
         this.addLevelUrlField();
+        this.addPlayLevelUrlField();
     }
 
     this.boardSvg = d3.select("#" + this.boardSvgId())
@@ -2816,7 +2815,16 @@ hundo.Viz.prototype.addShowSolution = function() {
 }
 
 hundo.Viz.prototype.addLevelUrlField = function() {
-    var contents = `<div class="levelUrl">URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
+    var contents = `<div class="levelUrl">URL for editing this level: <input type="text" id="${this.levelUrlFieldId()}"
+    value=""></input></div>`
+
+    var saveButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(saveButton);
+}
+
+hundo.Viz.prototype.addPlayLevelUrlField = function() {
+    var contents = `<div class="levelUrl">URL for playing this level: <input type="text" id="${this.levelPlayingUrlFieldId()}"
     value=""></input></div>`
 
     var saveButton = $("<div/>").html(contents).contents();
@@ -2855,6 +2863,11 @@ hundo.Viz.prototype.solutionButtonId = function() {
 hundo.Viz.prototype.levelUrlFieldId = function() {
     return "levelUrlField" + this.id
 }
+
+hundo.Viz.prototype.levelPlayingUrlFieldId = function() {
+    return "levelPlayingUrlField" + this.id
+}
+
 
 hundo.Viz.prototype.consoleId = function() {
     return "console" + this.id;
@@ -3774,6 +3787,10 @@ hundo.Viz.prototype.clickSave = function() {
     $("#" + this.levelUrlFieldId()).attr("value", url);
 
     $("#" + this.levelUrlFieldId()).select();
+
+    $("#" + this.levelPlayingUrlFieldId()).attr("value", url);
+
+    $("#" + this.levelPlayingUrlFieldId()).select();
 
     console.log(url);
     console.log(JSON.stringify(this.board.getJson()));
