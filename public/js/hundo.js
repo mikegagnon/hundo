@@ -493,7 +493,14 @@ hundo.Gblock.prototype.eq = function(piece) {
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
     // Push every member of this gblock's group.
-    function pushMembers() {
+    function pushMembers(THIS) {
+
+        // members is an array containing every member of this gblock's group.
+        var members = board.gblocks[THIS.groupId];
+
+        var totalSuccess = true;
+        var totalAnimations = [];
+        var totalMoves = [];
 
         // clear out memoization
         _.each(members, function(member) {
@@ -529,7 +536,7 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     }
 
     // pushSelf is called when this gblock is being pushed by pushMembers.
-    function pushSelf() {
+    function pushSelf(THIS) {
         if (THIS.result) {
             return [THIS.result[0], [], []];
         }
@@ -575,40 +582,19 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         return [success, animations, moves];
     }
 
-
-
-    var THIS = this;
-
-    // members is an array containing every member of this gblock's group.
-    var members = board.gblocks[this.groupId];
-    
-    var totalSuccess = true;
-    var totalAnimations = [];
-    var totalMoves = [];
-
-    // TODO: eval this commentary
-    // Two cases:
-    //      1. A non-gblock bumps into this gblock, which case we bump
-    //         all gblocks
-    //      2. A gbock (from the same group) bumps into this gblock, in which
-    //         case we do the recursive bumps as usual, except we memoize
-    //         results.
-
-
     // TODO: reorder if statement to get rid of negation
     if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
         message.sender.groupId == this.groupId)) {
 
-        // TODO: put pushMembers code here
         if (this.pushingDir == hundo.DirectionEnum.NODIR) {
-            return pushMembers();
+            return pushMembers(this);
         } else {
             return [true, [], []];
         }
 
     } else {
 
-        return pushSelf();
+        return pushSelf(this);
 
     }
 }
