@@ -395,10 +395,6 @@ hundo.Goal.prototype.messageUp = function(board, message) {
 
 /**
  * Ice piece
- * =========
- *
- * Ice uses this.pushingDir to deal with cases where other pices push into the
- * ice into the ice, after it's already been pushed. See documentation for Ball.
  ******************************************************************************/
 
 hundo.Ice = function(row, col) {
@@ -461,7 +457,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 }
 
 /**
- * Gblock piece
+ * Gblock pieces move together as a group.
  ******************************************************************************/
 
 hundo.Gblock = function(row, col, groupId) {
@@ -488,7 +484,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     var totalAnimations = [];
     var totalMoves = [];
 
-    // TODO: s/neighbor/member/g
     function pushMembers() {
 
         // clear out memoization
