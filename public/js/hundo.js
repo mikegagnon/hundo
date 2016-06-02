@@ -544,7 +544,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             return [false, [], []];
         }
 
-        // TODO: factor out code common to this and ice, etc.
         var newMessage = {
             sender: THIS,
             forwarder: THIS,
@@ -575,7 +574,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         return [success, animations, moves];
     }
 
-    // TODO: reorder if statement to get rid of negation
     if (message.pushFromMember) {
 
         return pushSelf(this);
