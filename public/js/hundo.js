@@ -285,69 +285,71 @@ hundo.Ball.prototype.eq = function(piece) {
 }
 
 /**
+ * Both Ball and Ice use slidingPieceMessageUp as the core to their messageUp
+ * functions.
  *
- * The ball uses this.pushingDir to deal with cases where other pieces bump
- * into the ball. For example:
+ * Ball and Ice use THIS.pushingDir to deal with cases where other pieces bump
+ * into the piece. For example:
  *      (1) The ball has a gblock-0 to the left and to the right, and the
  *          the ball pushes to the left. This causes the gblock-0 on the right
- *          to bump into the ball, pushing to the left. To elegantly avoid
- *          infinite recursion, the ball simply returns success.
+ *          to bump into the ball, pushing to the left. To avoid infinite
+ *          recursion, the ball simply returns success.
  *      (2) The ball pushes into a chain of ice cubes, which go into a pipe,
  *          change direction, then push into the ball perpendicularly. In this
  *          case, the ball vetos the movement.
  ******************************************************************************/
 
-hundo.Ball.prototype.messageUp = function(board, message) {
-
+hundo.slidingPieceMessageUp = function(board, message, pieceString, THIS) {
     var success;
     var animations = [];
     var moves = [];
 
-    // If this is the first time the ball is being pushed; viz., by a keypress
-    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+    if (THIS.pushingDir == hundo.DirectionEnum.NODIR) {
 
-        this.pushingDir = message.dir;
+        THIS.pushingDir = message.dir;
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
+            message.dir, THIS.row, THIS.col);
 
         var newMessage = {
-            sender: this,
-            forwarder: this,
+            sender: THIS,
+            forwarder: THIS,
             dir: message.dir,
             newRow: newRow,
-            newCol: newCol
-        }
+            newCol: newCol,
+        };
 
-        var [success, animations, moves] = board.messageDown(newMessage);
+        [success, animations, moves] = board.messageDown(newMessage);
 
         if (success) {
 
-            // in case some piece has mutated the direction of the ball
-            this.dir = newMessage.dir;
+            // in case some piece has mutated the direction of the piece
+            THIS.dir = newMessage.dir;
 
             moves.push({
-                piece: this,
+                piece: THIS,
                 newRow: newMessage.newRow,
                 newCol: newMessage.newCol
             });
 
-            animations.push(
-                {
-                    move: {
-                        ball: this,
-                        dir: this.dir,
-                    }
-                });
+            var newAnimation = {};
+            newAnimation.move = {};
+            newAnimation.move[pieceString] = THIS;
+            newAnimation.move.dir = message.dir;
 
+            animations.push(newAnimation);
         }
-    } else if (this.pushingDir == message.dir) {
+    } else if (THIS.pushingDir == message.dir) {
         success = true;
     } else {
         success = false;
     }
 
     return [success, animations, moves];
+}
+
+hundo.Ball.prototype.messageUp = function(board, message) {
+    return hundo.slidingPieceMessageUp(board, message, "ball", this);
 }
 
 /**
@@ -393,10 +395,6 @@ hundo.Goal.prototype.messageUp = function(board, message) {
 
 /**
  * Ice piece
- * =========
- *
- * Ice uses this.pushingDir to deal with cases where other pices push into the
- * ice into the ice, after it's already been pushed. See documentation for Ball.
  ******************************************************************************/
 
 hundo.Ice = function(row, col) {
@@ -414,51 +412,9 @@ hundo.Ice.prototype.eq = function(piece) {
 }
 
 hundo.Ice.prototype.messageUp = function(board, message) {
-
-    var success;
-    var animations = [];
-    var moves = [];
-
-    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
-
-        this.pushingDir = message.dir;
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
-
-        var newMessage = {
-            sender: this,
-            forwarder: this,
-            dir: message.dir,
-            newRow: newRow,
-            newCol: newCol,
-        };
-
-        [success, animations, moves] = board.messageDown(newMessage);
-
-        if (success) {
-
-            moves.push({
-                piece: this,
-                newRow: newMessage.newRow,
-                newCol: newMessage.newCol
-            });
-
-            animations.push({
-                move: {
-                    ice: this,
-                    dir: message.dir,
-                }
-            });
-        }
-    } else if (this.pushingDir == message.dir) {
-        success = true;
-    } else {
-        success = false;
-    }
-
-    return [success, animations, moves];
+    return hundo.slidingPieceMessageUp(board, message, "ice", this);
 }
+
 /**
  * Arrow piece
  ******************************************************************************/
@@ -501,7 +457,7 @@ hundo.Arrow.prototype.messageDown = function(board, message) {
 }
 
 /**
- * Gblock piece
+ * Gblock pieces move together as a group.
  ******************************************************************************/
 
 hundo.Gblock = function(row, col, groupId) {
@@ -520,38 +476,52 @@ hundo.Gblock.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
+/**
+ * When a gblock piece is pushed, every member of that gblock's group must push.
+ * And the the total push is only successful iff every group member's push 
+ * was success. Then, and only then, the gblock pieces move forward. If the push
+ * of any member of of the gblock group is vetoed, then the whole push is
+ * vetoed.
+ *
+ * To implement this logic, the gblock detects if it is pushed by a foreigner
+ * (namely, a piece that is not a member of this gblock's group).
+ *
+ * If the gblock piece is pushed by a foreigner, then the gblock pushes every
+ * member of it's group, aggregating the push results, and returning success
+ * only if every gblock member's push is a success.
+ */
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
-    var THIS = this;
-    var members = board.gblocks[this.groupId];
-    var totalSuccess = true;
-    var totalAnimations = [];
-    var totalMoves = [];
+    // Push every member of this gblock's group.
+    function pushMembers(THIS) {
 
-    // TODO: s/neighbor/member/g
-    function pushMembers() {
+        // members is an array containing every member of this gblock's group.
+        var members = board.gblocks[THIS.groupId];
+
+        var totalSuccess = true;
+        var totalAnimations = [];
+        var totalMoves = [];
 
         // clear out memoization
         _.each(members, function(member) {
-            member.result = undefined;
             member.pushingDir = message.dir;
         });
 
         // push every member of this gblock's group
         _.each(members, function(member) {
 
-            // TODO: shouldn't this be member.row + dr, etc.?
             var newMessage = {
                 sender: THIS,
                 forwarder: THIS,
                 dir: message.dir,
                 newRow: member.row,
                 newCol: member.col,
+                pushFromMember: true,
             }
 
-            // Send message directly to member; otherwise, the message
-            // will go down and up, which would be incorrect
-            var [success, animations, moves] = member.messageUp(board, newMessage);
+            // Send message directly to member.
+            var [success, animations, moves] = member.messageUp(board,
+                newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
             totalMoves = _.concat(totalMoves, moves);
@@ -562,48 +532,21 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         });
 
         return [totalSuccess, totalAnimations, totalMoves];
-
     }
 
-    // TODO: eval this commentary
-    // Two cases:
-    //      1. A non-gblock bumps into this gblock, which case we bump
-    //         all gblocks
-    //      2. A gbock (from the same group) bumps into this gblock, in which
-    //         case we do the recursive bumps as usual, except we memoize
-    //         results.
-
-
-    // TODO: reorder if statement to get rid of negation
-    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        message.sender.groupId == this.groupId)) {
-
-        // TODO: put pushMembers code here
-        if (this.pushingDir == hundo.DirectionEnum.NODIR) {
-            return pushMembers();
-        } else {
-            return [true, [], []];
-        }
-
-    } else {
-
-
-        if (this.result) {
-            return [this.result[0], [], []];
-        }
-
+    // pushSelf is called when this gblock is being pushed by pushMembers.
+    function pushSelf(THIS) {
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
+            message.dir, THIS.row, THIS.col);
 
         if (!board.inBounds(newRow, newCol)) {
             return [false, [], []];
         }
 
-        // TODO: factor out code common to this and ice, etc.
         var newMessage = {
-            sender: this,
-            forwarder: this,
+            sender: THIS,
+            forwarder: THIS,
             dir: message.dir,
             newRow: newRow,
             newCol: newCol,
@@ -611,12 +554,10 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
         var [success, animations, moves] = board.messageDown(newMessage);
 
-        this.result = [success, animations, moves];
-
         if (success) {
 
             moves.push({
-                piece: this,
+                piece: THIS,
                 newRow: newMessage.newRow,
                 newCol: newMessage.newCol
             });
@@ -624,13 +565,27 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
             animations.push(
                 {
                     move: {
-                        gblock: this,
+                        gblock: THIS,
                         dir: message.dir,
                     }
                 });
         }
 
         return [success, animations, moves];
+    }
+
+    if (message.pushFromMember) {
+
+        return pushSelf(this);
+
+    } else {
+
+        if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+            return pushMembers(this);
+        } else {
+            return [true, [], []];
+        }
+
     }
 }
 
@@ -711,7 +666,14 @@ hundo.Portal.prototype.messageUp = function(board, message) {
     }
 
     // TODO: switch order of code so there's no negation here
-    if (!this.receivingTeleportation) {
+     if (this.receivingTeleportation) {
+
+        message.forwarder = this;
+
+        var [success, animations, moves] = board.messageUp(message);
+
+        return [success, animations, moves];
+    } else {
 
         var partner = this.getPartner(board);
 
@@ -727,13 +689,6 @@ hundo.Portal.prototype.messageUp = function(board, message) {
         partner.receivingTeleportation = false;
 
         return [success, animations, moves];
-    } else {
-
-        message.forwarder = this;
-
-        var [success, animations, moves] = board.messageUp(message);
-
-        return [success, animations, moves];
     }
 }
 
@@ -747,7 +702,6 @@ hundo.Portal.prototype.eq = function(piece) {
  * Pip piece
  ******************************************************************************/
 
-// TODO: do we really need to store this.up, etc.?
 hundo.Pip = function(row, col, up, down, left, right) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.PIP;
@@ -766,7 +720,7 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.open[hundo.DirectionEnum.LEFT] = left;
     this.open[hundo.DirectionEnum.RIGHT] = right;
 
-    // If this pip is not and elbow, then this.elbow = false
+    // If this pip is not an elbow, then this.elbow = false
     // If this pip is an elbow, then this.elbow[x] = y, where
     // x == the direction the top piece is moving in, and
     // y == the new direction the top piece (because the pip modifies the
@@ -830,7 +784,6 @@ hundo.Pip.prototype.messageUp = function(board, message) {
         return [false, [], []];
     }
 
-
 }
 
 hundo.Pip.prototype.eq = function(piece) {
@@ -845,7 +798,6 @@ hundo.Pip.prototype.eq = function(piece) {
  * Board encapsulates the model of the game (MVC style)
  ******************************************************************************/
 
-// TODO: Assume boardConfig is untrusted
 hundo.Board = function(boardConfig) {
 
     // is the ball at rest?
@@ -871,8 +823,9 @@ hundo.Board = function(boardConfig) {
 
     var THIS = this;
 
-    // this.matrix[row][col][true] == the top piece, or undefined
-    // this.matrix[row][col][false] == the bottom piece, or undefined
+    // this.matrix[row][col][hundo.LayerEnum.TOP] == the top piece, or undefined
+    // this.matrix[row][col][hundo.LayerEnum.BOTTOM] == the bottom piece, or
+    // undefined
     this.matrix = new Array();
     _.each(_.range(0, this.numRows), function(r){
         THIS.matrix[r] = new Array();
@@ -2042,10 +1995,6 @@ hundo.Viz = function(config) {
 
     var levelFromUrl = hundo.Viz.levelFromUrl();
 
-    if (levelFromUrl) {
-        this.maker.on = true;
-    }
-
     if (this.maker.on) {
 
         if (levelFromUrl) {
@@ -2061,6 +2010,8 @@ hundo.Viz = function(config) {
 
         config.viz.levelSelect = false;
 
+    } else if (levelFromUrl) {
+        this.levels = [levelFromUrl];
     } else {
         this.levels = config.levels;
     }
@@ -2092,11 +2043,16 @@ hundo.Viz = function(config) {
         this.addResetButton();
     }
 
+    if (config.viz.createButton) {
+        this.addCreateButton();
+    }
+
     if (this.maker.on) {
         this.addSave();
         this.addShowSolution();
         this.addPalette();
         this.addLevelUrlField();
+        this.addPlayLevelUrlField();
     }
 
     this.boardSvg = d3.select("#" + this.boardSvgId())
@@ -2385,12 +2341,6 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
 
                 <rect id="perim" x="0" y="0" style="stroke-width:3;stroke:#999" fill-opacity="0.0"/>
 
-                <!-- hard coded to standard numCols numRows -->
-                <text x="85" y="150"
-                    font-family="Impact"
-                    font-size="55">
-                    TOTAL VICTORY!
-                </text>
             </svg>
         </div>
         <div id="${this.consoleId()}" class="console">
@@ -2519,6 +2469,16 @@ hundo.Viz.prototype.addResetButton = function() {
     var resetButton = $("<div/>").html(contents).contents();
 
      $("#" + this.consoleId()).append(resetButton);
+}
+
+hundo.Viz.prototype.addCreateButton = function() {
+
+    var contents = `<button id="${this.createButtonId()}" onclick="window.location.href = 'level-editor.html'" type="button"
+     class="button">Create new puzzle</button>`
+
+    var createButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(createButton);
 }
 
 // TODO: id incorpoates viz id
@@ -2869,7 +2829,16 @@ hundo.Viz.prototype.addShowSolution = function() {
 }
 
 hundo.Viz.prototype.addLevelUrlField = function() {
-    var contents = `<div class="levelUrl">URL for this level: <input type="text" id="${this.levelUrlFieldId()}"
+    var contents = `<div class="levelUrl">URL for editing this level: <input type="text" id="${this.levelUrlFieldId()}"
+    value=""></input></div>`
+
+    var saveButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(saveButton);
+}
+
+hundo.Viz.prototype.addPlayLevelUrlField = function() {
+    var contents = `<div class="levelUrl">URL for playing this level: <input type="text" id="${this.levelPlayingUrlFieldId()}"
     value=""></input></div>`
 
     var saveButton = $("<div/>").html(contents).contents();
@@ -2897,6 +2866,10 @@ hundo.Viz.prototype.resetButtonId = function() {
     return "resetButton" + this.id;
 }
 
+hundo.Viz.prototype.createButtonId = function() {
+    return "createButton" + this.id;
+}
+
 hundo.Viz.prototype.saveButtonId = function() {
     return "saveButton" + this.id;
 }
@@ -2908,6 +2881,11 @@ hundo.Viz.prototype.solutionButtonId = function() {
 hundo.Viz.prototype.levelUrlFieldId = function() {
     return "levelUrlField" + this.id
 }
+
+hundo.Viz.prototype.levelPlayingUrlFieldId = function() {
+    return "levelPlayingUrlField" + this.id
+}
+
 
 hundo.Viz.prototype.consoleId = function() {
     return "console" + this.id;
@@ -3300,10 +3278,15 @@ hundo.Viz.dxdy = function(dir) {
     }
 }
 
+
+// TODO: add instance id to #background
 hundo.Viz.prototype.undoAnimateVictory = function() {
 
     this.boardSvg.select("#background")
         .style("fill", "#000")
+
+    this.boardSvg.select("#theend" + this.id)
+        .remove();
 
     this.drawGrid();
 }
@@ -3320,6 +3303,18 @@ hundo.Viz.prototype.animateVictory = function() {
 
     this.boardSvg.selectAll(".grid")
         .remove();
+
+    this.boardSvg.selectAll()
+        .data([1])
+        .enter()
+        .append("text")
+        .attr("id", "theend" + this.id)
+        .attr("x", 50)
+        .attr("y", 150)
+        .attr("font-family", "Impact")
+        .attr("font-size", 55)
+        .text("The end...");
+
 }
 
 hundo.Viz.prototype.animateSolvedQuick = function() {
@@ -3445,7 +3440,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
     var levelText;
 
     if (this.level == "victory" ) {
-        levelText = "VICTORY"
+        levelText = "The end... "
     } else {
         levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
     }
@@ -3805,11 +3800,16 @@ hundo.clickReset = function(id) {
 hundo.Viz.prototype.clickSave = function() {
     console.log("save");
 
-    var url = this.getBoardUrl()
+    var url = this.getBoardUrl("level-editor.html");
 
     $("#" + this.levelUrlFieldId()).attr("value", url);
 
     $("#" + this.levelUrlFieldId()).select();
+
+    var url = this.getBoardUrl("index.html");
+
+    $("#" + this.levelPlayingUrlFieldId()).attr("value", url);
+
 
     console.log(url);
     console.log(JSON.stringify(this.board.getJson()));
@@ -3884,14 +3884,23 @@ hundo.clickPalette = function(id, config) {
     viz.clickPalette(config);
 }
 
-hundo.Viz.prototype.getBoardUrl = function() {
+hundo.Viz.prototype.getBoardUrl = function(filename) {
     var levelParam = hundo.Compress.compressLevel(this.board.getJson());
     var url = window.location.href;
 
     url = _.split(url, "?")[0];
 
-    url += "?level=" + encodeURIComponent(levelParam)
-    return url;
+    var parts = _.split(url, "/");
+
+    parts.pop();
+
+    var urlPrefix = _.join(parts, "/");
+
+    console.log(filename);
+    console.log(urlPrefix);
+
+    return urlPrefix + "/" + filename + "?level=" +
+        encodeURIComponent(levelParam);
 }
 
 hundo.cheat = function() {
@@ -4338,6 +4347,7 @@ hundo.defaultVizConfig = {
     numCols: 21,
     playButton: false,
     resetButton: true,
+    createButton: true,
     levelSelect: true,
     levelMax: 0,
     allLevels: true
