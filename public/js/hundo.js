@@ -511,7 +511,6 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         // push every member of this gblock's group
         _.each(members, function(member) {
 
-            // TODO: shouldn't this be member.row + dr, etc.?
             var newMessage = {
                 sender: THIS,
                 forwarder: THIS,
@@ -521,9 +520,9 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
                 pushFromMember: true,
             }
 
-            // Send message directly to member; otherwise, the message
-            // will go down and up, which would be incorrect
-            var [success, animations, moves] = member.messageUp(board, newMessage);
+            // Send message directly to member.
+            var [success, animations, moves] = member.messageUp(board,
+                newMessage);
 
             totalAnimations = _.concat(totalAnimations, animations);
             totalMoves = _.concat(totalMoves, moves);
