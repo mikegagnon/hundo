@@ -324,6 +324,7 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
         if (success) {
 
+            // in case some piece has mutated the direction of the ball
             this.dir = newMessage.dir;
 
             moves.push({
