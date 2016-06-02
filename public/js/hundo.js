@@ -285,69 +285,71 @@ hundo.Ball.prototype.eq = function(piece) {
 }
 
 /**
+ * Both Ball and Ice use slidingPieceMessageUp as the core to their messageUp
+ * functions.
  *
- * The ball uses this.pushingDir to deal with cases where other pieces bump
- * into the ball. For example:
+ * Ball and Ice use THIS.pushingDir to deal with cases where other pieces bump
+ * into the piece. For example:
  *      (1) The ball has a gblock-0 to the left and to the right, and the
  *          the ball pushes to the left. This causes the gblock-0 on the right
- *          to bump into the ball, pushing to the left. To elegantly avoid
- *          infinite recursion, the ball simply returns success.
+ *          to bump into the ball, pushing to the left. To avoid infinite
+ *          recursion, the ball simply returns success.
  *      (2) The ball pushes into a chain of ice cubes, which go into a pipe,
  *          change direction, then push into the ball perpendicularly. In this
  *          case, the ball vetos the movement.
  ******************************************************************************/
 
-hundo.Ball.prototype.messageUp = function(board, message) {
-
+hundo.slidingPieceMessageUp = function(board, message, pieceString, THIS) {
     var success;
     var animations = [];
     var moves = [];
 
-    // If this is the first time the ball is being pushed; viz., by a keypress
-    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
+    if (THIS.pushingDir == hundo.DirectionEnum.NODIR) {
 
-        this.pushingDir = message.dir;
+        THIS.pushingDir = message.dir;
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
+            message.dir, THIS.row, THIS.col);
 
         var newMessage = {
-            sender: this,
-            forwarder: this,
+            sender: THIS,
+            forwarder: THIS,
             dir: message.dir,
             newRow: newRow,
-            newCol: newCol
-        }
+            newCol: newCol,
+        };
 
-        var [success, animations, moves] = board.messageDown(newMessage);
+        [success, animations, moves] = board.messageDown(newMessage);
 
         if (success) {
 
-            // in case some piece has mutated the direction of the ball
-            this.dir = newMessage.dir;
+            // in case some piece has mutated the direction of the piece
+            THIS.dir = newMessage.dir;
 
             moves.push({
-                piece: this,
+                piece: THIS,
                 newRow: newMessage.newRow,
                 newCol: newMessage.newCol
             });
 
-            animations.push(
-                {
-                    move: {
-                        ball: this,
-                        dir: this.dir,
-                    }
-                });
-
+            animations.push({
+                move: {
+                    pieceString: THIS,
+                    dir: message.dir,
+                }
+            });
         }
-    } else if (this.pushingDir == message.dir) {
+    } else if (THIS.pushingDir == message.dir) {
         success = true;
     } else {
         success = false;
     }
 
     return [success, animations, moves];
+}
+
+hundo.Ball.prototype.messageUp = function(board, message) {
+    return hundo.slidingPieceMessageUp(board, message, "ball", this);
 }
 
 /**
@@ -414,51 +416,9 @@ hundo.Ice.prototype.eq = function(piece) {
 }
 
 hundo.Ice.prototype.messageUp = function(board, message) {
-
-    var success;
-    var animations = [];
-    var moves = [];
-
-    if (this.pushingDir == hundo.DirectionEnum.NODIR) {
-
-        this.pushingDir = message.dir;
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
-
-        var newMessage = {
-            sender: this,
-            forwarder: this,
-            dir: message.dir,
-            newRow: newRow,
-            newCol: newCol,
-        };
-
-        [success, animations, moves] = board.messageDown(newMessage);
-
-        if (success) {
-
-            moves.push({
-                piece: this,
-                newRow: newMessage.newRow,
-                newCol: newMessage.newCol
-            });
-
-            animations.push({
-                move: {
-                    ice: this,
-                    dir: message.dir,
-                }
-            });
-        }
-    } else if (this.pushingDir == message.dir) {
-        success = true;
-    } else {
-        success = false;
-    }
-
-    return [success, animations, moves];
+    return hundo.slidingPieceMessageUp(board, message, "ice", this);
 }
+
 /**
  * Arrow piece
  ******************************************************************************/
