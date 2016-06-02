@@ -3782,15 +3782,16 @@ hundo.clickReset = function(id) {
 hundo.Viz.prototype.clickSave = function() {
     console.log("save");
 
-    var url = this.getBoardUrl()
+    var url = this.getBoardUrl("level-editor.html");
 
     $("#" + this.levelUrlFieldId()).attr("value", url);
 
     $("#" + this.levelUrlFieldId()).select();
 
+    var url = this.getBoardUrl("index.html");
+
     $("#" + this.levelPlayingUrlFieldId()).attr("value", url);
 
-    $("#" + this.levelPlayingUrlFieldId()).select();
 
     console.log(url);
     console.log(JSON.stringify(this.board.getJson()));
@@ -3865,14 +3866,23 @@ hundo.clickPalette = function(id, config) {
     viz.clickPalette(config);
 }
 
-hundo.Viz.prototype.getBoardUrl = function() {
+hundo.Viz.prototype.getBoardUrl = function(filename) {
     var levelParam = hundo.Compress.compressLevel(this.board.getJson());
     var url = window.location.href;
 
     url = _.split(url, "?")[0];
 
-    url += "?level=" + encodeURIComponent(levelParam)
-    return url;
+    var parts = _.split(url, "/");
+
+    parts.pop();
+
+    var urlPrefix = _.join(parts, "/");
+
+    console.log(filename);
+    console.log(urlPrefix);
+
+    return urlPrefix + "/" + filename + "?level=" +
+        encodeURIComponent(levelParam);
 }
 
 hundo.cheat = function() {
