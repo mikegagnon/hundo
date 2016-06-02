@@ -3980,9 +3980,17 @@ hundo.Compress.numToDir = function(num) {
 
 hundo.Compress.sep = "-";
 
+hundo.Compress.versioningSentinelValue = 61;
+
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level) {
     var levelArray = [];
+
+    // The first two bytes specify the  version number of the compression
+    // algorithm
+    levelArray.push(hundo.Compress.toBase64Digit(
+        hundo.Compress.versioningSentinelValue));
+    levelArray.push(hundo.Compress.toBase64Digit(1));
 
     // The first two bytes encode numRows, numCols
     levelArray.push(hundo.Compress.toBase64Digit(level.numRows));
@@ -4108,6 +4116,19 @@ hundo.Compress.decompressLevel = function(byteString) {
     };
 
     var bytes = _.split(byteString, "")
+
+    var version;
+
+    var versioningSentinel = hundo.Compress.fromBase64Digit(bytes[0]);
+    bytes.shift();
+
+    if (versioningSentinel == hundo.Compress.versioningSentinelValue) {
+        version = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+    } else {
+        version = 0;
+        bytes = _.concat(versioningSentinel, bytes);
+    }
 
     var [r, c] = hundo.Compress.getRowCol(bytes);
     level.numRows = r;
