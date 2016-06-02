@@ -332,12 +332,12 @@ hundo.slidingPieceMessageUp = function(board, message, pieceString, THIS) {
                 newCol: newMessage.newCol
             });
 
-            animations.push({
-                move: {
-                    pieceString: THIS,
-                    dir: message.dir,
-                }
-            });
+            var newAnimation = {};
+            newAnimation.move = {};
+            newAnimation.move[pieceString] = THIS;
+            newAnimation.move.dir = message.dir;
+
+            animations.push(newAnimation);
         }
     } else if (THIS.pushingDir == message.dir) {
         success = true;
