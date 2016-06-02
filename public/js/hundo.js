@@ -476,14 +476,23 @@ hundo.Gblock.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
+/**
+ * When a gblock piece is pushed, every member of that gblock's group must push.
+ * And the the total push is only successful iff every group member's push 
+ * was success. Then, and only then, the gblock pieces move forward. If the push
+ * of any member of of the gblock group is vetoed, then the whole push is
+ * vetoed.
+ *
+ * To implement this logic, the gblock detects if it is pushed by a foreigner
+ * (namely, a piece that is not a member of this gblock's group).
+ *
+ * If the gblock piece is pushed by a foreigner, then the gblock pushes every
+ * member of it's group, aggregating the push results, and returning success
+ * only if every gblock member's push is a success.
+ */
 hundo.Gblock.prototype.messageUp = function(board, message) {
 
-    var THIS = this;
-    var members = board.gblocks[this.groupId];
-    var totalSuccess = true;
-    var totalAnimations = [];
-    var totalMoves = [];
-
+    // Push every member of this gblock's group.
     function pushMembers() {
 
         // clear out memoization
@@ -517,8 +526,65 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
         });
 
         return [totalSuccess, totalAnimations, totalMoves];
-
     }
+
+    // pushSelf is called when this gblock is being pushed by pushMembers.
+    function pushSelf() {
+        if (THIS.result) {
+            return [THIS.result[0], [], []];
+        }
+
+
+        var [newRow, newCol] = hundo.Board.dirRowCol(
+            message.dir, THIS.row, THIS.col);
+
+        if (!board.inBounds(newRow, newCol)) {
+            return [false, [], []];
+        }
+
+        // TODO: factor out code common to this and ice, etc.
+        var newMessage = {
+            sender: THIS,
+            forwarder: THIS,
+            dir: message.dir,
+            newRow: newRow,
+            newCol: newCol,
+        }
+
+        var [success, animations, moves] = board.messageDown(newMessage);
+
+        THIS.result = [success, animations, moves];
+
+        if (success) {
+
+            moves.push({
+                piece: THIS,
+                newRow: newMessage.newRow,
+                newCol: newMessage.newCol
+            });
+
+            animations.push(
+                {
+                    move: {
+                        gblock: THIS,
+                        dir: message.dir,
+                    }
+                });
+        }
+
+        return [success, animations, moves];
+    }
+
+
+
+    var THIS = this;
+
+    // members is an array containing every member of this gblock's group.
+    var members = board.gblocks[this.groupId];
+    
+    var totalSuccess = true;
+    var totalAnimations = [];
+    var totalMoves = [];
 
     // TODO: eval this commentary
     // Two cases:
@@ -542,50 +608,8 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     } else {
 
+        return pushSelf();
 
-        if (this.result) {
-            return [this.result[0], [], []];
-        }
-
-
-        var [newRow, newCol] = hundo.Board.dirRowCol(
-            message.dir, this.row, this.col);
-
-        if (!board.inBounds(newRow, newCol)) {
-            return [false, [], []];
-        }
-
-        // TODO: factor out code common to this and ice, etc.
-        var newMessage = {
-            sender: this,
-            forwarder: this,
-            dir: message.dir,
-            newRow: newRow,
-            newCol: newCol,
-        }
-
-        var [success, animations, moves] = board.messageDown(newMessage);
-
-        this.result = [success, animations, moves];
-
-        if (success) {
-
-            moves.push({
-                piece: this,
-                newRow: newMessage.newRow,
-                newCol: newMessage.newCol
-            });
-
-            animations.push(
-                {
-                    move: {
-                        gblock: this,
-                        dir: message.dir,
-                    }
-                });
-        }
-
-        return [success, animations, moves];
     }
 }
 
