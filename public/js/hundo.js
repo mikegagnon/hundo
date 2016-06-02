@@ -537,10 +537,11 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
 
     // pushSelf is called when this gblock is being pushed by pushMembers.
     function pushSelf(THIS) {
+
+        // push results are memoized, and stored in THIS.result
         if (THIS.result) {
             return [THIS.result[0], [], []];
         }
-
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
             message.dir, THIS.row, THIS.col);
