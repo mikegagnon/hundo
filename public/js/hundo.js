@@ -4279,7 +4279,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
         bytes.shift();
 
-        pip = {
+        var pip = {
             row: r,
             col: c,
             up: up,
