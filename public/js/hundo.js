@@ -19,6 +19,75 @@
  *   input from the user.
  ******************************************************************************/
 
+/**
+ * Overview of Board
+ * =================
+ *
+ * The board is comprised of a matrix of cells. Each cell has two layers, a top
+ * and a bottom. The top layer can only hold a top piece, and the bottom layer
+ * can only hold a bottom piece.
+ *
+ * The top pieces are: Ball, Block, Ice, and Gblock
+ * The bottom pieces are: Goal, Arrow, Sand, Portal, and Pip
+ *
+ * Let's look at one hypthetical row:
+ *          ____     ____    ____    __________    ____    ____
+ * top     |____|   |____|  |ice |  |   ball   |  |____|  |____|
+ *
+ *          ____     ____    ____    __________    ____    ____
+ * bottom  |____|   |____|  |sand|  |arrow-left|  |____|  |____|
+ *      
+ *          col0     col1    col2    col3    col4    col5
+ *
+ * A piece can only leave its cell if it has permission from:
+ *   (A) the bottom piece of its current cell,
+ *   (B) the bottom piece of its destination cell, and
+ *   (C) the top piece of it's destination cell.
+ *
+ * The way we implement the permission system is with messages.
+ * 
+ * Example
+ * -------
+ *
+ * In this case, the ball creates a message indicating it wants to move left
+ * one cell, and hands the message down to the arrow-left piece.
+ *
+ * Because the arrow is pointing left, it forwards the message to the left cell.
+ * (If the arrow had been pointing up or down, the arrow would have vetoed the
+ * message, causing the ball to not move).
+ *
+ * The sand piece receives the ball's message, and forwards the message up
+ * to the ice piece. (The sand piece happens to never veto messages). The sand
+ * piece also adds a directive to stop the ball's momentum.
+ *
+ * The ice piece receives the message, so it creates a new message, hands it
+ * down to the sand piece, which hands it to the empty cell in col1. Empty cells
+ * never veto movement messages, so the ice moves into col1, and returns
+ * "success," causes the sand to return "success," which causes arrow-left to
+ * return "success," and so the ball then moves left into col2.
+ *
+ *          ____     ____    ____    __________    ____    ____
+ * top     |____|   |____|  |ice |  |   ball   |  |____|  |____|
+ *                    /\     \/ /\       \/
+ *          ____     ____    ____    __________    ____    ____
+ * bottom  |____|   |____|  |sand|  |arrow-left|  |____|  |____|
+ *                    /\     \/ /\       \/
+ *          col0     col1    col2    col3    col4    col5
+ *
+ * Mutations
+ * ---------
+ *
+ * Oh yeah, bottom pieces can mutate messages. For example:
+ *      - Elbow-pip pieces mutate the direction of the message
+ *      - Portal pieces change the row, col of the incoming piece, in order
+ *        to transport the piece to the cell of its partner piece.
+ * 
+ * Review
+ * ------
+ *      - Top pieces sends message down to bottom pieces
+ *      - Bottom pieces either veto messages or forward messages
+ ******************************************************************************/
+
 var hundo = {}
 
 /**
@@ -140,26 +209,43 @@ hundo.equalsTypeRowCol = function(a, b) {
 }
 
 /**
- * Block board pieces
+ * Overview of piece classes
+ * =========================
+ *
+ * There are 9 different types of pieces, each with its own class.
+ * 
+ * Every top-piece class has:
+ *      (1) a constructor,
+ *      (2) a messageUp method
+ *
+ * Every bottom-piece class has:
+ *      (1) a constructor,
+ *      (2) a messageUp method
+ *      (3) a messageDown method
+ *   
+ * The messageUp method is called when the message is coming from down below.
+ *      - For top pieces, the up message is either coming from the board, or
+ *        from its bottom piece.
+ *      - For bottom pieces, the up message always comes from the board.
+ *
+ * The messageDown method is called when the message is coming from up above
+ * (which is why only bottom pieces implement messageDown)
+ *
+ * Both messageUp and messageDown methods always return a triple of
+ * [success, animations, moves], where:
+ *
+ *      - success is true or false; true iff the piece is allowing the movement
+ *        request; false iff the piece is vetoing the movement request
+ *      - animations is an array of animation descriptions
+ *      - moves is an array of movement descriptions, which will be enacted
+ *        should the ball's movement request succeed.
+ *
  ******************************************************************************/
-
-// TODO: where to but this commentary
-// There are two types of pieces: bottom pieces and top pieces.
-//
-//      - Bottom pieces are stationary. For example: sand, pips, and goals
-//      - Top pieces are mobile: For example: the ball, gblocks, and ice
-//
-// Certain top pieces are "compatible" with certain bottom pieces, which is to
-// say that the top piece and the bottom piece may occupy the same cell
-// at the same time.
-
-
 
 /**
  * Block piece
  ******************************************************************************/
 
-// id is a uuid relative to board pieces
 hundo.Block = function(row, col) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.BLOCK;
@@ -1377,115 +1463,7 @@ hundo.Board.prototype.getJson = function() {
 
 }
 
-/**
- * Every cell has two layers, a top and a bottom. The top layer can only hold
- * a top piece, and the bottom layer can only hold a bottom piece.
- *
- * Let's look at one row:
- *          ____     ____    ____    ____    ____     ____
- * top     |____|   |____|  |____|  |____|  |____|   |____|
- *
- *          ____     ____    ____    ____    ____     ____
- * bottom  |____|   |____|  |____|  |____|  |____|   |____|
- *      
- *          col0     col1    col2    col3    col4    col5
- *
- * Let's say col3 holds the ball:
- *
- *                                    O
- *          ____     ____    ____    ____    ____     ____
- * top     |____|   |____|  |____|  |____|  |____|   |____|
- *
- *          ____     ____    ____    ____    ____     ____
- * bottom  |____|   |____|  |____|  |____|  |____|   |____|
- *      
- *          col0     col1    col2    col3    col4    col5
- *
- * The ball can only leave its cell if it has permission from bottom piece of
- * its cell.
- *
- * So, when the ball wants to leave its cell, it passes a message down to the
- * bottom piece. If bottom piece returns true, the ball may move. Else, the
- * ball may not move.
- * 
- *                                    O
- *          ____     ____    ____    ____    ____     ____
- * top     |____|   |____|  |____|  |_\/_|  |____|   |____|  messages going down
- *
- *          ____     ____    ____    ____    ____     ____
- * bottom  |____|   |____|  |____|  |_\/_|  |____|   |____|
- *      
- *          col0     col1    col2    col3    col4    col5
- *
- * The bottom piece may decide to veto the movement out right (say, because
- * it is an arrow piece, and the movement goes against a wall of the arrow).
- *
- * Or the bottom piece may decide to allow the move. But! The bottom piece
- * doesn't have sufficient information to decide whether or not the move is
- * legal. So, the bottom piece passes the message UP on the cell the ball
- * wants to move into.
- *
- *                                    O
- *          ____     ____    ____    ____    ____     ____
- * top     |____|   |____|  |_/\_|  |_\/_|  |____|   |____| 
- *
- *          ____     ____    ____    ____    ____     ____
- * bottom  |____|   |____|  |_/\_|  |_\/_|  |____|   |____| messages going up
- *      
- *          col0     col1    col2    col3    col4    col5
- *
- * First, the bottom piece reviews the message (possibly vetoing it).
- * Then, the top piece reviews the message (possibly vetoing it).
- *
- * Oh yeah, bottom pieces can mutate messages as well..
- *
- * And, if a piece is absent from the top or bottom, the board will simply
- * forward the messsage up or down.
- * 
- * To review:
- *      - Top piece sends message down to bottom piece
- *      - Bottom piece vetoes message, or sends message down to board
- *      - Board passes message up to bottom piece (to the recipient of messsage)
- *      - Bottom piece vetoes message, or sends message up to top piece
- *      - The top piece won't forward the message, but it might create a new
- *        message, creating a cascade of messages.
- ******************************************************************************/
 
-
-/**
- * When a top piece wants to move, it calls board.messageDown(message), where
- * message describes the movement the top piece wants to make. In this case,
- * board.messageDown(message) passes the message to the bottom piece of the same
- * cell that the top piece is in. This way, the bottom piece can veto the
- * movement if it would like.
-
- * Also, the bottom piece may make a new call to messageDown, if the bottom
- * peice would like more information before it decides whether or not to veto
- * the movement.
- *
- * Also, the bottom piece can mutate the message.
- *
- * If there is no bottom piece, then board.message() passes the message up to
- * the to the "newCell" where the top pieces wants to move.
- *
- * In this case, board.message() passes the message to newCell's bottom piece.
- *
- * But if there is no bottom piece, then board.message() passes the message to
- * the newCell's top piece.
- *
- * And, finally, if there is no top piece, then board.message() returns true,
- * since newCell has no pieces which might veto the movement.
- *
- * Illustation:
- *
- *  |  piece that wants to move          ^  newCell top
- *  V                                    | 
- *  |                                    | 
- *  | bottom                             ^  newCell bottom
- *  V                                    |
- *   >-----------------------------------^
- *
- */
 hundo.Board.prototype.messageDown = function(message) {
 
     // get the top and bottom pieces for the cell where the "piece that wants
