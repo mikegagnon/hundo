@@ -284,22 +284,27 @@ hundo.Ball.prototype.eq = function(piece) {
         this.dir == piece.dir;
 }
 
+/**
+ * The ball uses this.pushingDir to deal with cases where other pieces bump
+ * into the ball. For example:
+ *      (1) The ball has a gblock-0 to the left and to the right, and the
+ *          the ball pushes to the left. This causes the gblock-0 on the right
+ *          to bump into the ball, pushing to the left. To elegantly avoid
+ *          infinite recursion, the ball simply returns success.
+ *      (2) The ball pushes into a chain of ice cubes, which go into a pipe,
+ *          change direction, then push into the ball perpendicularly. In this
+ *          case, the ball vetos the movement.
+ */
 hundo.Ball.prototype.messageUp = function(board, message) {
 
     var success;
     var animations = [];
     var moves = [];
 
+    // If this is the first time the ball is being pushed; viz., by a keypress
     if (this.pushingDir == hundo.DirectionEnum.NODIR) {
 
         this.pushingDir = message.dir;
-
-        // When a keypress leads to ball.pushInto, sender is empty.
-        // So, when there is a sender, it means another piece is pushing into the 
-        // ball.
-        if (message.sender) {
-            return [false, [], []];        
-        }
 
         var [newRow, newCol] = hundo.Board.dirRowCol(
             message.dir, this.row, this.col);
