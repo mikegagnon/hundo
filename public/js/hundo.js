@@ -2338,12 +2338,6 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
 
                 <rect id="perim" x="0" y="0" style="stroke-width:3;stroke:#999" fill-opacity="0.0"/>
 
-                <!-- hard coded to standard numCols numRows -->
-                <text x="85" y="150"
-                    font-family="Impact"
-                    font-size="55">
-                    TOTAL VICTORY!
-                </text>
             </svg>
         </div>
         <div id="${this.consoleId()}" class="console">
@@ -3253,10 +3247,15 @@ hundo.Viz.dxdy = function(dir) {
     }
 }
 
+
+// TODO: add instance id to #background
 hundo.Viz.prototype.undoAnimateVictory = function() {
 
     this.boardSvg.select("#background")
         .style("fill", "#000")
+
+    this.boardSvg.select("#theend" + this.id)
+        .remove();
 
     this.drawGrid();
 }
@@ -3273,6 +3272,18 @@ hundo.Viz.prototype.animateVictory = function() {
 
     this.boardSvg.selectAll(".grid")
         .remove();
+
+    this.boardSvg.selectAll()
+        .data([1])
+        .enter()
+        .append("text")
+        .attr("id", "theend" + this.id)
+        .attr("x", 50)
+        .attr("y", 150)
+        .attr("font-family", "Impact")
+        .attr("font-size", 55)
+        .text("The end...");
+
 }
 
 hundo.Viz.prototype.animateSolvedQuick = function() {
@@ -3398,7 +3409,7 @@ hundo.Viz.prototype.updateLevelSelect = function() {
     var levelText;
 
     if (this.level == "victory" ) {
-        levelText = "VICTORY"
+        levelText = "The end... "
     } else {
         levelText = "Level " + (this.level + 1) + "/" + this.levels.length;
     }
