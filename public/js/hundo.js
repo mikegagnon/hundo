@@ -702,7 +702,6 @@ hundo.Portal.prototype.eq = function(piece) {
  * Pip piece
  ******************************************************************************/
 
-// TODO: do we really need to store this.up, etc.?
 hundo.Pip = function(row, col, up, down, left, right) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.PIP;
@@ -721,7 +720,7 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.open[hundo.DirectionEnum.LEFT] = left;
     this.open[hundo.DirectionEnum.RIGHT] = right;
 
-    // If this pip is not and elbow, then this.elbow = false
+    // If this pip is not an elbow, then this.elbow = false
     // If this pip is an elbow, then this.elbow[x] = y, where
     // x == the direction the top piece is moving in, and
     // y == the new direction the top piece (because the pip modifies the
