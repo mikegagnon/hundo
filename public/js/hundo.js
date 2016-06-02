@@ -666,7 +666,14 @@ hundo.Portal.prototype.messageUp = function(board, message) {
     }
 
     // TODO: switch order of code so there's no negation here
-    if (!this.receivingTeleportation) {
+     if (this.receivingTeleportation) {
+
+        message.forwarder = this;
+
+        var [success, animations, moves] = board.messageUp(message);
+
+        return [success, animations, moves];
+    } else {
 
         var partner = this.getPartner(board);
 
@@ -680,13 +687,6 @@ hundo.Portal.prototype.messageUp = function(board, message) {
         var [success, animations, moves] = partner.messageUp(board, message);
 
         partner.receivingTeleportation = false;
-
-        return [success, animations, moves];
-    } else {
-
-        message.forwarder = this;
-
-        var [success, animations, moves] = board.messageUp(message);
 
         return [success, animations, moves];
     }
