@@ -2043,6 +2043,10 @@ hundo.Viz = function(config) {
         this.addResetButton();
     }
 
+    if (config.viz.createButton) {
+        this.addCreateButton();
+    }
+
     if (this.maker.on) {
         this.addSave();
         this.addShowSolution();
@@ -2467,6 +2471,16 @@ hundo.Viz.prototype.addResetButton = function() {
      $("#" + this.consoleId()).append(resetButton);
 }
 
+hundo.Viz.prototype.addCreateButton = function() {
+
+    var contents = `<button id="${this.createButtonId()}" onclick="window.location.href = 'level-editor.html'" type="button"
+     class="button">Create new puzzle</button>`
+
+    var createButton = $("<div/>").html(contents).contents();
+
+     $("#" + this.consoleId()).append(createButton);
+}
+
 // TODO: id incorpoates viz id
 hundo.Viz.prototype.paletteButtonHtml = function(image, config) {
     return `
@@ -2850,6 +2864,10 @@ hundo.Viz.prototype.playButtonId = function() {
 
 hundo.Viz.prototype.resetButtonId = function() {
     return "resetButton" + this.id;
+}
+
+hundo.Viz.prototype.createButtonId = function() {
+    return "createButton" + this.id;
 }
 
 hundo.Viz.prototype.saveButtonId = function() {
@@ -4307,6 +4325,7 @@ hundo.defaultVizConfig = {
     numCols: 21,
     playButton: false,
     resetButton: true,
+    createButton: true,
     levelSelect: true,
     levelMax: 0,
     allLevels: true
