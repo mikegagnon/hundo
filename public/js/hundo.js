@@ -324,13 +324,13 @@ hundo.Ball.prototype.messageUp = function(board, message) {
 
         if (success) {
 
+            this.dir = newMessage.dir;
+
             moves.push({
                 piece: this,
                 newRow: newMessage.newRow,
                 newCol: newMessage.newCol
             });
-
-            this.dir = newMessage.dir;
 
             animations.push(
                 {
