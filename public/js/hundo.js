@@ -2837,7 +2837,7 @@ hundo.Viz.prototype.addPalette = function() {
         })
         .join("")
 
-    var contents = "<div class='palette'>" + contents + "</div>"
+    var contents = "<div class='palette' id='" + this.paletteDivId() + "''>" + contents + "</div>"
 
     var palette = $("<div/>").html(contents).contents();
 
@@ -2924,6 +2924,10 @@ hundo.Viz.prototype.levelBackButtonId = function() {
 
 hundo.Viz.prototype.levelForwardButtonId = function() {
     return "levelForwardButton" + this.id;
+}
+
+hundo.Viz.prototype.paletteDivId = function() {
+    return "paletteDiv" + this.id;
 }
 
 hundo.Viz.prototype.drawGrid = function() {
@@ -3776,8 +3780,10 @@ hundo.Viz.prototype.clickPlay = function() {
 
     if (this.maker.play) {
         $("#" + this.playButtonId()).text("Edit");
+        $("#" + this.paletteDivId()).children().css("opacity", 0.15).css("cursor", "");
     } else {
         $("#" + this.playButtonId()).text("Play");
+        $("#" + this.paletteDivId()).children().css("opacity", 1.0).css("cursor", "pointer");
     }
 
 }
@@ -3854,6 +3860,10 @@ hundo.Viz.prototype.getPalettePieceId = function(id) {
 }
 
 hundo.Viz.prototype.clickPalette = function(config) {
+
+    if (this.maker.play) {
+        return;
+    }
 
     $("#" + this.getPalettePieceId(this.paletteSelection.id))
         .css("border-style", "")
