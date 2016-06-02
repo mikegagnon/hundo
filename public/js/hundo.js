@@ -285,8 +285,6 @@ hundo.Ball.prototype.eq = function(piece) {
 }
 
 /**
- * Ball piece
- * ==========
  *
  * The ball uses this.pushingDir to deal with cases where other pieces bump
  * into the ball. For example:
@@ -298,6 +296,7 @@ hundo.Ball.prototype.eq = function(piece) {
  *          change direction, then push into the ball perpendicularly. In this
  *          case, the ball vetos the movement.
  ******************************************************************************/
+
 hundo.Ball.prototype.messageUp = function(board, message) {
 
     var success;
