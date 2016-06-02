@@ -583,18 +583,18 @@ hundo.Gblock.prototype.messageUp = function(board, message) {
     }
 
     // TODO: reorder if statement to get rid of negation
-    if (!(message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
-        message.sender.groupId == this.groupId)) {
+    if (message.sender.type == hundo.PieceTypeEnum.GBLOCK &&
+        message.sender.groupId == this.groupId) {
+
+        return pushSelf(this);
+
+    } else {
 
         if (this.pushingDir == hundo.DirectionEnum.NODIR) {
             return pushMembers(this);
         } else {
             return [true, [], []];
         }
-
-    } else {
-
-        return pushSelf(this);
 
     }
 }
