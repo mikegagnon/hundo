@@ -4046,6 +4046,17 @@ hundo.Compress.addRowColGroupId = function(level, levelArray, pieces) {
     levelArray.push(hundo.Compress.sep);
 }
 
+hundo.Compress.addPips = function(level, levelArray, pieces) {
+
+    _.each(pieces, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                piece.up ? 1 : 0,
+                piece.down ? 1 : 0,
+                piece.left ? 1 : 0,
+                piece.right ? 1 : 0);
+    });
+}
+
 // TODO: make a class
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level, version) {
@@ -4069,17 +4080,7 @@ hundo.Compress.compressLevel = function(level, version) {
     hundo.Compress.addRowColGroupId(level, levelArray, level.gblocks);
     hundo.Compress.addRowCol(level, levelArray, level.sand);
     hundo.Compress.addRowColGroupId(level, levelArray, level.portals);
-
-    // TODO: fancier compression for pips?
-
-    // Encode the pips
-    _.each(level.pips, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                piece.up ? 1 : 0,
-                piece.down ? 1 : 0,
-                piece.left ? 1 : 0,
-                piece.right ? 1 : 0);
-    });
+    hundo.Compress.addPips(level, levelArray, level.pips);
 
     return _.join(levelArray, "");
 }
