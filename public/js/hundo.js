@@ -4144,6 +4144,45 @@ hundo.Compress.pullBall = function(bytes) {
     return ball;
 }
 
+hundo.Compress.pullRowColPieces = function(bytes) {
+
+    var pieces = [];
+
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        var [r, c] = hundo.Compress.getRowCol(bytes);
+        var piece = {
+            row: r,
+            col: c
+        }
+        pieces.push(piece);
+    }
+
+    hundo.Compress.pullSeparator(bytes);
+
+    return pieces;
+}
+
+hundo.Compress.pullRowColDirPieces = function(bytes) {
+
+    var pieces = [];
+
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        var [r, c] = hundo.Compress.getRowCol(bytes);
+        var dir = hundo.Compress.numToDir(bytes[0]);
+        bytes.shift();
+        var piece = {
+            row: r,
+            col: c,
+            dir: dir
+        }
+        pieces.push(piece);
+    }
+
+    hundo.Compress.pullSeparator(bytes);
+
+    return pieces;
+}
+
 
 // 64-bit bytes
 // TODO: factor out common code
@@ -4167,44 +4206,12 @@ hundo.Compress.decompressLevel = function(byteString) {
     var [version, bytes] = hundo.Compress.pullVersion(bytes);
 
     [level.numRows, level.numCols] = hundo.Compress.getRowCol(bytes);
-    
+
     level.ball = hundo.Compress.pullBall(bytes);
     
+    level.blocks = hundo.Compress.pullRowColPieces(bytes);
 
-
-    // Get the blocks
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var block = {
-            row: r,
-            col: c
-        }
-        level.blocks.push(block);
-    }
-
-    hundo.Compress.pullSeparator(bytes);
-
-    // Get the goals
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var dir = hundo.Compress.numToDir(bytes[0]);
-        bytes.shift();
-        var goal = {
-            row: r,
-            col: c,
-            dir: dir
-        }
-        level.goals.push(goal);
-    }
-
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
+    level.goals = hundo.Compress.pullRowColDirPieces(bytes);
 
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
         [r, c] = hundo.Compress.getRowCol(bytes);
