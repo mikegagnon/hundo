@@ -4108,6 +4108,24 @@ hundo.Compress.pullSeparator = function(bytes) {
     }
 }
 
+hundo.Compress.pullVersion = function(bytes) {
+    var version;
+
+    var firstByteNum = hundo.Compress.fromBase64Digit(bytes[0]);
+    bytes.shift();
+
+    if (firstByteNum == hundo.Compress.versioningSentinel) {
+        version = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+    } else {
+        version = 0;
+        var firstByte = hundo.Compress.toBase64Digit(firstByteNum);
+        bytes = _.concat(firstByte, bytes);
+    }
+
+    return [version, bytes];
+}
+
 
 // 64-bit bytes
 // TODO: factor out common code
@@ -4126,19 +4144,7 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     var bytes = _.split(byteString, "")
 
-    var version;
-
-    var firstByteNum = hundo.Compress.fromBase64Digit(bytes[0]);
-    bytes.shift();
-
-    if (firstByteNum == hundo.Compress.versioningSentinel) {
-        version = hundo.Compress.fromBase64Digit(bytes[0]);
-        bytes.shift();
-    } else {
-        version = 0;
-        var firstByte = hundo.Compress.toBase64Digit(firstByteNum);
-        bytes = _.concat(firstByte, bytes);
-    }
+    var [version, bytes] = hundo.Compress.pullVersion(bytes);
 
     var [r, c] = hundo.Compress.getRowCol(bytes);
     level.numRows = r;
