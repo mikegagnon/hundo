@@ -3896,9 +3896,6 @@ hundo.Viz.prototype.getBoardUrl = function(filename) {
 
     var urlPrefix = _.join(parts, "/");
 
-    console.log(filename);
-    console.log(urlPrefix);
-
     return urlPrefix + "/" + filename + "?level=" +
         encodeURIComponent(levelParam);
 }
@@ -4086,9 +4083,6 @@ hundo.Compress.addPips = function(level, levelArray, pieces, version) {
                 directions |= 1;
             }
 
-            console.log(piece)
-            console.log(directions)
-
             hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
                     directions);
 
@@ -4259,26 +4253,78 @@ hundo.Compress.pullPips = function(bytes, version) {
 
     var pieces = [];
 
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        var [r, c] = hundo.Compress.getRowCol(bytes);
-        var up = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var down = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var left = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
+    if (version == 0) {
 
-        var pip = {
-            row: r,
-            col: c,
-            up: up,
-            down: down,
-            left: left,
-            right: right
+        while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+            var [r, c] = hundo.Compress.getRowCol(bytes);
+            var up = hundo.Compress.fromBase64Digit(
+                bytes[0]) == 1 ? true : false;
+            bytes.shift();
+            var down = hundo.Compress.fromBase64Digit(
+                bytes[0]) == 1 ? true : false;
+            bytes.shift();
+            var left = hundo.Compress.fromBase64Digit(
+                bytes[0]) == 1 ? true : false;
+            bytes.shift();
+            var right = hundo.Compress.fromBase64Digit(
+                bytes[0]) == 1 ? true : false;
+            bytes.shift();
+
+            var pip = {
+                row: r,
+                col: c,
+                up: up,
+                down: down,
+                left: left,
+                right: right
+            }
+            pieces.push(pip);
         }
-        pieces.push(pip);
+
+    } else if (version == 1) {
+
+        while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+            var [r, c] = hundo.Compress.getRowCol(bytes);
+            var directions = hundo.Compress.fromBase64Digit(bytes[0]);
+            bytes.shift();
+
+            var up = false, down = false, left = false, right = false;
+
+            if (directions & 1 == 1) {
+                right = true;
+            }
+
+            directions >>= 1;
+
+            if (directions & 1 == 1) {
+                left = true;
+            }
+
+            directions >>= 1;
+
+            if (directions & 1 == 1) {
+                down = true;
+            }
+
+            directions >>= 1;
+
+            if (directions & 1 == 1) {
+                up = true;
+            }
+
+            var pip = {
+                row: r,
+                col: c,
+                up: up,
+                down: down,
+                left: left,
+                right: right
+            }
+
+            pieces.push(pip);
+        }
+    } else {
+        console.error("Unsupported version number: " + version);
     }
 
     hundo.Compress.pullSeparator(bytes);
@@ -4324,7 +4370,7 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     level.portals = hundo.Compress.pullRowColGroupIdPieces(bytes);
 
-    level.pips = hundo.Compress.pullPips(bytes);    
+    level.pips = hundo.Compress.pullPips(bytes, version);
 
     return level;
 }
