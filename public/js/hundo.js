@@ -4097,6 +4097,18 @@ hundo.Compress.getRowCol = function(bytes) {
 
 }
 
+hundo.Compress.pullSeparator = function(bytes) {
+    // shift past the sep
+    if (bytes.length > 0) {
+        if (bytes[0] != hundo.Compress.sep) {
+            console.error("Could not parse level");
+            return null;
+        }
+        bytes.shift();
+    }
+}
+
+
 // 64-bit bytes
 // TODO: factor out common code
 hundo.Compress.decompressLevel = function(byteString) {
@@ -4141,15 +4153,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         }
     }
 
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
-
+    hundo.Compress.pullSeparator(bytes);
 
     // Get the blocks
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
@@ -4161,14 +4165,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         level.blocks.push(block);
     }
 
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
+    hundo.Compress.pullSeparator(bytes);
 
     // Get the goals
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
