@@ -4036,6 +4036,16 @@ hundo.Compress.addRowColDir = function(level, levelArray, pieces) {
     levelArray.push(hundo.Compress.sep);
 }
 
+hundo.Compress.addRowColGroupId = function(level, levelArray, pieces) {
+
+    _.each(pieces, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+            piece.groupId);
+    });
+
+    levelArray.push(hundo.Compress.sep);
+}
+
 // TODO: make a class
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level, version) {
@@ -4054,49 +4064,11 @@ hundo.Compress.compressLevel = function(level, version) {
     hundo.Compress.addBall(level, levelArray);
     hundo.Compress.addRowCol(level, levelArray, level.blocks);
     hundo.Compress.addRowColDir(level, levelArray, level.goals);
-
-    // Encode the ice
-    _.each(level.ice, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode the arrows
-    _.each(level.arrows, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                hundo.Compress.dirToNum(piece.dir));
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode the gblocks
-    _.each(level.gblocks, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                piece.groupId);
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode the sand
-    _.each(level.sand, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode the portals
-    _.each(level.portals, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                piece.groupId);
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
+    hundo.Compress.addRowCol(level, levelArray, level.ice);
+    hundo.Compress.addRowColDir(level, levelArray, level.arrows);
+    hundo.Compress.addRowColGroupId(level, levelArray, level.gblocks);
+    hundo.Compress.addRowCol(level, levelArray, level.sand);
+    hundo.Compress.addRowColGroupId(level, levelArray, level.portals);
 
     // TODO: fancier compression for pips?
 
