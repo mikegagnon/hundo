@@ -4126,6 +4126,24 @@ hundo.Compress.pullVersion = function(bytes) {
     return [version, bytes];
 }
 
+// TODO: unit test without ball
+hundo.Compress.pullBall = function(bytes) {
+
+    var ball;
+
+    if (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        var [r, c] = hundo.Compress.getRowCol(bytes);
+        ball = {
+            row: r,
+            col: c
+        }
+    }
+
+    hundo.Compress.pullSeparator(bytes);
+
+    return ball;
+}
+
 
 // 64-bit bytes
 // TODO: factor out common code
@@ -4142,24 +4160,17 @@ hundo.Compress.decompressLevel = function(byteString) {
         pips: []
     };
 
+    var r, c;
+
     var bytes = _.split(byteString, "")
 
     var [version, bytes] = hundo.Compress.pullVersion(bytes);
 
-    var [r, c] = hundo.Compress.getRowCol(bytes);
-    level.numRows = r;
-    level.numCols = c;
+    [level.numRows, level.numCols] = hundo.Compress.getRowCol(bytes);
+    
+    level.ball = hundo.Compress.pullBall(bytes);
+    
 
-    // Get the ball, if it's there
-    if (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        level.ball = {
-            row: r,
-            col: c
-        }
-    }
-
-    hundo.Compress.pullSeparator(bytes);
 
     // Get the blocks
     while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
