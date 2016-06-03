@@ -4183,7 +4183,57 @@ hundo.Compress.pullRowColDirPieces = function(bytes) {
     return pieces;
 }
 
+hundo.Compress.pullRowColGroupIdPieces = function(bytes) {
 
+    var pieces = [];
+
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        var [r, c] = hundo.Compress.getRowCol(bytes);
+        var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
+        bytes.shift();
+        var piece = {
+            row: r,
+            col: c,
+            groupId: groupId
+        }
+        pieces.push(piece);
+    }
+
+    hundo.Compress.pullSeparator(bytes);
+
+    return pieces;
+}
+
+hundo.Compress.pullPips = function(bytes) {
+
+    var pieces = [];
+
+    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
+        var [r, c] = hundo.Compress.getRowCol(bytes);
+        var up = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
+        bytes.shift();
+        var down = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
+        bytes.shift();
+        var left = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
+        bytes.shift();
+        var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
+        bytes.shift();
+
+        var pip = {
+            row: r,
+            col: c,
+            up: up,
+            down: down,
+            left: left,
+            right: right
+        }
+        pieces.push(pip);
+    }
+
+    hundo.Compress.pullSeparator(bytes);
+
+    return pieces;
+}
 // 64-bit bytes
 // TODO: factor out common code
 hundo.Compress.decompressLevel = function(byteString) {
@@ -4213,131 +4263,17 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     level.goals = hundo.Compress.pullRowColDirPieces(bytes);
 
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var ice = {
-            row: r,
-            col: c
-        }
-        level.ice.push(ice);
-    }
+    level.ice = hundo.Compress.pullRowColPieces(bytes);
 
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
+    level.arrows = hundo.Compress.pullRowColDirPieces(bytes);
 
-    // Get the arrows
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var dir = hundo.Compress.numToDir(bytes[0]);
-        bytes.shift();
-        var arrow = {
-            row: r,
-            col: c,
-            dir: dir
-        }
-        level.arrows.push(arrow);
-    }
+    level.gblocks = hundo.Compress.pullRowColGroupIdPieces(bytes);
 
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
+    level.sand = hundo.Compress.pullRowColPieces(bytes);
 
-    // Get the gblocks
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
-        bytes.shift();
-        var gblock = {
-            row: r,
-            col: c,
-            groupId: groupId
-        }
-        level.gblocks.push(gblock);
-    }
+    level.portals = hundo.Compress.pullRowColGroupIdPieces(bytes);
 
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
-
-    // Get the sand
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var sand = {
-            row: r,
-            col: c,
-        }
-        level.sand.push(sand);
-    }
-
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
-
-    // Get the portals
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var groupId = hundo.Compress.fromBase64Digit(bytes[0]);
-        bytes.shift();
-        var portal = {
-            row: r,
-            col: c,
-            groupId: groupId
-        }
-        level.portals.push(portal);
-    }
-
-    // shift past the sep
-    if (bytes.length > 0) {
-        if (bytes[0] != hundo.Compress.sep) {
-            console.error("Could not parse level");
-            return null;
-        }
-        bytes.shift();
-    }
-
-    // Get the pips
-    while (bytes.length > 0 && bytes[0] != hundo.Compress.sep) {
-        [r, c] = hundo.Compress.getRowCol(bytes);
-        var up = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var down = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var left = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-        var right = hundo.Compress.fromBase64Digit(bytes[0]) == 1 ? true : false;
-        bytes.shift();
-
-        var pip = {
-            row: r,
-            col: c,
-            up: up,
-            down: down,
-            left: left,
-            right: right
-        }
-        level.pips.push(pip);
-    }
+    level.pips = hundo.Compress.pullPips(bytes);    
 
     return level;
 }
