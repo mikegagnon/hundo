@@ -3993,99 +3993,102 @@ hundo.Compress.versioningSentinel = 61;
 
 hundo.Compress.versionNumber = 1;
 
-hundo.Compress.pushDigit64 = function(levelArray, num) {
-    levelArray.push(hundo.Compress.toBase64Digit(num));    
+hundo.Compress.pushNumbers = function(levelArray, ...nums) {
+
+    _.each(nums, function(num) {
+        levelArray.push(hundo.Compress.toBase64Digit(num));
+    });
 }
 
 hundo.Compress.addVersion = function(levelArray) {
-    hundo.Compress.pushDigit64(levelArray, hundo.Compress.versioningSentinel);
-    hundo.Compress.pushDigit64(levelArray, hundo.Compress.versionNumber);
+    hundo.Compress.pushNumbers(levelArray,
+        hundo.Compress.versioningSentinel,
+        hundo.Compress.versionNumber);
 }
 
 hundo.Compress.addDimensions = function(level, levelArray) {
-
-    levelArray.push(hundo.Compress.toBase64Digit(level.numRows));
-    levelArray.push(hundo.Compress.toBase64Digit(level.numCols));
+    hundo.Compress.pushNumbers(levelArray, level.numRows, level.numCols);
 }
 
+// TODO: make a class
 // assumes numRows, numCols < 32
-hundo.Compress.compressLevel = function(level) {
+hundo.Compress.compressLevel = function(level, version) {
+
+    if (typeof version == "undefined") {
+        version = hundo.Compress.versionNumber;
+    }
+
     var levelArray = [];
 
-    hundo.Compress.addVersion(levelArray);
+    if (version > 0) {
+        hundo.Compress.addVersion(levelArray);
+    }
+
     hundo.Compress.addDimensions(level, levelArray);
 
     // The next two bytes encode ball.row, ball.col
     if (typeof level.ball != "undefined") {
-        levelArray.push(hundo.Compress.toBase64Digit(level.ball.row));
-        levelArray.push(hundo.Compress.toBase64Digit(level.ball.col));
+        hundo.Compress.pushNumbers(levelArray, level.ball.row, level.ball.col);
     }
 
     // signifies beginning of blocks
     levelArray.push(hundo.Compress.sep);
 
     // Encode each block as (block.row, block.col) pair
-    _.each(level.blocks, function(block){
-        levelArray.push(hundo.Compress.toBase64Digit(block.row));
-        levelArray.push(hundo.Compress.toBase64Digit(block.col));
+    _.each(level.blocks, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
     });
 
     // separates blocks and goals
     levelArray.push(hundo.Compress.sep);
 
     // Encode the goals, like blocks
-    _.each(level.goals, function(goal){
-        levelArray.push(hundo.Compress.toBase64Digit(goal.row));
-        levelArray.push(hundo.Compress.toBase64Digit(goal.col));
-        levelArray.push(hundo.Compress.dirToNum(goal.dir))
+    _.each(level.goals, function(piece){
+            hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                hundo.Compress.dirToNum(piece.dir));
     });
 
     // separator
     levelArray.push(hundo.Compress.sep);
 
     // Encode the ice
-    _.each(level.ice, function(ice){
-        levelArray.push(hundo.Compress.toBase64Digit(ice.row));
-        levelArray.push(hundo.Compress.toBase64Digit(ice.col));
+    _.each(level.ice, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
     });
 
     // separator
     levelArray.push(hundo.Compress.sep);
 
     // Encode the arrows
-    _.each(level.arrows, function(arrow){
-        levelArray.push(hundo.Compress.toBase64Digit(arrow.row));
-        levelArray.push(hundo.Compress.toBase64Digit(arrow.col));
-        levelArray.push(hundo.Compress.dirToNum(arrow.dir))
+    _.each(level.arrows, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                hundo.Compress.dirToNum(piece.dir));
     });
 
     // separator
     levelArray.push(hundo.Compress.sep);
 
     // Encode the gblocks
-    _.each(level.gblocks, function(gblock){
-        levelArray.push(hundo.Compress.toBase64Digit(gblock.row));
-        levelArray.push(hundo.Compress.toBase64Digit(gblock.col));
-        levelArray.push(hundo.Compress.toBase64Digit(gblock.groupId));
+    _.each(level.gblocks, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                piece.groupId);
     });
 
     // separator
     levelArray.push(hundo.Compress.sep);
 
     // Encode the sand
-    _.each(level.sand, function(sand){
-        levelArray.push(hundo.Compress.toBase64Digit(sand.row));
-        levelArray.push(hundo.Compress.toBase64Digit(sand.col));
+    _.each(level.sand, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
     });
 
     // separator
     levelArray.push(hundo.Compress.sep);
 
     // Encode the portals
-    _.each(level.portals, function(portal){
-        levelArray.push(hundo.Compress.toBase64Digit(portal.row));
-        levelArray.push(hundo.Compress.toBase64Digit(portal.col));
-        levelArray.push(hundo.Compress.toBase64Digit(portal.groupId));
+    _.each(level.portals, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                piece.groupId);
     });
 
     // separator
@@ -4094,14 +4097,12 @@ hundo.Compress.compressLevel = function(level) {
     // TODO: fancier compression for pips?
 
     // Encode the pips
-    _.each(level.pips, function(pip){
-        levelArray.push(hundo.Compress.toBase64Digit(pip.row));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.col));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.up ? 1 : 0));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.down ? 1 : 0));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.left ? 1 : 0));
-        levelArray.push(hundo.Compress.toBase64Digit(pip.right ? 1 : 0));
-
+    _.each(level.pips, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                piece.up ? 1 : 0,
+                piece.down ? 1 : 0,
+                piece.left ? 1 : 0,
+                piece.right ? 1 : 0);
     });
 
     return _.join(levelArray, "");
