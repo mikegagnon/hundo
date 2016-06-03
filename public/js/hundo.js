@@ -28,7 +28,7 @@
  * can only hold a bottom piece.
  *
  * The top pieces are: Ball, Block, Ice, and Gblock
- * The bottom pieces are: Goal, Arrow, Sand, Portal, and Pip
+ * The bottom pieces are: Goal, Arrow, Sand, Portal, and Pipe
  *
  * Let's look at one hypthetical row:
  *          ____     ____    ____    __________    ____    ____
@@ -78,7 +78,7 @@
  * ---------
  *
  * Oh yeah, bottom pieces can mutate messages. For example:
- *      - Elbow-pip pieces mutate the direction of the message
+ *      - Elbow-pipe pieces mutate the direction of the message
  *      - Portal pieces change the row, col of the incoming piece, in order
  *        to transport the piece to the cell of its partner piece.
  * 
@@ -699,10 +699,10 @@ hundo.Portal.prototype.eq = function(piece) {
 
 
 /**
- * Pip piece
+ * Pipe piece
  ******************************************************************************/
 
-hundo.Pip = function(row, col, up, down, left, right) {
+hundo.Pipe = function(row, col, up, down, left, right) {
     this.id = hundo.idGenerator.next();
     this.type = hundo.PieceTypeEnum.PIP;
     this.layer = hundo.LayerEnum.BOTTOM;
@@ -720,10 +720,10 @@ hundo.Pip = function(row, col, up, down, left, right) {
     this.open[hundo.DirectionEnum.LEFT] = left;
     this.open[hundo.DirectionEnum.RIGHT] = right;
 
-    // If this pip is not an elbow, then this.elbow = false
-    // If this pip is an elbow, then this.elbow[x] = y, where
+    // If this pipe is not an elbow, then this.elbow = false
+    // If this pipe is an elbow, then this.elbow[x] = y, where
     // x == the direction the top piece is moving in, and
-    // y == the new direction the top piece (because the pip modifies the
+    // y == the new direction the top piece (because the pipe modifies the
     // direction of the top piece)
     if (up && right && !down && !left) {
         this.elbow = {};
@@ -746,7 +746,7 @@ hundo.Pip = function(row, col, up, down, left, right) {
     }
 }
 
-hundo.Pip.prototype.messageDown = function(board, message) {
+hundo.Pipe.prototype.messageDown = function(board, message) {
 
     if (this.open[message.dir]) {
         message.forwarder = this;
@@ -768,7 +768,7 @@ hundo.Pip.prototype.messageDown = function(board, message) {
 
 }
 
-hundo.Pip.prototype.messageUp = function(board, message) {
+hundo.Pipe.prototype.messageUp = function(board, message) {
 
     if (message.sender.type == hundo.PieceTypeEnum.GBLOCK) {
         return [false, [], []];
@@ -786,7 +786,7 @@ hundo.Pip.prototype.messageUp = function(board, message) {
 
 }
 
-hundo.Pip.prototype.eq = function(piece) {
+hundo.Pipe.prototype.eq = function(piece) {
     return hundo.equalsTypeRowCol(this, piece) &&
         this.up == piece.up &&
         this.down == piece.down &&
@@ -905,10 +905,10 @@ hundo.Board = function(boardConfig) {
         }
     });
 
-    // Add Pips
-    _.each(boardConfig.pips, function(pip) {
-        var piece = new hundo.Pip(pip.row, pip.col, pip.up, pip.down, pip.left,
-            pip.right);
+    // Add Pipes
+    _.each(boardConfig.pipes, function(pipe) {
+        var piece = new hundo.Pipe(pipe.row, pipe.col, pipe.up, pipe.down, pipe.left,
+            pipe.right);
         if (!THIS.addPiece(piece)) {
             console.error("Could not add piece: ", piece);
         }
@@ -1340,7 +1340,7 @@ hundo.Board.prototype.getPortals = function() {
 };
 
 // TODO: is this up, down, left, right functionality unnecessary?
-hundo.Board.prototype.getPips = function(up, down, left, right) {
+hundo.Board.prototype.getPipes = function(up, down, left, right) {
 
     if (typeof up == "undefined") {
         return this.getPieces(function(piece){
@@ -1408,14 +1408,14 @@ hundo.Board.prototype.getJson = function() {
                     groupId: portal.groupId
                 }
             }),
-        pips: _.map(this.getPips(), function(pip) {
+        pipes: _.map(this.getPipes(), function(pipe) {
                 return {
-                    row: pip.row,
-                    col: pip.col,
-                    up: pip.up,
-                    down: pip.down,
-                    left: pip.left,
-                    right: pip.right
+                    row: pipe.row,
+                    col: pipe.col,
+                    up: pipe.up,
+                    down: pipe.down,
+                    left: pipe.left,
+                    right: pipe.right
                 }
             }),
     }
@@ -2255,7 +2255,7 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
 
 
                     <!-- PIP four dirs -->
-                    <g id="pipTemplate-1111" height="26" width="26">
+                    <g id="pipeTemplate-1111" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
@@ -2264,28 +2264,28 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
 
                     <!-- three dirs -->
-                    <g id="pipTemplate-0111" height="26" width="26">
+                    <g id="pipeTemplate-0111" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-1011" height="26" width="26">
+                    <g id="pipeTemplate-1011" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-1101" height="26" width="26">
+                    <g id="pipeTemplate-1101" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-1110" height="26" width="26">
+                    <g id="pipeTemplate-1110" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
@@ -2293,37 +2293,37 @@ hundo.Viz.prototype.drawSvgGrid = function(name) {
                     </g>
 
                     <!-- two dirs -->
-                    <g id="pipTemplate-1100" height="26" width="26">
+                    <g id="pipeTemplate-1100" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-1010" height="26" width="26">
+                    <g id="pipeTemplate-1010" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-1001" height="26" width="26">
+                    <g id="pipeTemplate-1001" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--up-->    <rect x="8" y="0" width="10" height="13" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-0110" height="26" width="26">
+                    <g id="pipeTemplate-0110" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-0101" height="26" width="26">
+                    <g id="pipeTemplate-0101" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--down-->  <rect x="8" y="13" width="10" height="13" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
                     </g>
 
-                    <g id="pipTemplate-0011" height="26" width="26">
+                    <g id="pipeTemplate-0011" height="26" width="26">
                         <ellipse cx="13" cy="13" rx="5" ry="5" style="fill:#0a0" />
                         <!--left-->  <rect x="0" y="8" width="13" height="10" style="fill:#0a0" />
                         <!--right--> <rect x="13" y="8" width="13" height="10" style="fill:#0a0" />
@@ -2378,7 +2378,7 @@ hundo.Viz.prototype.getPieceFromPalette = function(row, col) {
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.PORTAL) {
         return new hundo.Portal(row, col, this.paletteSelection.groupId);
     } else if (this.paletteSelection.type == hundo.PieceTypeEnum.PIP) {
-        return new hundo.Pip(row, col, this.paletteSelection.up,
+        return new hundo.Pipe(row, col, this.paletteSelection.up,
             this.paletteSelection.down, this.paletteSelection.left,
             this.paletteSelection.right);
     }else {
@@ -2662,7 +2662,7 @@ hundo.Viz.prototype.addPalette = function() {
 
 
         {
-            image: "pip-0011",
+            image: "pipe-0011",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: false,
@@ -2673,7 +2673,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-1100",
+            image: "pipe-1100",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2685,7 +2685,7 @@ hundo.Viz.prototype.addPalette = function() {
         },
 
         {
-            image: "pip-1001",
+            image: "pipe-1001",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2696,7 +2696,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-0101",
+            image: "pipe-0101",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: false,
@@ -2707,7 +2707,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-0110",
+            image: "pipe-0110",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: false,
@@ -2718,7 +2718,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-1010",
+            image: "pipe-1010",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2730,7 +2730,7 @@ hundo.Viz.prototype.addPalette = function() {
         },
 
         {
-            image: "pip-1101",
+            image: "pipe-1101",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2741,7 +2741,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-0111",
+            image: "pipe-0111",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: false,
@@ -2752,7 +2752,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-1110",
+            image: "pipe-1110",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2763,7 +2763,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-1011",
+            image: "pipe-1011",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -2774,7 +2774,7 @@ hundo.Viz.prototype.addPalette = function() {
             }
         },
         {
-            image: "pip-1111",
+            image: "pipe-1111",
             config: {
                 type: hundo.PieceTypeEnum.PIP,
                 up: true,
@@ -3098,24 +3098,24 @@ hundo.Viz.prototype.drawPieces = function(transformation) {
             return THIS.transform(piece, transformation);
         });
 
-    function pipTemplate(pip) {
+    function pipeTemplate(pipe) {
         
-        var connections = [pip.up, pip.down, pip.left, pip.right];
+        var connections = [pipe.up, pipe.down, pipe.left, pipe.right];
 
         var connectionString = _.map(connections, function(bool) {
                 return bool ? "1" : "0";
             })
             .join("")
-        return "#pipTemplate-" + connectionString;
+        return "#pipeTemplate-" + connectionString;
 
     }
 
     this.boardSvg.selectAll()
-        .data(this.board.getPips())
+        .data(this.board.getPipes())
         .enter()
         .append("svg:use")
         .attr("id", hundo.Viz.pieceId)
-        .attr("xlink:href", pipTemplate)
+        .attr("xlink:href", pipeTemplate)
         .attr("transform", function(piece) {
             return THIS.transform(piece, transformation);
         });
@@ -4043,7 +4043,7 @@ hundo.Compress.addRowColGroupId = function(level, levelArray, pieces) {
     levelArray.push(hundo.Compress.sep);
 }
 
-hundo.Compress.addPips = function(level, levelArray, pieces, version) {
+hundo.Compress.addPipes = function(level, levelArray, pieces, version) {
 
     if (version == 0) {
 
@@ -4125,7 +4125,7 @@ hundo.Compress.compressLevel = function(level, version) {
     
     hundo.Compress.addRowColGroupId(level, levelArray, level.portals);
     
-    hundo.Compress.addPips(level, levelArray, level.pips, version);
+    hundo.Compress.addPipes(level, levelArray, level.pipes, version);
 
     return _.join(levelArray, "");
 }
@@ -4249,7 +4249,7 @@ hundo.Compress.pullRowColGroupIdPieces = function(bytes) {
     return pieces;
 }
 
-hundo.Compress.pullPips = function(bytes, version) {
+hundo.Compress.pullPipes = function(bytes, version) {
 
     var pieces = [];
 
@@ -4270,7 +4270,7 @@ hundo.Compress.pullPips = function(bytes, version) {
                 bytes[0]) == 1 ? true : false;
             bytes.shift();
 
-            var pip = {
+            var pipe = {
                 row: r,
                 col: c,
                 up: up,
@@ -4278,7 +4278,7 @@ hundo.Compress.pullPips = function(bytes, version) {
                 left: left,
                 right: right
             }
-            pieces.push(pip);
+            pieces.push(pipe);
         }
 
     } else if (version == 1) {
@@ -4312,7 +4312,7 @@ hundo.Compress.pullPips = function(bytes, version) {
                 up = true;
             }
 
-            var pip = {
+            var pipe = {
                 row: r,
                 col: c,
                 up: up,
@@ -4321,7 +4321,7 @@ hundo.Compress.pullPips = function(bytes, version) {
                 right: right
             }
 
-            pieces.push(pip);
+            pieces.push(pipe);
         }
     } else {
         console.error("Unsupported version number: " + version);
@@ -4343,7 +4343,7 @@ hundo.Compress.decompressLevel = function(byteString) {
         gblocks: [],
         sand: [],
         portals: [],
-        pips: []
+        pipes: []
     };
 
     var r, c;
@@ -4370,7 +4370,7 @@ hundo.Compress.decompressLevel = function(byteString) {
 
     level.portals = hundo.Compress.pullRowColGroupIdPieces(bytes);
 
-    level.pips = hundo.Compress.pullPips(bytes, version);
+    level.pipes = hundo.Compress.pullPipes(bytes, version);
 
     return level;
 }
