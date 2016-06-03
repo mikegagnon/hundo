@@ -4010,6 +4010,32 @@ hundo.Compress.addDimensions = function(level, levelArray) {
     hundo.Compress.pushNumbers(levelArray, level.numRows, level.numCols);
 }
 
+hundo.Compress.addBall = function(level, levelArray) {
+    if (typeof level.ball != "undefined") {
+        hundo.Compress.pushNumbers(levelArray, level.ball.row, level.ball.col);
+    }
+
+    levelArray.push(hundo.Compress.sep);
+}
+
+hundo.Compress.addRowCol = function(level, levelArray, pieces) {
+    _.each(pieces, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
+    });
+
+    levelArray.push(hundo.Compress.sep);
+}
+
+hundo.Compress.addRowColDir = function(level, levelArray, pieces) {
+
+    _.each(pieces, function(piece){
+        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+            hundo.Compress.dirToNum(piece.dir));
+    });
+
+    levelArray.push(hundo.Compress.sep);
+}
+
 // TODO: make a class
 // assumes numRows, numCols < 32
 hundo.Compress.compressLevel = function(level, version) {
@@ -4025,31 +4051,9 @@ hundo.Compress.compressLevel = function(level, version) {
     }
 
     hundo.Compress.addDimensions(level, levelArray);
-
-    // The next two bytes encode ball.row, ball.col
-    if (typeof level.ball != "undefined") {
-        hundo.Compress.pushNumbers(levelArray, level.ball.row, level.ball.col);
-    }
-
-    // signifies beginning of blocks
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode each block as (block.row, block.col) pair
-    _.each(level.blocks, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col);
-    });
-
-    // separates blocks and goals
-    levelArray.push(hundo.Compress.sep);
-
-    // Encode the goals, like blocks
-    _.each(level.goals, function(piece){
-            hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                hundo.Compress.dirToNum(piece.dir));
-    });
-
-    // separator
-    levelArray.push(hundo.Compress.sep);
+    hundo.Compress.addBall(level, levelArray);
+    hundo.Compress.addRowCol(level, levelArray, level.blocks);
+    hundo.Compress.addRowColDir(level, levelArray, level.goals);
 
     // Encode the ice
     _.each(level.ice, function(piece){
