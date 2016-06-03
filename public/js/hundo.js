@@ -3379,12 +3379,13 @@ hundo.Viz.prototype.prevLevel = function() {
 
     this.level--;
     this.board = new hundo.Board(this.levels[this.level]);
-    this.drawBoardQuick();
-    this.updateLevelSelect();
 
     if (this.level == this.levels.length - 1) {
         this.undoAnimateVictory();
     }
+
+    this.drawBoardQuick();
+    this.updateLevelSelect();
 
 }
 
