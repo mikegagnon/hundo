@@ -4046,15 +4046,57 @@ hundo.Compress.addRowColGroupId = function(level, levelArray, pieces) {
     levelArray.push(hundo.Compress.sep);
 }
 
-hundo.Compress.addPips = function(level, levelArray, pieces) {
+hundo.Compress.addPips = function(level, levelArray, pieces, version) {
 
-    _.each(pieces, function(piece){
-        hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
-                piece.up ? 1 : 0,
-                piece.down ? 1 : 0,
-                piece.left ? 1 : 0,
-                piece.right ? 1 : 0);
-    });
+    if (version == 0) {
+
+        _.each(pieces, function(piece){
+            hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                    piece.up ? 1 : 0,
+                    piece.down ? 1 : 0,
+                    piece.left ? 1 : 0,
+                    piece.right ? 1 : 0);
+        });
+
+    } else if (version == 1) {
+
+        _.each(pieces, function(piece){
+
+            var directions = 0;
+
+            if (piece.up) {
+                directions |= 1;
+            }
+
+            directions <<= 1;
+
+            if (piece.down) {
+                directions |= 1;
+            }
+
+            directions <<= 1;
+
+            if (piece.left) {
+                directions |= 1;
+            }
+
+            directions <<= 1;
+
+            if (piece.right) {
+                directions |= 1;
+            }
+
+            console.log(piece)
+            console.log(directions)
+
+            hundo.Compress.pushNumbers(levelArray, piece.row, piece.col,
+                    directions);
+
+        });
+
+    } else {
+        console.error("Unsupported version number: " + version);
+    }
 }
 
 // TODO: make a class
@@ -4089,7 +4131,7 @@ hundo.Compress.compressLevel = function(level, version) {
     
     hundo.Compress.addRowColGroupId(level, levelArray, level.portals);
     
-    hundo.Compress.addPips(level, levelArray, level.pips);
+    hundo.Compress.addPips(level, levelArray, level.pips, version);
 
     return _.join(levelArray, "");
 }
@@ -4213,7 +4255,7 @@ hundo.Compress.pullRowColGroupIdPieces = function(bytes) {
     return pieces;
 }
 
-hundo.Compress.pullPips = function(bytes) {
+hundo.Compress.pullPips = function(bytes, version) {
 
     var pieces = [];
 
