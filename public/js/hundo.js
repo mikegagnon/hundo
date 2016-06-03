@@ -932,6 +932,8 @@ hundo.Board.prototype.getTopBottom = function(row, col) {
     return [cell[hundo.LayerEnum.TOP], cell[hundo.LayerEnum.BOTTOM]];
 }
 
+
+// return the number of pieces in cell: row, col
 hundo.Board.prototype.numPieces = function(row, col) {
 
     var count = 0;
@@ -953,8 +955,7 @@ hundo.Board.prototype.isEmptyCell = function(row, col) {
     return this.numPieces(row, col) == 0;
 }
 
-// func(piece) should return true iff the piece is of the type being gotten
-// or, if func is undefined then returns all pieces
+// returns all pieces for which func(piece) is true
 hundo.Board.prototype.getPieces = function(func) {
 
     if (!func) {
@@ -988,6 +989,7 @@ hundo.Board.prototype.getPieces = function(func) {
     return pieces;
 }
 
+// return true iff the board has exactly one ball
 hundo.Board.prototype.hasBall = function() {
 
     var balls = this.getPieces(function(piece) {
@@ -1002,6 +1004,7 @@ hundo.Board.prototype.hasBall = function() {
     return balls.length == 1;
 }
 
+// Remove all pieces in row, col
 hundo.Board.prototype.clearCell = function(row, col) {
     if (this.ball && this.ball.row == row && this.ball.col == col) {
         this.ball = undefined;
@@ -1011,6 +1014,7 @@ hundo.Board.prototype.clearCell = function(row, col) {
 
     var bottom = cell[hundo.LayerEnum.BOTTOM]
 
+    // If we are clearing out a portal, then update this.portals to reflect that
     if (bottom && bottom.type == hundo.PieceTypeEnum.PORTAL) {
 
         var i = _.findIndex(this.portals[bottom.groupId], function(portal) {
@@ -1027,8 +1031,6 @@ hundo.Board.prototype.clearCell = function(row, col) {
 
     cell[hundo.LayerEnum.TOP] = undefined;
     cell[hundo.LayerEnum.BOTTOM] = undefined;
-
-
 }
 
 // hundo.compatible[piece.type] == the array of pieces that are
@@ -1045,7 +1047,6 @@ hundo.Board.isCompatible = function(piece1, piece2) {
     });
 
     return i >= 0;
-
 }
 
 
@@ -1067,11 +1068,9 @@ hundo.Board.prototype.getOnePiece = function(row, col) {
         console.error("This code shouldn't be reachable");
         return undefined;
     }
-
 }
 
-
-// BUG: multiple balls allowed to be added
+// returns true iff piece can be added to the board
 hundo.Board.prototype.canAddPiece = function(piece) {
 
     var numPieces = this.numPieces(piece.row, piece.col);
