@@ -4072,14 +4072,23 @@ hundo.Compress.compressLevel = function(level, version) {
     }
 
     hundo.Compress.addDimensions(level, levelArray);
+    
     hundo.Compress.addBall(level, levelArray);
+    
     hundo.Compress.addRowCol(level, levelArray, level.blocks);
+    
     hundo.Compress.addRowColDir(level, levelArray, level.goals);
+    
     hundo.Compress.addRowCol(level, levelArray, level.ice);
+    
     hundo.Compress.addRowColDir(level, levelArray, level.arrows);
+    
     hundo.Compress.addRowColGroupId(level, levelArray, level.gblocks);
+    
     hundo.Compress.addRowCol(level, levelArray, level.sand);
+    
     hundo.Compress.addRowColGroupId(level, levelArray, level.portals);
+    
     hundo.Compress.addPips(level, levelArray, level.pips);
 
     return _.join(levelArray, "");
